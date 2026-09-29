@@ -8,7 +8,7 @@ import { LayoutDashboard, User, UserRound } from "lucide-react";
 import { useAccount } from "@/lib/account-context";
 
 const iconButtonClass =
-  "relative flex h-10 w-10 items-center justify-center rounded-full text-black/70 transition-colors hover:bg-black/5";
+  "relative flex h-11 w-11 items-center justify-center rounded-full text-black/70 transition-colors hover:bg-black/5";
 
 function SessionDot() {
   return <span aria-hidden className="absolute right-2 top-2 h-2 w-2 rounded-pill border-2 border-white bg-accent" />;

@@ -6,6 +6,7 @@ import { ArrowLeft, Globe2, UtensilsCrossed, Wine } from "lucide-react";
 import { getProductBySku } from "@/lib/catalog";
 import { formatMXN } from "@/lib/pricing";
 import AddToCartButton from "@/components/AddToCartButton";
+import HealthNotice from "@/components/HealthNotice";
 import FavoriteButton from "@/components/FavoriteButton";
 import ProductVideoLoop from "@/components/ProductVideoLoop";
 
@@ -100,6 +101,8 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
               <FavoriteButton productId={product.id} productName={product.name} size="lg" />
             </div>
           </div>
+          <p className="text-xs text-muted">Precio final en MXN con IVA e IEPS incluidos.</p>
+          <HealthNotice />
         </div>
       </div>
 

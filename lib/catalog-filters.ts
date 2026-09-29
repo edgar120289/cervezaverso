@@ -1,5 +1,8 @@
 import type { Product } from "@/lib/types";
 
+/** Parámetro de URL con el texto buscado desde el header (`/?q=…`). */
+export const SEARCH_PARAM = "q";
+
 /** Filtros del catálogo de la tienda. Se aplican en el cliente sobre el catálogo ya cargado. */
 export type CatalogFilters = {
   query: string;

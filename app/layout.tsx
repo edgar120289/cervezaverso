@@ -46,13 +46,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   const capasCirculares = listPublicImages(MEDIA_DIRS.capasCirculares);
 
   return (
-    <html lang="es" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[#f2f4f5]">
+    <html lang="es-MX" className={`${inter.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col bg-canvas">
+        <a
+          href="#contenido"
+          className="sr-only rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200]"
+        >
+          Saltar al contenido
+        </a>
         <AccountProvider>
           <CartProvider>
             <AgeGateModal logoImages={capasCirculares} logoFrame={`/${MEDIA_DIRS.marcoCircular}`} />
             <Header logoImages={tarros} />
-            <main className="flex-1">{children}</main>
+            <main id="contenido" tabIndex={-1} className="flex-1 outline-none">
+              {children}
+            </main>
             <Footer logoImages={capasCirculares} logoFrame={`/${MEDIA_DIRS.marcoCircular}`} />
             <CartDrawer />
             <WhatsAppFAB />

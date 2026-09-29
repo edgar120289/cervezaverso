@@ -1,6 +1,7 @@
 "use client";
 
-import { useDeferredValue, useMemo, useState, type ReactNode } from "react";
+import { useDeferredValue, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import type { Product } from "@/lib/types";
@@ -12,6 +13,7 @@ import {
   matchesFilters,
   normalize,
   PRICE_PRESETS,
+  SEARCH_PARAM,
   type CatalogFilters,
   type FacetOption,
 } from "@/lib/catalog-filters";
@@ -226,8 +228,22 @@ function FilterPanel({
 
 /** Catálogo con buscador y filtros en tiempo real (País, Precio, ABV, Estilo y Cervecería). */
 export default function CatalogBrowser({ products }: { products: Product[] }) {
-  const [filters, setFilters] = useState<CatalogFilters>(EMPTY_FILTERS);
+  const urlQuery = useSearchParams().get(SEARCH_PARAM) ?? "";
+  const [filters, setFilters] = useState<CatalogFilters>(() => ({ ...EMPTY_FILTERS, query: urlQuery }));
+  const [appliedUrlQuery, setAppliedUrlQuery] = useState(urlQuery);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Búsqueda nueva desde el header (`/?q=`): se aplica durante el render, sin efecto de más.
+  if (urlQuery !== appliedUrlQuery) {
+    setAppliedUrlQuery(urlQuery);
+    setFilters((current) => ({ ...current, query: urlQuery }));
+  }
+
+  useEffect(() => {
+    if (!urlQuery) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.getElementById("catalogo")?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+  }, [urlQuery]);
   // El texto se filtra con prioridad baja: escribir nunca se siente trabado.
   const deferredFilters = useDeferredValue(filters);
 

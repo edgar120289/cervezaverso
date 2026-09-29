@@ -2,6 +2,7 @@ import Link from "next/link";
 import MultiverseLogo from "./MultiverseLogo";
 import { FacebookIcon, InstagramIcon, WhatsAppIcon } from "./SocialIcons";
 import { CONTACT } from "@/lib/site";
+import HealthNotice from "./HealthNotice";
 
 const SOCIAL_LINKS = [
   { icon: InstagramIcon, href: CONTACT.instagramUrl, label: `Instagram ${CONTACT.handle}` },
@@ -51,7 +52,8 @@ export default function Footer({ logoImages, logoFrame }: FooterProps) {
         <div className="mt-8 flex flex-col-reverse items-center gap-5 border-t border-black/5 pt-6 text-xs text-black/40 sm:flex-row sm:justify-between">
           <div className="text-center sm:text-left">
             <p>© {new Date().getFullYear()} Cervezaverso. Todos los derechos reservados.</p>
-            <p className="mt-1">Venta exclusiva para mayores de 18 años. Evita el exceso.</p>
+            <p className="mt-1">Venta exclusiva para mayores de 18 años.</p>
+            <HealthNotice className="mt-1" />
           </div>
 
           <div className="flex items-center gap-2">
