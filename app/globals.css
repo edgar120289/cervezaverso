@@ -1,26 +1,94 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-canvas-mist: #f2f4f5;
+  --color-canvas: var(--color-canvas-mist);
+  --color-surface: #ffffff;
+  --color-ink: #000000;
+  --color-accent: #5433eb;
+  --color-accent-shadow: rgba(69, 36, 219, 0.34);
+  --shadow-card: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px;
+  --shadow-accent: rgba(69, 36, 219, 0.34) 0px 4px 24px 0px;
+  --radius-card: 28px;
+  --radius-media: 20px;
+  --radius-pill: 9999px;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-canvas: var(--color-canvas);
+  --color-surface: var(--color-surface);
+  --color-ink: var(--color-ink);
+  --color-accent: var(--color-accent);
+  --radius-card: var(--radius-card);
+  --radius-media: var(--radius-media);
+  --radius-pill: var(--radius-pill);
+  --font-sans: "GT Standard", var(--font-inter), "Inter", system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-canvas);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: "GT Standard", var(--font-inter), "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.03em;
+}
+
+/* En @layer base para que utilidades como `border-accent/20` puedan sobrescribirlo. */
+@layer base {
+  * {
+    border-color: transparent;
+  }
+}
+
+/* Jerarquía por tracking, no por peso: sólo regular (400) y semibold (600). */
+@layer base {
+  h1 {
+    letter-spacing: -0.05em;
+    font-weight: 600;
+  }
+  h2,
+  h3 {
+    letter-spacing: -0.04em;
+    font-weight: 600;
+  }
+  strong,
+  b {
+    font-weight: 600;
+  }
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.shadow-card {
+  box-shadow: var(--shadow-card);
+}
+
+.shadow-accent {
+  box-shadow: var(--shadow-accent);
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Destello que recorre el CTA del Hero. */
+@keyframes shine {
+  0%,
+  60% {
+    transform: translateX(0) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(400%) skewX(-12deg);
+  }
 }

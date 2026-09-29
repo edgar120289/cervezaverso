@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cervezaverso
 
-## Getting Started
+Tienda en línea de cerveza artesanal nacional e importada. Next.js (App
+Router) + TypeScript + Tailwind v4 + Framer Motion + Supabase.
 
-First, run the development server:
+## Empezar
 
 ```bash
+npm install
+cp .env.example .env.local   # completa tus llaves de Supabase / OpenAI
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Base de datos
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Crea un proyecto en [Supabase](https://supabase.com).
+2. Corre `supabase/schema.sql` en el SQL editor del proyecto (tablas
+   `users`, `products`, `pedidos`, `favorites` con RLS).
+3. Copia la URL y las llaves (`anon` y `service_role`) a `.env.local`.
+4. Para crear el primer admin: registra una cuenta desde `/login` y luego
+   actualiza manualmente su fila en `public.users` con
+   `role = 'admin'`.
 
-## Learn More
+## Importar catálogo desde Excel
 
-To learn more about Next.js, take a look at the following resources:
+Como administrador, entra a `/admin/import` y sube el archivo `.xlsx`
+con la pestaña **LISTA MONASTERIO**. El precio de venta se calcula
+automáticamente con la fórmula obligatoria del SPEC:
+`Math.floor((cost_price * 1.5) / 5) * 5`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Enriquecimiento con IA
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`POST /api/ai/enrich` con `{ product_id }` genera `description_ai` y
+`pairing_ai` vía OpenAI (requiere `OPENAI_API_KEY`).
 
-## Deploy on Vercel
+## Assets pendientes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `public/multiverso/jar-*.svg` son placeholders del logo dinámico;
+  reemplázalos con los tarros reales del multiverso.
+- `public/video/hero-broll.mp4` y `public/video/sommelier-broll.mp4` no
+  existen aún: agrega los videos B-roll reales (el sitio funciona sin
+  ellos, mostrando el fondo oscuro de respaldo).
+- Pagos: preparado para Stripe / Mercado Pago en modo sandbox; falta
+  conectar las llaves y el flujo real de cobro en `/carrito`.

@@ -1,0 +1,379 @@
+"use client";
+
+import { useDeferredValue, useMemo, useState, type ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Search, SlidersHorizontal, X } from "lucide-react";
+import type { Product } from "@/lib/types";
+import {
+  ABV_RANGES,
+  activeFilterCount,
+  EMPTY_FILTERS,
+  facetOptions,
+  matchesFilters,
+  normalize,
+  PRICE_PRESETS,
+  type CatalogFilters,
+  type FacetOption,
+} from "@/lib/catalog-filters";
+import { formatMXN } from "@/lib/pricing";
+import ProductCard from "./ProductCard";
+
+type Facet = "countries" | "styles" | "breweries";
+
+const COLLAPSED_OPTIONS = 6;
+const SEARCHABLE_OPTIONS = 10;
+
+function chipClass(active: boolean) {
+  return `rounded-full px-3.5 py-2 text-xs font-semibold transition-colors ${
+    active ? "bg-black text-white" : "bg-[#f2f4f5] text-black/65 hover:bg-black/10 hover:text-black"
+  }`;
+}
+
+function FilterSection({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <fieldset className="border-t border-black/5 pt-4 first:border-0 first:pt-0">
+      <legend className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-black/45">{title}</legend>
+      {children}
+    </fieldset>
+  );
+}
+
+function CheckboxList({
+  options,
+  selected,
+  onToggle,
+}: {
+  options: FacetOption[];
+  selected: string[];
+  onToggle: (value: string) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [search, setSearch] = useState("");
+  const term = normalize(search);
+  // Seleccionados primero, luego los que tienen resultados: lo útil queda arriba.
+  const sorted = [...options].sort(
+    (a, b) =>
+      Number(selected.includes(b.value)) - Number(selected.includes(a.value)) ||
+      Number(b.count > 0) - Number(a.count > 0)
+  );
+  const matching = term ? sorted.filter((o) => normalize(o.value).includes(term)) : sorted;
+  const visible = expanded || term ? matching : matching.slice(0, COLLAPSED_OPTIONS);
+
+  return (
+    <div className="space-y-0.5">
+      {options.length > SEARCHABLE_OPTIONS && (
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={`Buscar entre ${options.length}…`}
+          className="mb-1.5 w-full rounded-full bg-[#f2f4f5] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-black/15"
+        />
+      )}
+      {term && matching.length === 0 && <p className="px-2 py-1.5 text-xs text-black/40">Sin coincidencias.</p>}
+      {visible.map(({ value, count }) => {
+        const checked = selected.includes(value);
+        const disabled = count === 0 && !checked;
+        return (
+          <label
+            key={value}
+            className={`flex cursor-pointer items-center gap-2.5 rounded-xl px-2 py-1.5 text-sm transition-colors hover:bg-[#f2f4f5] ${
+              disabled ? "opacity-40" : ""
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={checked}
+              disabled={disabled}
+              onChange={() => onToggle(value)}
+              className="h-4 w-4 shrink-0 cursor-pointer rounded accent-[#5433eb]"
+            />
+            <span className="min-w-0 flex-1 truncate">{value}</span>
+            <span className="text-xs tabular-nums text-black/35">{count}</span>
+          </label>
+        );
+      })}
+      {!term && matching.length > COLLAPSED_OPTIONS && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="px-2 pt-1 text-xs font-semibold text-accent hover:underline"
+        >
+          {expanded ? "Ver menos" : `Ver todos (${matching.length})`}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function parsePrice(value: string): number | null {
+  if (value.trim() === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+function FilterPanel({
+  products,
+  filters,
+  setFilters,
+}: {
+  products: Product[];
+  filters: CatalogFilters;
+  setFilters: (update: (current: CatalogFilters) => CatalogFilters) => void;
+}) {
+  const countries = useMemo(() => facetOptions(products, filters, "countries"), [products, filters]);
+  const styles = useMemo(() => facetOptions(products, filters, "styles"), [products, filters]);
+  const breweries = useMemo(() => facetOptions(products, filters, "breweries"), [products, filters]);
+
+  function toggle(facet: Facet, value: string) {
+    setFilters((current) => ({
+      ...current,
+      [facet]: current[facet].includes(value)
+        ? current[facet].filter((v) => v !== value)
+        : [...current[facet], value],
+    }));
+  }
+
+  return (
+    <div className="space-y-4">
+      <FilterSection title="Precio">
+        <div className="flex flex-wrap gap-1.5">
+          {PRICE_PRESETS.map((preset) => {
+            const active = filters.minPrice === preset.min && filters.maxPrice === preset.max;
+            return (
+              <button
+                key={preset.label}
+                type="button"
+                aria-pressed={active}
+                onClick={() =>
+                  setFilters((c) => ({
+                    ...c,
+                    minPrice: active ? null : preset.min,
+                    maxPrice: active ? null : preset.max,
+                  }))
+                }
+                className={chipClass(active)}
+              >
+                {preset.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-2.5 flex items-center gap-2">
+          <input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            placeholder="Mín"
+            aria-label="Precio mínimo"
+            value={filters.minPrice ?? ""}
+            onChange={(e) => setFilters((c) => ({ ...c, minPrice: parsePrice(e.target.value) }))}
+            className="w-full min-w-0 rounded-full bg-[#f2f4f5] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-black/15"
+          />
+          <span className="text-black/30">–</span>
+          <input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            placeholder="Máx"
+            aria-label="Precio máximo"
+            value={filters.maxPrice ?? ""}
+            onChange={(e) => setFilters((c) => ({ ...c, maxPrice: parsePrice(e.target.value) }))}
+            className="w-full min-w-0 rounded-full bg-[#f2f4f5] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-black/15"
+          />
+        </div>
+      </FilterSection>
+
+      <FilterSection title="Nivel de alcohol">
+        <div className="flex flex-wrap gap-1.5">
+          {ABV_RANGES.map((range) => {
+            const active = filters.abv === range.id;
+            return (
+              <button
+                key={range.id}
+                type="button"
+                aria-pressed={active}
+                onClick={() => setFilters((c) => ({ ...c, abv: active ? null : range.id }))}
+                className={chipClass(active)}
+              >
+                {range.label}
+              </button>
+            );
+          })}
+        </div>
+      </FilterSection>
+
+      {countries.length > 0 && (
+        <FilterSection title="País">
+          <CheckboxList options={countries} selected={filters.countries} onToggle={(v) => toggle("countries", v)} />
+        </FilterSection>
+      )}
+
+      {styles.length > 0 && (
+        <FilterSection title="Estilo">
+          <CheckboxList options={styles} selected={filters.styles} onToggle={(v) => toggle("styles", v)} />
+        </FilterSection>
+      )}
+
+      {breweries.length > 0 && (
+        <FilterSection title="Marca / Cervecería">
+          <CheckboxList options={breweries} selected={filters.breweries} onToggle={(v) => toggle("breweries", v)} />
+        </FilterSection>
+      )}
+    </div>
+  );
+}
+
+/** Catálogo con buscador y filtros en tiempo real (País, Precio, ABV, Estilo y Cervecería). */
+export default function CatalogBrowser({ products }: { products: Product[] }) {
+  const [filters, setFilters] = useState<CatalogFilters>(EMPTY_FILTERS);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  // El texto se filtra con prioridad baja: escribir nunca se siente trabado.
+  const deferredFilters = useDeferredValue(filters);
+
+  const results = useMemo(
+    () => products.filter((product) => matchesFilters(product, deferredFilters)),
+    [products, deferredFilters]
+  );
+  const activeCount = activeFilterCount(filters);
+  const hasAnyFilter = activeCount > 0 || filters.query.trim() !== "";
+
+  const activeChips: { key: string; label: string; clear: () => void }[] = [
+    ...(["countries", "styles", "breweries"] as const).flatMap((facet) =>
+      filters[facet].map((value) => ({
+        key: `${facet}:${value}`,
+        label: value,
+        clear: () => setFilters((c) => ({ ...c, [facet]: c[facet].filter((v) => v !== value) })),
+      }))
+    ),
+    ...(filters.minPrice !== null || filters.maxPrice !== null
+      ? [
+          {
+            key: "price",
+            label:
+              filters.minPrice !== null && filters.maxPrice !== null
+                ? `${formatMXN(filters.minPrice)} – ${formatMXN(filters.maxPrice)}`
+                : filters.minPrice !== null
+                  ? `Desde ${formatMXN(filters.minPrice)}`
+                  : `Hasta ${formatMXN(filters.maxPrice!)}`,
+            clear: () => setFilters((c) => ({ ...c, minPrice: null, maxPrice: null })),
+          },
+        ]
+      : []),
+    ...(filters.abv
+      ? [
+          {
+            key: "abv",
+            label: ABV_RANGES.find((r) => r.id === filters.abv)!.label,
+            clear: () => setFilters((c) => ({ ...c, abv: null })),
+          },
+        ]
+      : []),
+  ];
+
+  const panel = <FilterPanel products={products} filters={filters} setFilters={setFilters} />;
+
+  return (
+    <div className="lg:grid lg:grid-cols-[250px_1fr] lg:items-start lg:gap-6">
+      {/* Sidebar (escritorio) */}
+      <aside
+        aria-label="Filtros del catálogo"
+        className="hidden max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-[28px] bg-white p-5 shadow-card lg:sticky lg:top-24 lg:block"
+      >
+        {panel}
+      </aside>
+
+      <div className="min-w-0 space-y-4">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-black/35" />
+            <input
+              type="search"
+              value={filters.query}
+              onChange={(e) => setFilters((c) => ({ ...c, query: e.target.value }))}
+              placeholder="Busca por nombre, estilo, país o cervecería"
+              aria-label="Buscar cervezas"
+              className="w-full rounded-full bg-white py-3.5 pl-11 pr-5 text-sm shadow-card outline-none focus:ring-2 focus:ring-black/15"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => setMobileOpen((open) => !open)}
+            aria-expanded={mobileOpen}
+            className="flex shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold shadow-card lg:hidden"
+          >
+            <SlidersHorizontal size={16} />
+            Filtros
+            {activeCount > 0 && (
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[11px] text-white">
+                {activeCount}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {/* Panel plegable (móvil y tablet) */}
+        <AnimatePresence initial={false}>
+          {mobileOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="overflow-hidden lg:hidden"
+            >
+              <div className="rounded-[28px] bg-white p-5 shadow-card">{panel}</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="mr-1 text-sm text-black/50" aria-live="polite">
+            {results.length} {results.length === 1 ? "cerveza" : "cervezas"}
+          </p>
+          {activeChips.map((chip) => (
+            <button
+              key={chip.key}
+              type="button"
+              onClick={chip.clear}
+              aria-label={`Quitar filtro ${chip.label}`}
+              className="flex items-center gap-1 rounded-full bg-white py-1.5 pl-3 pr-2 text-xs font-semibold shadow-card hover:bg-black hover:text-white"
+            >
+              {chip.label}
+              <X size={13} />
+            </button>
+          ))}
+          {hasAnyFilter && (
+            <button
+              type="button"
+              onClick={() => setFilters(EMPTY_FILTERS)}
+              className="text-xs font-semibold text-accent hover:underline"
+            >
+              Limpiar todo
+            </button>
+          )}
+        </div>
+
+        {results.length === 0 ? (
+          <div className="rounded-[28px] bg-white px-6 py-14 text-center shadow-card">
+            <p className="text-lg font-semibold tracking-[-0.03em]">Ninguna cerveza coincide</p>
+            <p className="mt-1 text-sm text-black/50">Prueba con otros filtros o una búsqueda más corta.</p>
+            <button
+              type="button"
+              onClick={() => setFilters(EMPTY_FILTERS)}
+              className="mt-5 rounded-full bg-[#5433eb] px-6 py-3 text-sm font-semibold text-white shadow-accent"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            {results.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
