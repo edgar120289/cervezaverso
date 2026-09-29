@@ -8,6 +8,7 @@ import Honeypot from "@/components/Honeypot";
 import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import FormField, { INPUT_CLASS } from "@/components/FormField";
 import FormMessage from "@/components/FormMessage";
+import PrivacyNotice from "@/components/PrivacyNotice";
 
 type Mode = "signin" | "signup";
 
@@ -159,19 +160,11 @@ export default function LoginForm({ next, notice: initialNotice }: { next: strin
             {isLoading ? "Cargando…" : mode === "signin" ? "Entrar" : "Registrarme"}
           </button>
 
-          {mode === "signup" && (
-            <p className="px-2 text-xs leading-relaxed text-muted">
-              Al registrarte aceptas los{" "}
-              <Link href="/terminos" className="underline underline-offset-2 hover:text-black">
-                Términos
-              </Link>{" "}
-              y el tratamiento de tus datos conforme al{" "}
-              <Link href="/privacidad" className="underline underline-offset-2 hover:text-black">
-                Aviso de Privacidad
-              </Link>
-              .
-            </p>
-          )}
+          <PrivacyNotice className="px-2">
+            {mode === "signup"
+              ? "Usamos tus datos para crear tu cuenta, verificar tu mayoría de edad y gestionar tus pedidos."
+              : "Usamos tu correo para identificarte y proteger tu cuenta."}
+          </PrivacyNotice>
         </form>
 
         <button

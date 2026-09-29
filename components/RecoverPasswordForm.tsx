@@ -8,6 +8,7 @@ import Honeypot from "@/components/Honeypot";
 import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import FormField, { INPUT_CLASS } from "@/components/FormField";
 import FormMessage from "@/components/FormMessage";
+import PrivacyNotice from "@/components/PrivacyNotice";
 
 export default function RecoverPasswordForm() {
   const [email, setEmail] = useState("");
@@ -79,6 +80,7 @@ export default function RecoverPasswordForm() {
             >
               {isLoading ? "Enviando…" : "Enviar enlace"}
             </button>
+            <PrivacyNotice className="px-2">Usamos tu correo sólo para enviarte el enlace de recuperación.</PrivacyNotice>
           </form>
         )}
 

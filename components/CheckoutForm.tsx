@@ -22,6 +22,7 @@ import Honeypot from "@/components/Honeypot";
 import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import FormField from "@/components/FormField";
 import HealthNotice from "@/components/HealthNotice";
+import PrivacyNotice from "@/components/PrivacyNotice";
 import type { Direccion, DireccionEnvio } from "@/lib/types";
 
 const NUEVA = "nueva";
@@ -470,6 +471,9 @@ export default function CheckoutForm({
           Te contactaremos para coordinar el pago. Muy pronto podrás pagar en línea con Mercado Pago.
         </p>
         <HealthNotice className="text-center" />
+        <PrivacyNotice className="text-center">
+          Usamos tus datos para procesar y entregar tu pedido y verificar que eres mayor de edad.
+        </PrivacyNotice>
       </aside>
     </form>
   );

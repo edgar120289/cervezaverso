@@ -13,8 +13,8 @@ type LegalPageProps = {
 
 /**
  * Maqueta editorial para páginas legales: índice lateral fijo en escritorio y
- * columna de lectura de ~70 caracteres. Los textos son de relleno hasta tener
- * la versión revisada; basta con reemplazar el `body` de cada sección.
+ * columna de lectura de ~70 caracteres. Todo texto legal se publica como
+ * borrador hasta que lo revise un especialista.
  */
 export default function LegalPage({ eyebrow, title, intro, updatedAt, sections }: LegalPageProps) {
   return (
@@ -50,8 +50,8 @@ export default function LegalPage({ eyebrow, title, intro, updatedAt, sections }
         </nav>
 
         <article className="rounded-[28px] bg-white px-6 py-8 shadow-card sm:px-12 sm:py-12">
-          <p className="mb-10 rounded-[20px] bg-canvas px-5 py-4 text-sm text-muted">
-            Documento en preparación: el texto definitivo está pendiente de revisión legal.
+          <p role="note" className="mb-10 rounded-[20px] bg-canvas px-5 py-4 text-sm font-semibold text-ink">
+            Borrador · Pendiente de revisión legal.
           </p>
           <div className="space-y-12">
             {sections.map((section, i) => (
