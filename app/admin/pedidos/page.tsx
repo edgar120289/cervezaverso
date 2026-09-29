@@ -55,18 +55,18 @@ export default async function AdminPedidosPage({
       </div>
 
       {error ? (
-        <div className="rounded-[28px] bg-white p-6 text-sm text-red-600 shadow-card">
+        <div className="rounded-[28px] bg-white p-6 text-sm text-danger shadow-card">
           No se pudieron cargar los pedidos: {error.message}
         </div>
       ) : pedidos.length === 0 ? (
-        <div className="rounded-[28px] bg-white p-10 text-center text-sm text-black/50 shadow-card">
+        <div className="rounded-[28px] bg-white p-10 text-center text-sm text-muted shadow-card">
           {estadoActivo
             ? `No hay pedidos con estado “${estadoActivo}”.`
             : "Todavía no hay pedidos."}
         </div>
       ) : (
         <ul className="space-y-3">
-          <li className="hidden grid-cols-[2fr_1.5fr_1fr_1fr] gap-4 px-6 text-xs font-semibold uppercase tracking-wide text-black/40 sm:grid">
+          <li className="hidden grid-cols-[2fr_1.5fr_1fr_1fr] gap-4 px-6 text-xs font-semibold uppercase tracking-wide text-muted sm:grid">
             <span>Cliente</span>
             <span>Fecha</span>
             <span>Estado</span>
@@ -79,7 +79,7 @@ export default async function AdminPedidosPage({
             >
               <div className="col-span-2 min-w-0 sm:col-span-1">
                 <p className="truncate font-semibold">{pedido.cliente_nombre}</p>
-                <p className="truncate text-sm text-black/50">{pedido.cliente_email}</p>
+                <p className="truncate text-sm text-muted">{pedido.cliente_email}</p>
               </div>
               <p className="col-span-2 text-sm text-black/60 sm:col-span-1">
                 {formatFecha(pedido.fecha)}

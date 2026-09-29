@@ -14,7 +14,7 @@ export default function Home() {
 
         <section id="catalogo" className="scroll-mt-24 pt-8">
           <h2 className="text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">Catálogo</h2>
-          <p className="mb-5 mt-1 text-black/50">Nacional e importada, para cada ocasión.</p>
+          <p className="mb-5 mt-1 text-muted">Nacional e importada, para cada ocasión.</p>
           <Suspense fallback={<ProductGridSkeleton />}>
             <Catalog />
           </Suspense>

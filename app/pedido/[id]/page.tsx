@@ -55,7 +55,7 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
             <CircleCheck size={28} />
           </span>
           <h1 className="text-3xl font-semibold tracking-[-0.04em]">¡Gracias por tu pedido!</h1>
-          <p className="max-w-md text-black/55">
+          <p className="max-w-md text-muted">
             Recibimos tu pedido <span className="font-semibold text-black">#{folio(pedido.id)}</span>. Te
             escribiremos a <span className="font-semibold text-black">{pedido.cliente_email}</span> para
             coordinar el pago y el envío.
@@ -64,7 +64,7 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="text-3xl font-semibold tracking-tight">Pedido #{folio(pedido.id)}</h1>
-          <Link href="/cuenta" className="text-sm font-semibold text-black/50 hover:text-black">
+          <Link href="/cuenta" className="text-sm font-semibold text-muted hover:text-black">
             ← Mis pedidos
           </Link>
         </div>
@@ -73,7 +73,7 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
       <section className="rounded-[28px] bg-white p-6 shadow-card">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-semibold tracking-tight">Resumen de la compra</h2>
-          <div className="flex items-center gap-2 text-sm text-black/45">
+          <div className="flex items-center gap-2 text-sm text-muted">
             {formatFecha(pedido.fecha)}
             <span className={`rounded-full px-3 py-1 text-xs font-semibold ${ESTADO_BADGE[pedido.estado]}`}>
               {pedido.estado}
@@ -86,7 +86,7 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
             <li key={item.id} className="flex items-center justify-between gap-4 py-3 text-sm">
               <div className="min-w-0">
                 <p className="font-semibold">{item.nombre}</p>
-                <p className="text-black/45 tabular-nums">
+                <p className="text-muted tabular-nums">
                   {item.cantidad} × {formatMXN(Number(item.precio_unitario))}
                 </p>
               </div>
@@ -122,7 +122,7 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
       <div className="grid gap-4 sm:grid-cols-2">
         <section className="rounded-[28px] bg-white p-6 shadow-card">
           <h2 className="mb-3 flex items-center gap-2 font-semibold tracking-tight">
-            <MapPin size={18} className="text-black/40" /> Envío a
+            <MapPin size={18} className="text-muted" /> Envío a
           </h2>
           {d ? (
             <div className="space-y-0.5 text-sm text-black/60">
@@ -135,19 +135,19 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
                 {d.estado}, C.P. {d.codigo_postal}
               </p>
               <p>Tel. {d.telefono}</p>
-              {d.referencias && <p className="pt-1 text-black/45">Ref.: {d.referencias}</p>}
+              {d.referencias && <p className="pt-1 text-muted">Ref.: {d.referencias}</p>}
             </div>
           ) : (
-            <p className="text-sm text-black/45">Sin dirección registrada.</p>
+            <p className="text-sm text-muted">Sin dirección registrada.</p>
           )}
         </section>
 
         <section className="rounded-[28px] bg-white p-6 shadow-card">
           <h2 className="mb-3 flex items-center gap-2 font-semibold tracking-tight">
-            <Truck size={18} className="text-black/40" /> Método de envío
+            <Truck size={18} className="text-muted" /> Método de envío
           </h2>
           <p className="text-sm font-semibold">{envio.label}</p>
-          <p className="text-sm text-black/55">
+          <p className="text-sm text-muted">
             {pedido.metodo_envio === "local"
               ? "Sin costo · Entrega en 2 a 3 días hábiles."
               : "Paquetería a toda la República."}
@@ -157,14 +157,14 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
 
       <section className="rounded-[28px] bg-white p-6 shadow-card">
         <h2 className="mb-3 flex items-center gap-2 font-semibold tracking-tight">
-          <MessageSquareText size={18} className="text-black/40" /> Notas o instrucciones especiales
+          <MessageSquareText size={18} className="text-muted" /> Notas o instrucciones especiales
         </h2>
         {pedido.notas ? (
           <p className="whitespace-pre-line rounded-[20px] bg-canvas px-5 py-4 text-sm text-black/70">
             {pedido.notas}
           </p>
         ) : (
-          <p className="text-sm text-black/40">Sin notas para este pedido.</p>
+          <p className="text-sm text-muted">Sin notas para este pedido.</p>
         )}
       </section>
 

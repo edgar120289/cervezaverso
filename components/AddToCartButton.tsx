@@ -17,7 +17,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
         addItem(product);
         openDrawer();
       }}
-      className="w-full rounded-full bg-[#5433eb] px-7 py-3.5 font-semibold text-white shadow-accent transition hover:brightness-110 disabled:cursor-not-allowed disabled:bg-black/10 disabled:text-black/40 disabled:shadow-none sm:w-auto"
+      className="w-full rounded-full bg-accent px-7 py-3.5 font-semibold text-white shadow-accent transition hover:brightness-110 disabled:cursor-not-allowed disabled:bg-black/10 disabled:text-muted disabled:shadow-none sm:w-auto"
     >
       {isOutOfStock ? "Agotada" : "Agregar al carrito"}
     </motion.button>

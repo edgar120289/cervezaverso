@@ -8,7 +8,7 @@ import { firstIssue, promoCreateSchema } from "@/lib/validation";
 import type { DiscountType } from "@/lib/types";
 
 const inputClass =
-  "w-full rounded-full bg-[#f2f4f5] px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-black/15";
+  "w-full rounded-full bg-canvas px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-black/15";
 
 function toNumber(value: string): number {
   return value.trim() === "" ? NaN : Number(value);
@@ -78,14 +78,14 @@ export default function PromoCreateForm() {
             >
               <Icon size={16} className="text-accent" />
               <p className="mt-1.5 text-xs font-semibold">{preset.label}</p>
-              <p className="text-[11px] text-black/45">{preset.hint}</p>
+              <p className="text-[11px] text-muted">{preset.hint}</p>
             </button>
           );
         })}
       </div>
 
       <label className="block space-y-1.5">
-        <span className="px-2 text-xs font-semibold uppercase tracking-wide text-black/45">Código</span>
+        <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted">Código</span>
         <input
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase().replace(/\s/g, ""))}
@@ -95,7 +95,7 @@ export default function PromoCreateForm() {
         />
       </label>
 
-      <div role="radiogroup" aria-label="Tipo de descuento" className="grid grid-cols-2 gap-1 rounded-full bg-[#f2f4f5] p-1">
+      <div role="radiogroup" aria-label="Tipo de descuento" className="grid grid-cols-2 gap-1 rounded-full bg-canvas p-1">
         {(["percent", "fixed"] as const).map((option) => (
           <button
             key={option}
@@ -104,7 +104,7 @@ export default function PromoCreateForm() {
             aria-checked={type === option}
             onClick={() => setType(option)}
             className={`rounded-full py-2 text-sm font-semibold transition-colors ${
-              type === option ? "bg-white shadow-card" : "text-black/50 hover:text-black"
+              type === option ? "bg-white shadow-card" : "text-muted hover:text-black"
             }`}
           >
             {option === "percent" ? "Porcentaje" : "Monto fijo"}
@@ -114,7 +114,7 @@ export default function PromoCreateForm() {
 
       <div className="grid grid-cols-2 gap-3">
         <label className="block space-y-1.5">
-          <span className="px-2 text-xs font-semibold uppercase tracking-wide text-black/45">
+          <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted">
             {type === "percent" ? "Descuento (%)" : "Monto (MXN)"}
           </span>
           <input
@@ -128,7 +128,7 @@ export default function PromoCreateForm() {
           />
         </label>
         <label className="block space-y-1.5">
-          <span className="px-2 text-xs font-semibold uppercase tracking-wide text-black/45">Compra mín.</span>
+          <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted">Compra mín.</span>
           <input
             type="number"
             min={0}
@@ -141,7 +141,7 @@ export default function PromoCreateForm() {
       </div>
 
       <label className="block space-y-1.5">
-        <span className="px-2 text-xs font-semibold uppercase tracking-wide text-black/45">Usos máximos</span>
+        <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted">Usos máximos</span>
         <input
           type="number"
           min={1}
@@ -151,19 +151,19 @@ export default function PromoCreateForm() {
           placeholder="Ilimitados"
           className={inputClass}
         />
-        <span className="block px-2 text-xs text-black/40">
+        <span className="block px-2 text-xs text-muted">
           Usa 1 para tarjetas de regalo: después del primer pedido el código deja de servir.
         </span>
       </label>
 
       {type === "fixed" && toNumber(value) > 0 && (
-        <p className="rounded-[20px] bg-[#f2f4f5] px-4 py-3 text-xs text-black/55">
+        <p className="rounded-[20px] bg-canvas px-4 py-3 text-xs text-muted">
           Si el pedido es menor a {formatMXN(toNumber(value))}, el descuento se limita al subtotal y el saldo
           restante no se conserva.
         </p>
       )}
 
-      {error && <p className="px-2 text-sm text-red-500">{error}</p>}
+      {error && <p className="px-2 text-sm text-danger">{error}</p>}
       {notice && (
         <p className="rounded-[20px] border border-accent/20 bg-accent/5 px-4 py-3 text-sm text-black/70">{notice}</p>
       )}
@@ -171,7 +171,7 @@ export default function PromoCreateForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full rounded-full bg-[#5433eb] py-3.5 font-semibold text-white shadow-accent transition-transform active:scale-[0.98] disabled:opacity-60"
+        className="w-full rounded-full bg-accent py-3.5 font-semibold text-white shadow-accent transition-transform active:scale-[0.98] disabled:opacity-60"
       >
         {isPending ? "Creando…" : "Crear código"}
       </button>

@@ -231,8 +231,8 @@ export default function CheckoutForm({
                       </span>
                     )}
                   </p>
-                  <p className="mt-0.5 text-sm text-black/55">{formatDireccion(d)}</p>
-                  <p className="text-sm text-black/40">Tel. {d.telefono}</p>
+                  <p className="mt-0.5 text-sm text-muted">{formatDireccion(d)}</p>
+                  <p className="text-sm text-muted">Tel. {d.telefono}</p>
                 </OptionCard>
               ))}
               <OptionCard checked={seleccion === NUEVA} onSelect={() => setSeleccion(NUEVA)} name="direccion">
@@ -358,10 +358,10 @@ export default function CheckoutForm({
             <OptionCard checked={metodo === "nacional"} onSelect={() => setMetodo("nacional")} name="metodo_envio">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex gap-3">
-                  <Truck size={20} className="mt-0.5 shrink-0 text-black/50" />
+                  <Truck size={20} className="mt-0.5 shrink-0 text-muted" />
                   <div>
                     <p className="font-semibold">{SHIPPING_METHODS.nacional.label}</p>
-                    <p className="text-sm text-black/50">{SHIPPING_METHODS.nacional.description}</p>
+                    <p className="text-sm text-muted">{SHIPPING_METHODS.nacional.description}</p>
                   </div>
                 </div>
                 <ShippingPrice amount={calculateShippingCost(subtotal, "nacional")} />
@@ -375,10 +375,10 @@ export default function CheckoutForm({
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex gap-3">
-                  <MapPin size={20} className="mt-0.5 shrink-0 text-black/50" />
+                  <MapPin size={20} className="mt-0.5 shrink-0 text-muted" />
                   <div>
                     <p className="font-semibold">{SHIPPING_METHODS.local.label}</p>
-                    <p className="text-sm text-black/50">
+                    <p className="text-sm text-muted">
                       {localDisponible
                         ? SHIPPING_METHODS.local.description
                         : "Disponible para direcciones en Ciudad de México y Estado de México."}

@@ -17,12 +17,12 @@ export default function CarritoPage() {
       <div className="mx-auto flex max-w-lg flex-col items-center gap-4 px-4 py-24 text-center">
         <span className="text-5xl">🍻</span>
         <h1 className="text-2xl font-semibold tracking-tight">Tu carrito está vacío</h1>
-        <p className="text-black/50">
+        <p className="text-muted">
           Elige tu primera cerveza del catálogo para empezar.
         </p>
         <Link
           href="/"
-          className="mt-2 rounded-full bg-[#5433eb] px-7 py-3.5 font-semibold text-white shadow-accent"
+          className="mt-2 rounded-full bg-accent px-7 py-3.5 font-semibold text-white shadow-accent"
         >
           Explorar catálogo
         </Link>
@@ -41,7 +41,7 @@ export default function CarritoPage() {
               key={product.id}
               className="flex gap-4 rounded-[28px] bg-white p-4 shadow-card"
             >
-              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[20px] bg-[#f2f4f5]">
+              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[20px] bg-canvas">
                 {product.image_url ? (
                   <Image
                     src={product.image_url}
@@ -61,21 +61,21 @@ export default function CarritoPage() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="font-semibold">{product.name}</p>
-                    <p className="text-xs text-black/40">
+                    <p className="text-xs text-muted">
                       {product.style} · {product.country}
                     </p>
                   </div>
                   <button
                     onClick={() => removeItem(product.id)}
                     aria-label={`Quitar ${product.name}`}
-                    className="text-black/30 hover:text-black/60"
+                    className="text-muted hover:text-black/60"
                   >
                     <X size={16} />
                   </button>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 rounded-full bg-[#f2f4f5] px-3 py-1.5">
+                  <div className="flex items-center gap-3 rounded-full bg-canvas px-3 py-1.5">
                     <button
                       onClick={() => setQuantity(product.id, quantity - 1)}
                       className="flex h-6 w-6 items-center justify-center rounded-full hover:bg-white"
@@ -103,12 +103,12 @@ export default function CarritoPage() {
           <h2 className="text-lg font-semibold tracking-tight">Resumen</h2>
 
           {remainingForFreeShipping > 0 ? (
-            <p className="rounded-[20px] bg-[#f2f4f5] px-4 py-3 text-xs text-black/60">
+            <p className="rounded-[20px] bg-canvas px-4 py-3 text-xs text-black/60">
               Agrega {formatMXN(remainingForFreeShipping)} más a tu pedido y el envío es
               gratis.
             </p>
           ) : (
-            <p className="rounded-[20px] bg-[#f2f4f5] px-4 py-3 text-xs font-semibold text-black/70">
+            <p className="rounded-[20px] bg-canvas px-4 py-3 text-xs font-semibold text-black/70">
               ¡Envío gratis desbloqueado!
             </p>
           )}
@@ -133,11 +133,11 @@ export default function CarritoPage() {
 
           <Link
             href="/checkout"
-            className="block w-full rounded-full bg-[#5433eb] py-3.5 text-center font-semibold text-white shadow-accent transition-transform active:scale-[0.98]"
+            className="block w-full rounded-full bg-accent py-3.5 text-center font-semibold text-white shadow-accent transition-transform active:scale-[0.98]"
           >
             Continuar al pago
           </Link>
-          <p className="text-center text-[11px] text-black/35">
+          <p className="text-center text-[11px] text-muted">
             Envío local CDMX y Área Metropolitana sin costo · se elige en el siguiente paso.
           </p>
         </div>

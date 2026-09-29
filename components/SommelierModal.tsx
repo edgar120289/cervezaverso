@@ -24,7 +24,7 @@ function RecommendationCard({ recommendation, rank }: { recommendation: Recommen
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: rank * 0.08, duration: 0.3 }}
-      className="flex gap-4 rounded-[22px] bg-[#f2f4f5] p-3"
+      className="flex gap-4 rounded-[22px] bg-canvas p-3"
     >
       <Link
         href={`/cervezas/${product.sku}`}
@@ -48,7 +48,7 @@ function RecommendationCard({ recommendation, rank }: { recommendation: Recommen
         <Link href={`/cervezas/${product.sku}`} className="line-clamp-2 text-sm font-semibold leading-snug hover:underline">
           {product.name}
         </Link>
-        <p className="truncate text-xs text-black/45">
+        <p className="truncate text-xs text-muted">
           {product.style} · {product.country}
         </p>
         <div className="mt-1.5 flex flex-wrap gap-1">
@@ -64,7 +64,7 @@ function RecommendationCard({ recommendation, rank }: { recommendation: Recommen
             type="button"
             onClick={() => addItem(product, 1, { openDrawer: false })}
             className={`flex items-center gap-1 rounded-full px-3.5 py-2 text-xs font-semibold transition-colors ${
-              inCart ? "bg-black text-white" : "bg-[#5433eb] text-white shadow-accent hover:brightness-110"
+              inCart ? "bg-black text-white" : "bg-accent text-white shadow-accent hover:brightness-110"
             }`}
           >
             {inCart ? <Check size={14} /> : <Plus size={14} />}
@@ -148,7 +148,7 @@ export default function SommelierModal({ isOpen, onClose }: { isOpen: boolean; o
                 <button
                   type="button"
                   onClick={() => setStep(step - 1)}
-                  className="flex items-center gap-1 text-sm font-semibold text-black/45 hover:text-black"
+                  className="flex items-center gap-1 text-sm font-semibold text-muted hover:text-black"
                 >
                   <ArrowLeft size={16} /> Atrás
                 </button>
@@ -191,7 +191,7 @@ export default function SommelierModal({ isOpen, onClose }: { isOpen: boolean; o
                   exit={{ opacity: 0, x: -16 }}
                   transition={{ duration: 0.22 }}
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-black/35">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted">
                     Pregunta {step + 1} de {QUIZ_STEPS.length}
                   </p>
                   <h3 className="mb-5 mt-1 text-2xl font-semibold tracking-[-0.035em]">{current.question}</h3>
@@ -204,7 +204,7 @@ export default function SommelierModal({ isOpen, onClose }: { isOpen: boolean; o
                           type="button"
                           onClick={() => handleAnswer(option.id)}
                           className={`group flex items-center gap-3 rounded-[20px] px-4 py-3.5 text-left transition-colors ${
-                            selected ? "bg-black text-white" : "bg-[#f2f4f5] hover:bg-black hover:text-white"
+                            selected ? "bg-black text-white" : "bg-canvas hover:bg-black hover:text-white"
                           }`}
                         >
                           <span className="text-2xl" aria-hidden>
@@ -213,7 +213,7 @@ export default function SommelierModal({ isOpen, onClose }: { isOpen: boolean; o
                           <span className="min-w-0">
                             <span className="block font-semibold leading-tight">{option.label}</span>
                             <span
-                              className={`block text-xs ${selected ? "text-white/60" : "text-black/45 group-hover:text-white/60"}`}
+                              className={`block text-xs ${selected ? "text-white/60" : "text-muted group-hover:text-white/60"}`}
                             >
                               {option.hint}
                             </span>
@@ -226,14 +226,14 @@ export default function SommelierModal({ isOpen, onClose }: { isOpen: boolean; o
               ) : (
                 <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
                   <h3 className="text-2xl font-semibold tracking-[-0.035em]">Tus 3 cervezas ideales</h3>
-                  <p className="mb-5 mt-1 text-sm text-black/50">
+                  <p className="mb-5 mt-1 text-sm text-muted">
                     Elegidas del catálogo según tu sabor, tu ocasión y la intensidad que buscas.
                   </p>
 
                   {isPending ? (
                     <ul className="space-y-3" role="status" aria-label="Buscando tus cervezas…">
                       {[0, 1, 2].map((i) => (
-                        <li key={i} className="h-[120px] animate-pulse rounded-[22px] bg-[#f2f4f5]" />
+                        <li key={i} className="h-[120px] animate-pulse rounded-[22px] bg-canvas" />
                       ))}
                     </ul>
                   ) : recommendations.length > 0 ? (
@@ -243,7 +243,7 @@ export default function SommelierModal({ isOpen, onClose }: { isOpen: boolean; o
                       ))}
                     </ul>
                   ) : (
-                    <p className="rounded-[20px] bg-[#f2f4f5] px-5 py-4 text-sm text-black/55">
+                    <p className="rounded-[20px] bg-canvas px-5 py-4 text-sm text-muted">
                       Por ahora no tenemos cervezas disponibles con ese perfil. Prueba con otra combinación.
                     </p>
                   )}

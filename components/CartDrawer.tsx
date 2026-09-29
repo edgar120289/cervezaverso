@@ -41,7 +41,7 @@ export default function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed right-0 top-0 z-[95] flex h-full w-full max-w-md flex-col bg-[#f2f4f5] p-4"
+            className="fixed right-0 top-0 z-[95] flex h-full w-full max-w-md flex-col bg-canvas p-4"
           >
             <div className="flex items-center justify-between rounded-[28px] bg-white p-5 shadow-card">
               <h2 className="text-lg font-semibold tracking-tight">Tu carrito</h2>
@@ -58,12 +58,12 @@ export default function CartDrawer() {
               <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 text-center">
                 <span className="text-4xl">🍻</span>
                 <p className="text-lg font-semibold tracking-tight">Tu carrito está vacío</p>
-                <p className="text-sm text-black/50">
+                <p className="text-sm text-muted">
                   Elige tu primera cerveza del catálogo para empezar.
                 </p>
                 <button
                   onClick={closeDrawer}
-                  className="mt-2 rounded-full bg-[#5433eb] px-6 py-2.5 text-sm font-semibold text-white shadow-accent"
+                  className="mt-2 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-white shadow-accent"
                 >
                   Explorar cervezas
                 </button>
@@ -76,7 +76,7 @@ export default function CartDrawer() {
                       key={product.id}
                       className="flex gap-3 rounded-[20px] bg-white p-3 shadow-card"
                     >
-                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[20px] bg-[#f2f4f5]">
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[20px] bg-canvas">
                         {product.image_url ? (
                           <Image
                             src={product.image_url}
@@ -98,13 +98,13 @@ export default function CartDrawer() {
                           <button
                             onClick={() => removeItem(product.id)}
                             aria-label={`Quitar ${product.name}`}
-                            className="text-black/30 hover:text-black/60"
+                            className="text-muted hover:text-black/60"
                           >
                             <X size={14} />
                           </button>
                         </div>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 rounded-full bg-[#f2f4f5] px-2 py-1">
+                          <div className="flex items-center gap-2 rounded-full bg-canvas px-2 py-1">
                             <button
                               onClick={() => setQuantity(product.id, quantity - 1)}
                               className="flex h-5 w-5 items-center justify-center rounded-full hover:bg-white"
@@ -130,7 +130,7 @@ export default function CartDrawer() {
 
                 <div className="space-y-3 rounded-[28px] bg-white p-5 shadow-card">
                   {remainingForFreeShipping > 0 ? (
-                    <p className="text-xs text-black/50">
+                    <p className="text-xs text-muted">
                       Agrega {formatMXN(remainingForFreeShipping)} más y obtén envío gratis.
                     </p>
                   ) : (
@@ -158,7 +158,7 @@ export default function CartDrawer() {
                   <Link
                     href="/checkout"
                     onClick={closeDrawer}
-                    className="block rounded-full bg-[#5433eb] py-3.5 text-center font-semibold text-white shadow-accent transition-transform active:scale-[0.98]"
+                    className="block rounded-full bg-accent py-3.5 text-center font-semibold text-white shadow-accent transition-transform active:scale-[0.98]"
                   >
                     Ir a pagar
                   </Link>

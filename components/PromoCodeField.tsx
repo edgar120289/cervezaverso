@@ -39,7 +39,7 @@ export default function PromoCodeField() {
           <Icon size={18} className="shrink-0 text-accent" />
           <div className="min-w-0 flex-1 text-sm">
             <p className="font-semibold tracking-wide">{promo.code}</p>
-            <p className="text-xs text-black/55">
+            <p className="text-xs text-muted">
               {promo.discount_type === "fixed" ? "Tarjeta de regalo" : "Descuento"} de {formatPromoValue(promo)}
               {discount > 0 && ` · ahorras ${formatMXN(discount)}`}
             </p>
@@ -48,7 +48,7 @@ export default function PromoCodeField() {
             type="button"
             onClick={removePromo}
             aria-label={`Quitar el código ${promo.code}`}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-black/40 hover:bg-black/5 hover:text-black"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted hover:bg-black/5 hover:text-black"
           >
             <X size={16} />
           </button>
@@ -103,7 +103,7 @@ export default function PromoCodeField() {
           maxLength={30}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? "promo-code-error" : undefined}
-          className="min-w-0 flex-1 rounded-full bg-[#f2f4f5] px-4 py-3 text-sm font-semibold uppercase tracking-wide outline-none placeholder:font-normal placeholder:normal-case placeholder:tracking-normal placeholder:text-black/35 focus:ring-2 focus:ring-accent/30"
+          className="min-w-0 flex-1 rounded-full bg-canvas px-4 py-3 text-sm font-semibold uppercase tracking-wide outline-none placeholder:font-normal placeholder:normal-case placeholder:tracking-normal placeholder:text-muted focus:ring-2 focus:ring-accent/30"
         />
         <button
           type="button"
@@ -116,7 +116,7 @@ export default function PromoCodeField() {
         </button>
       </div>
       {error && (
-        <p id="promo-code-error" role="alert" className="px-1 text-xs text-red-600">
+        <p id="promo-code-error" role="alert" className="px-1 text-xs text-danger">
           {error}
         </p>
       )}

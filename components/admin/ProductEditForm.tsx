@@ -10,16 +10,16 @@ import { firstIssue, PRODUCT_IMAGE_BUCKET, PRODUCT_IMAGE_TYPES, productImageSche
 import type { Product, StockStatus } from "@/lib/types";
 
 const inputClass =
-  "w-full rounded-full bg-[#f2f4f5] px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-black/15";
+  "w-full rounded-full bg-canvas px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-black/15";
 const textareaClass =
-  "w-full rounded-[20px] bg-[#f2f4f5] px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-black/15";
+  "w-full rounded-[20px] bg-canvas px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-black/15";
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
     <label className="block space-y-1.5">
-      <span className="px-2 text-xs font-semibold uppercase tracking-wide text-black/45">{label}</span>
+      <span className="px-2 text-xs font-semibold uppercase tracking-wide text-muted">{label}</span>
       {children}
-      {hint && <span className="block px-2 text-xs text-black/40">{hint}</span>}
+      {hint && <span className="block px-2 text-xs text-muted">{hint}</span>}
     </label>
   );
 }
@@ -197,15 +197,15 @@ export default function ProductEditForm({ product, initialMargin }: { product: P
       {/* Imagen */}
       <div className="space-y-4">
         <div className="rounded-[28px] bg-white p-6 shadow-card">
-          <div className="relative aspect-square overflow-hidden rounded-[20px] bg-[#f2f4f5]">
+          <div className="relative aspect-square overflow-hidden rounded-[20px] bg-canvas">
             {imageUrl ? (
               <Image src={imageUrl} alt={form.name} fill sizes="320px" className="object-contain p-4" />
             ) : (
-              <div className="flex h-full items-center justify-center text-sm text-black/35">Sin imagen</div>
+              <div className="flex h-full items-center justify-center text-sm text-muted">Sin imagen</div>
             )}
             {isUploading && (
               <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm">
-                <Loader2 className="animate-spin text-black/50" />
+                <Loader2 className="animate-spin text-muted" />
               </div>
             )}
           </div>
@@ -221,21 +221,21 @@ export default function ProductEditForm({ product, initialMargin }: { product: P
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-[#f2f4f5] py-3 text-sm font-semibold transition-colors hover:bg-black hover:text-white disabled:opacity-60"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-canvas py-3 text-sm font-semibold transition-colors hover:bg-black hover:text-white disabled:opacity-60"
           >
             <ImageUp size={16} />
             {isUploading ? "Subiendo…" : imageUrl ? "Cambiar imagen" : "Subir imagen"}
           </button>
-          <p className="mt-2 text-center text-xs text-black/40">JPG, PNG, WebP o AVIF · máx. 5 MB</p>
+          <p className="mt-2 text-center text-xs text-muted">JPG, PNG, WebP o AVIF · máx. 5 MB</p>
         </div>
 
         {/* Precio */}
         <div className="rounded-[28px] bg-white p-6 shadow-card">
-          <p className="text-sm text-black/50">Precio de venta</p>
+          <p className="text-sm text-muted">Precio de venta</p>
           <p className="mt-1 text-3xl font-semibold tabular-nums">
             {salePrice === null ? "—" : formatMXN(salePrice)}
           </p>
-          <p className="mt-2 text-xs text-black/40">
+          <p className="mt-2 text-xs text-muted">
             Costo × (1 + margen) redondeado hacia abajo al múltiplo de $5.
           </p>
         </div>
@@ -245,7 +245,7 @@ export default function ProductEditForm({ product, initialMargin }: { product: P
       <div className="space-y-6 rounded-[28px] bg-white p-6 shadow-card sm:p-8">
         <div>
           <h2 className="text-xl font-semibold tracking-tight">{product.name}</h2>
-          <p className="mt-1 text-xs text-black/40">SKU: {product.sku}</p>
+          <p className="mt-1 text-xs text-muted">SKU: {product.sku}</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -321,7 +321,7 @@ export default function ProductEditForm({ product, initialMargin }: { product: P
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-semibold tracking-tight">Ficha del Sommelier Digital</p>
-              <p className="text-xs text-black/45">Se muestra en la página de la cerveza.</p>
+              <p className="text-xs text-muted">Se muestra en la página de la cerveza.</p>
             </div>
             <button
               type="button"
@@ -346,7 +346,7 @@ export default function ProductEditForm({ product, initialMargin }: { product: P
           </fieldset>
         </div>
 
-        {error && <p className="px-2 text-sm text-red-500">{error}</p>}
+        {error && <p className="px-2 text-sm text-danger">{error}</p>}
         {notice && (
           <p className="rounded-[20px] border border-accent/20 bg-accent/5 px-4 py-3 text-sm text-black/70">{notice}</p>
         )}
@@ -354,7 +354,7 @@ export default function ProductEditForm({ product, initialMargin }: { product: P
         <button
           type="submit"
           disabled={isSaving || isUploading || isGenerating}
-          className="w-full rounded-full bg-[#5433eb] py-3.5 font-semibold text-white shadow-accent transition-transform active:scale-[0.98] disabled:opacity-60 sm:w-auto sm:px-10"
+          className="w-full rounded-full bg-accent py-3.5 font-semibold text-white shadow-accent transition-transform active:scale-[0.98] disabled:opacity-60 sm:w-auto sm:px-10"
         >
           {isSaving ? "Guardando…" : "Guardar cambios"}
         </button>

@@ -60,7 +60,7 @@ export default async function CuentaPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-semibold tracking-[-0.04em]">Mi cuenta</h1>
-          <p className="mt-1 text-black/50">{user.email}</p>
+          <p className="mt-1 text-muted">{user.email}</p>
         </div>
         <form action={cerrarSesion}>
           <button
@@ -73,7 +73,7 @@ export default async function CuentaPage() {
       </div>
 
       {loadError && (
-        <p className="rounded-[20px] bg-red-50 px-5 py-4 text-sm text-red-600">
+        <p className="rounded-[20px] bg-red-50 px-5 py-4 text-sm text-danger">
           No pudimos cargar toda tu información: {loadError.message}
         </p>
       )}
@@ -94,7 +94,7 @@ export default async function CuentaPage() {
                     className="group grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 rounded-[28px] bg-white px-6 py-5 shadow-card transition-transform active:scale-[0.99] sm:grid-cols-[1.2fr_1.5fr_1fr_1fr_auto]"
                   >
                     <p className="font-semibold tabular-nums">#{folio(pedido.id)}</p>
-                    <p className="order-last col-span-2 text-sm text-black/50 sm:order-none sm:col-span-1">
+                    <p className="order-last col-span-2 text-sm text-muted sm:order-none sm:col-span-1">
                       {formatFecha(pedido.fecha)} · {piezas} {piezas === 1 ? "pieza" : "piezas"}
                     </p>
                     <span
@@ -156,7 +156,7 @@ export default async function CuentaPage() {
                     </span>
                   )}
                 </div>
-                <div className="mt-2 flex-1 space-y-0.5 text-sm text-black/55">
+                <div className="mt-2 flex-1 space-y-0.5 text-sm text-muted">
                   <p>{d.calle}</p>
                   <p>
                     {d.colonia}, {d.ciudad}
@@ -177,7 +177,7 @@ export default async function CuentaPage() {
                   )}
                   <form action={eliminarDireccion}>
                     <input type="hidden" name="id" value={d.id} />
-                    <button type="submit" className="text-black/40 hover:text-red-600">
+                    <button type="submit" className="text-muted hover:text-danger">
                       Eliminar
                     </button>
                   </form>
@@ -204,9 +204,9 @@ function SectionHeading({
 }) {
   return (
     <h2 id={id} className="flex items-center gap-2.5 text-xl font-semibold tracking-[-0.03em]">
-      <span className="text-black/40">{icon}</span>
+      <span className="text-muted">{icon}</span>
       {title}
-      {count > 0 && <span className="text-base font-normal tabular-nums text-black/35">{count}</span>}
+      {count > 0 && <span className="text-base font-normal tabular-nums text-muted">{count}</span>}
     </h2>
   );
 }
@@ -214,7 +214,7 @@ function SectionHeading({
 function EmptyState({ text, cta, href }: { text: string; cta?: string; href?: string }) {
   return (
     <div className="flex flex-col items-center gap-3 rounded-[28px] bg-white px-6 py-10 text-center shadow-card">
-      <p className="text-sm text-black/50">{text}</p>
+      <p className="text-sm text-muted">{text}</p>
       {cta && href && (
         <Link
           href={href}

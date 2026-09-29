@@ -26,7 +26,7 @@ export default async function EditProductPage({ params }: PageProps<"/admin/prod
     <div className="space-y-6">
       <Link
         href="/admin"
-        className="inline-flex items-center gap-1.5 text-sm font-semibold text-black/50 hover:text-black"
+        className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted hover:text-black"
       >
         <ArrowLeft size={16} />
         Volver a productos

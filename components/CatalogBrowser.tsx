@@ -27,14 +27,14 @@ const SEARCHABLE_OPTIONS = 10;
 
 function chipClass(active: boolean) {
   return `rounded-full px-3.5 py-2 text-xs font-semibold transition-colors ${
-    active ? "bg-black text-white" : "bg-[#f2f4f5] text-black/65 hover:bg-black/10 hover:text-black"
+    active ? "bg-black text-white" : "bg-canvas text-black/65 hover:bg-black/10 hover:text-black"
   }`;
 }
 
 function FilterSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <fieldset className="border-t border-black/5 pt-4 first:border-0 first:pt-0">
-      <legend className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-black/45">{title}</legend>
+      <legend className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-muted">{title}</legend>
       {children}
     </fieldset>
   );
@@ -69,17 +69,17 @@ function CheckboxList({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={`Buscar entre ${options.length}…`}
-          className="mb-1.5 w-full rounded-full bg-[#f2f4f5] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-black/15"
+          className="mb-1.5 w-full rounded-full bg-canvas px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-black/15"
         />
       )}
-      {term && matching.length === 0 && <p className="px-2 py-1.5 text-xs text-black/40">Sin coincidencias.</p>}
+      {term && matching.length === 0 && <p className="px-2 py-1.5 text-xs text-muted">Sin coincidencias.</p>}
       {visible.map(({ value, count }) => {
         const checked = selected.includes(value);
         const disabled = count === 0 && !checked;
         return (
           <label
             key={value}
-            className={`flex cursor-pointer items-center gap-2.5 rounded-xl px-2 py-1.5 text-sm transition-colors hover:bg-[#f2f4f5] ${
+            className={`flex cursor-pointer items-center gap-2.5 rounded-xl px-2 py-1.5 text-sm transition-colors hover:bg-canvas ${
               disabled ? "opacity-40" : ""
             }`}
           >
@@ -88,10 +88,10 @@ function CheckboxList({
               checked={checked}
               disabled={disabled}
               onChange={() => onToggle(value)}
-              className="h-4 w-4 shrink-0 cursor-pointer rounded accent-[#5433eb]"
+              className="h-4 w-4 shrink-0 cursor-pointer rounded accent-accent"
             />
             <span className="min-w-0 flex-1 truncate">{value}</span>
-            <span className="text-xs tabular-nums text-black/35">{count}</span>
+            <span className="text-xs tabular-nums text-muted">{count}</span>
           </label>
         );
       })}
@@ -170,9 +170,9 @@ function FilterPanel({
             aria-label="Precio mínimo"
             value={filters.minPrice ?? ""}
             onChange={(e) => setFilters((c) => ({ ...c, minPrice: parsePrice(e.target.value) }))}
-            className="w-full min-w-0 rounded-full bg-[#f2f4f5] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-black/15"
+            className="w-full min-w-0 rounded-full bg-canvas px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-black/15"
           />
-          <span className="text-black/30">–</span>
+          <span className="text-muted">–</span>
           <input
             type="number"
             inputMode="numeric"
@@ -181,7 +181,7 @@ function FilterPanel({
             aria-label="Precio máximo"
             value={filters.maxPrice ?? ""}
             onChange={(e) => setFilters((c) => ({ ...c, maxPrice: parsePrice(e.target.value) }))}
-            className="w-full min-w-0 rounded-full bg-[#f2f4f5] px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-black/15"
+            className="w-full min-w-0 rounded-full bg-canvas px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-black/15"
           />
         </div>
       </FilterSection>
@@ -302,7 +302,7 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
       <div className="min-w-0 space-y-4">
         <div className="flex gap-2">
           <div className="relative flex-1">
-            <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-black/35" />
+            <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
             <input
               type="search"
               value={filters.query}
@@ -344,7 +344,7 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
         </AnimatePresence>
 
         <div className="flex flex-wrap items-center gap-2">
-          <p className="mr-1 text-sm text-black/50" aria-live="polite">
+          <p className="mr-1 text-sm text-muted" aria-live="polite">
             {results.length} {results.length === 1 ? "cerveza" : "cervezas"}
           </p>
           {activeChips.map((chip) => (
@@ -373,11 +373,11 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
         {results.length === 0 ? (
           <div className="rounded-[28px] bg-white px-6 py-14 text-center shadow-card">
             <p className="text-lg font-semibold tracking-[-0.03em]">Ninguna cerveza coincide</p>
-            <p className="mt-1 text-sm text-black/50">Prueba con otros filtros o una búsqueda más corta.</p>
+            <p className="mt-1 text-sm text-muted">Prueba con otros filtros o una búsqueda más corta.</p>
             <button
               type="button"
               onClick={() => setFilters(EMPTY_FILTERS)}
-              className="mt-5 rounded-full bg-[#5433eb] px-6 py-3 text-sm font-semibold text-white shadow-accent"
+              className="mt-5 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-accent"
             >
               Limpiar filtros
             </button>

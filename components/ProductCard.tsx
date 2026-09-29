@@ -23,7 +23,7 @@ export default function ProductCard({ product }: { product: Product }) {
     >
       <Link
         href={`/cervezas/${product.sku}`}
-        className="relative block aspect-square w-full overflow-hidden rounded-[20px] bg-[#f2f4f5]"
+        className="relative block aspect-square w-full overflow-hidden rounded-[20px] bg-canvas"
       >
         {product.image_url ? (
           <Image
@@ -67,7 +67,7 @@ export default function ProductCard({ product }: { product: Product }) {
       </Link>
 
       <div className="flex flex-1 flex-col gap-1 px-1 pt-4">
-        <p className="text-xs text-black/40">
+        <p className="text-xs text-muted">
           {product.style} · {product.country}
         </p>
         <h3 className="text-base font-semibold leading-snug tracking-[-0.03em]">
@@ -75,7 +75,7 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.name}
           </Link>
         </h3>
-        <p className="text-xs text-black/40">{product.abv}% ABV · {product.volume_ml}ml</p>
+        <p className="text-xs text-muted">{product.abv}% ABV · {product.volume_ml}ml</p>
 
         <div className="mt-3 flex items-center justify-between">
           <span className="text-lg font-semibold">{formatMXN(product.sale_price)}</span>
@@ -86,7 +86,7 @@ export default function ProductCard({ product }: { product: Product }) {
             disabled={isOutOfStock}
             onClick={() => addItem(product)}
             aria-label={`Agregar ${product.name} al carrito`}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-[#5433eb] text-white shadow-accent transition-transform active:scale-90 disabled:cursor-not-allowed disabled:bg-black/10 disabled:shadow-none"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white shadow-accent transition-transform active:scale-90 disabled:cursor-not-allowed disabled:bg-black/10 disabled:shadow-none"
           >
               <Plus size={18} strokeWidth={2.5} />
             </button>

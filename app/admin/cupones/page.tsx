@@ -25,14 +25,14 @@ export default async function AdminCuponesPage() {
         <h2 className="text-lg font-semibold tracking-tight">Códigos</h2>
 
         {error ? (
-          <div className="rounded-[28px] bg-white p-6 text-sm text-red-600 shadow-card">
+          <div className="rounded-[28px] bg-white p-6 text-sm text-danger shadow-card">
             No se pudieron cargar los cupones: {error.message}
             {error.code === "42P01" || error.message.includes("promo_codes")
               ? " — ¿Ya corriste supabase/migrations/004_promo_codes.sql?"
               : ""}
           </div>
         ) : cupones.length === 0 ? (
-          <div className="rounded-[28px] bg-white p-10 text-center text-sm text-black/50 shadow-card">
+          <div className="rounded-[28px] bg-white p-10 text-center text-sm text-muted shadow-card">
             Todavía no hay cupones. Crea el primero con el formulario.
           </div>
         ) : (
@@ -47,7 +47,7 @@ export default async function AdminCuponesPage() {
                     cupon.active ? "" : "opacity-60"
                   }`}
                 >
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f2f4f5] text-black/60">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-canvas text-black/60">
                     <Icon size={20} />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -56,7 +56,7 @@ export default async function AdminCuponesPage() {
                       <span
                         className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-normal ${
                           !cupon.active
-                            ? "bg-black/5 text-black/50"
+                            ? "bg-black/5 text-muted"
                             : agotado
                               ? "bg-amber-100 text-amber-800"
                               : "bg-emerald-100 text-emerald-800"
@@ -65,12 +65,12 @@ export default async function AdminCuponesPage() {
                         {!cupon.active ? "Inactivo" : agotado ? "Agotado" : "Activo"}
                       </span>
                     </p>
-                    <p className="text-sm text-black/55">
+                    <p className="text-sm text-muted">
                       {formatPromoValue({ discount_type: cupon.discount_type, value: Number(cupon.value) })} de
                       descuento
                       {Number(cupon.min_purchase) > 0 && ` · mínimo ${formatMXN(Number(cupon.min_purchase))}`}
                     </p>
-                    <p className="text-xs text-black/40">
+                    <p className="text-xs text-muted">
                       Usado {cupon.times_used}
                       {cupon.max_uses !== null ? ` de ${cupon.max_uses}` : ""}{" "}
                       {cupon.times_used === 1 ? "vez" : "veces"} · creado {formatFecha(cupon.created_at)}

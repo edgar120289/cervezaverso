@@ -52,7 +52,7 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       className={`relative isolate overflow-hidden rounded-[28px] shadow-card ${
-        dark ? "bg-black text-white" : "bg-[#f2f4f5] text-black"
+        dark ? "bg-black text-white" : "bg-canvas text-black"
       }`}
     >
       {/* Fondo */}
@@ -76,7 +76,7 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
       ) : (
         <div aria-hidden className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-gradient-to-br from-white via-[#f2f4f5] to-[#e7e4fb]" />
-          <div className="absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full bg-[#5433eb]/15 blur-3xl" />
+          <div className="absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full bg-accent/15 blur-3xl" />
           <div className="absolute -bottom-32 left-1/4 h-[360px] w-[360px] rounded-full bg-[#f5b942]/20 blur-3xl" />
         </div>
       )}
@@ -86,7 +86,7 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
           <motion.p
             {...reveal(0)}
             className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide backdrop-blur ${
-              dark ? "bg-white/10 text-white/80" : "bg-white/70 text-black/60 shadow-card"
+              dark ? "bg-white/10 text-white/90" : "bg-white/70 text-black/60 shadow-card"
             }`}
           >
             Cervezaverso · Cerveza artesanal nacional e importada
@@ -112,7 +112,7 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
 
           <motion.p
             {...reveal(0.2)}
-            className={`mt-6 max-w-md text-lg leading-relaxed tracking-[-0.01em] ${dark ? "text-white/70" : "text-black/55"}`}
+            className={`mt-6 max-w-md text-lg leading-relaxed tracking-[-0.01em] ${dark ? "text-white/85" : "text-muted"}`}
           >
             Cervezas de más de 20 países. Estilos, orígenes y maridajes seleccionados, con envío gratis desde{" "}
             {formatMXN(FREE_SHIPPING_THRESHOLD)}.
@@ -122,7 +122,7 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
             <button
               type="button"
               onClick={openQuiz}
-              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full bg-[#5433eb] px-7 py-4 font-semibold text-white shadow-accent transition-transform hover:brightness-110 active:scale-[0.98]"
+              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full bg-accent px-7 py-4 font-semibold text-white shadow-accent transition-transform hover:brightness-110 active:scale-[0.98]"
             >
               {/* Brillo que recorre el botón */}
               {!reduceMotion && (
@@ -154,7 +154,7 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
           >
             <div
               aria-hidden
-              className={`absolute inset-[12%] rounded-full blur-3xl ${dark ? "bg-[#5433eb]/40" : "bg-[#5433eb]/20"}`}
+              className={`absolute inset-[12%] rounded-full blur-3xl ${dark ? "bg-accent/40" : "bg-accent/20"}`}
             />
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.div

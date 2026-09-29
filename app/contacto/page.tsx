@@ -74,7 +74,7 @@ export default function ContactoPage() {
         <h1 className="mt-3 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] sm:text-5xl">
           Hablemos de cerveza.
         </h1>
-        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-black/55">
+        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
           ¿Buscas una recomendación, un regalo o tienes una duda con tu pedido? Escríbenos por el canal que
           prefieras y te respondemos con gusto.
         </p>
@@ -88,19 +88,19 @@ export default function ContactoPage() {
             target={href.startsWith("mailto:") ? undefined : "_blank"}
             rel="noopener noreferrer"
             className={`group flex flex-col rounded-[28px] p-6 shadow-card transition-transform hover:-translate-y-1 ${
-              primary ? "bg-[#5433eb] text-white shadow-accent" : "bg-white"
+              primary ? "bg-accent text-white shadow-accent" : "bg-white"
             }`}
           >
             <span
               className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
-                primary ? "bg-white/15" : "bg-[#f2f4f5] text-black/70"
+                primary ? "bg-white/15" : "bg-canvas text-black/70"
               }`}
             >
               <Icon size={22} />
             </span>
             <p className="mt-5 text-lg font-semibold tracking-tight">{title}</p>
-            <p className={`text-sm font-semibold ${primary ? "text-white/80" : "text-black/55"}`}>{detail}</p>
-            <p className={`mt-2 flex-1 text-sm leading-relaxed ${primary ? "text-white/70" : "text-black/50"}`}>
+            <p className={`text-sm font-semibold ${primary ? "text-white" : "text-muted"}`}>{detail}</p>
+            <p className={`mt-2 flex-1 text-sm leading-relaxed ${primary ? "text-white/95" : "text-muted"}`}>
               {description}
             </p>
             <span className={`mt-5 text-sm font-semibold ${primary ? "" : "text-accent"}`}>
@@ -113,10 +113,10 @@ export default function ContactoPage() {
       <div className="grid gap-4 sm:grid-cols-2">
         {DETAILS.map(({ icon: Icon, title, body }) => (
           <section key={title} className="flex gap-4 rounded-[28px] bg-white p-6 shadow-card">
-            <Icon size={20} className="mt-0.5 shrink-0 text-black/40" />
+            <Icon size={20} className="mt-0.5 shrink-0 text-muted" />
             <div>
               <h2 className="font-semibold tracking-tight">{title}</h2>
-              <p className="mt-1 text-sm leading-relaxed text-black/55">{body}</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted">{body}</p>
             </div>
           </section>
         ))}

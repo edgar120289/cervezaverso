@@ -29,14 +29,14 @@ export default function SommelierSection() {
           <h2 className="text-3xl font-semibold tracking-[-0.04em]">
             ¿Qué cerveza elegir?
           </h2>
-          <p className="text-white/70">
+          <p className="text-white/85">
             Tres preguntas rápidas y te recomendamos tres cervezas del
             catálogo para tu paladar y el momento.
           </p>
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={openQuiz}
-            className="mt-2 rounded-full bg-[#5433eb] px-6 py-3.5 font-semibold text-white shadow-accent"
+            className="mt-2 rounded-full bg-accent px-6 py-3.5 font-semibold text-white shadow-accent"
           >
             Hacer el quiz
           </motion.button>

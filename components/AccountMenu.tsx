@@ -86,14 +86,14 @@ export default function AccountMenu() {
             transition={{ duration: 0.18, ease: "easeOut" }}
             className="absolute right-0 top-[calc(100%+10px)] w-60 origin-top-right rounded-[22px] bg-white p-1.5 shadow-card ring-1 ring-black/5"
           >
-            <p className="truncate px-3.5 pb-1.5 pt-2 text-xs text-black/40">{user?.email}</p>
+            <p className="truncate px-3.5 pb-1.5 pt-2 text-xs text-muted">{user?.email}</p>
             {ADMIN_LINKS.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}
                 role="menuitem"
                 aria-current={pathname.startsWith(href) ? "page" : undefined}
-                className="flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-semibold text-black/75 transition-colors hover:bg-[#f2f4f5] hover:text-black aria-[current=page]:text-accent"
+                className="flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-semibold text-black/75 transition-colors hover:bg-canvas hover:text-black aria-[current=page]:text-accent"
               >
                 <Icon size={17} className="shrink-0" />
                 {label}
