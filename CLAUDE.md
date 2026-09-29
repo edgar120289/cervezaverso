@@ -39,3 +39,19 @@ Referencia de Estilo Principal: Lee las directrices exactas y los tokens de dise
 Elementos Visuales: Plantas de lúpulo, tarros de cerveza y tipografía limpia.
 
 Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo nativo (mobile-first), y compresión de imágenes.
+
+## Estado
+
+- Fase actual: 1 - Plan (pendiente de `/arranque`; sin código nuevo hasta aprobarlo).
+- Ya existe en el repo, sin auditar contra las reglas globales: catálogo con filtros, ficha de producto, carrito, checkout, cuenta de cliente, recuperación de contraseña, panel de admin (productos, pedidos, cupones, importación de la lista de precios), Sommelier por cuestionario, modal de mayoría de edad, páginas de Privacidad, Términos y Contacto, sitemap, robots y Open Graph.
+- Pendiente de construir (fases siguientes): Sommelier con la API de OpenAI y modelo de datos de Tarjetas de Regalo.
+- Última actualización: 2026-09-29.
+
+## Decisiones
+
+- 2026-09-29 · Este CLAUDE.md describe la visión final del proyecto, no solo lo ya construido.
+- 2026-09-29 · El Sommelier actual (cuestionario con reglas en `lib/sommelier.ts`) se migrará a la API de OpenAI en una fase posterior; es una funcionalidad nueva.
+- 2026-09-29 · Las Tarjetas de Regalo son una funcionalidad nueva con su propio modelo de datos (saldo consumible), independiente de los cupones de descuento (`004_promo_codes.sql`).
+- 2026-09-29 · `brand/design-system.md` (Shop) es solo referencia de arquitectura UI: radios de 28px en tarjetas y 9999px en botones, sombras suaves, densidad compacta y un solo color de acento. La tipografía será Inter o fuentes del sistema (sin GT Standard ni Shopify Sans, que requieren licencia); la paleta y los logotipos serán propios de Cervezaverso.
+- 2026-09-29 · Se conserva `@AGENTS.md` al inicio de este archivo por los cambios importantes de esta versión de Next.js.
+- 2026-09-29 · Las hojas de cálculo (`*.xlsx`) no se versionan: la lista de precios del proveedor es confidencial y se eliminó del historial.
