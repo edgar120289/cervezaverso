@@ -2,7 +2,7 @@
 
 Nombre del Proyecto: Cervezaverso
 Tipo: Tienda en línea (E-commerce)
-Fase Actual: 1 - Plan presentado, pendiente de OK (ver sección Estado).
+Fase Actual: 2 - Base y correcciones, lista para revisión (ver sección Estado).
 
 Stack Tecnológico:
 
@@ -42,10 +42,12 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 
 ## Estado
 
-- Fase actual: 1 · Plan presentado (2026-09-29), **pendiente de OK**. Sin código nuevo hasta aprobarlo.
-- Siguiente: Fase 2 · Base + corrección de piezas existentes (ver Plan).
-- Ya existe en el repo, sin auditar contra las reglas globales: catálogo con filtros, ficha de producto, carrito, checkout (sin pago en línea), cuenta de cliente, recuperación de contraseña, panel de admin (productos, pedidos, cupones, importación de la lista de precios), Sommelier por cuestionario, modal de mayoría de edad, páginas de Privacidad, Términos y Contacto, sitemap, robots y Open Graph. `tsc` y ESLint limpios al 2026-09-29.
-- Pendiente de construir (fases siguientes): pago con Mercado Pago, Sommelier con la API de OpenAI y Tarjetas de Regalo.
+- Fase 1 · Plan: aprobada (2026-09-29).
+- Fase 2 · Base y correcciones: terminada en código (2026-09-29), **pendiente de OK**. Bloques 1–8 con commit propio; build, lint y typecheck limpios.
+- Para que funcione completo falta: correr `supabase/migrations/005_edad_rate_limit.sql` en Supabase y dar de alta las claves de Turnstile (ver `.env.example`).
+- Pendiente de revisar en navegador (360, 768, 1024 y 1440 px): no hubo navegador disponible en la sesión.
+- Pendientes de datos del negocio: marcados `[[PENDIENTE]]` en `/terminos` y `/privacidad`.
+- Siguiente: Fase 3 · Construcción (pago con Mercado Pago, Sommelier con OpenAI y Tarjetas de Regalo), página por página.
 - Última actualización: 2026-09-29.
 
 ## Decisiones
@@ -65,3 +67,7 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - 2026-09-29 · Leyenda sanitaria "El abuso en el consumo de este producto es nocivo para la salud." en Footer, ficha de producto y checkout (pendiente de revisión legal).
 - 2026-09-29 · Pagos: Mercado Pago (tarjetas, SPEI y OXXO Pay) con checkout alojado. El pago se da por confirmado solo con el webhook de firma verificada; el correo es notificación, no confirmación. Se descarta Stripe.
 - 2026-09-29 · Plataforma: se mantiene la arquitectura a la medida (Next.js + Supabase + Tailwind); no se migra a Shopify.
+- 2026-09-29 · Checkout como invitado: fecha de nacimiento obligatoria, validada en el servidor (+18) y guardada en el pedido (`cliente_fecha_nacimiento`).
+- 2026-09-29 · CSP sin nonce en `next.config.ts` (con 'unsafe-inline' en scripts) para no volver dinámicas las páginas estáticas; orígenes limitados a los propios, Turnstile, GA y Supabase.
+- 2026-09-29 · Límite de intentos en Supabase (`check_rate_limit`, migración 005) con IP en hash; si la base no responde deja pasar y lo registra en logs. Login, registro y recuperación pasan por Server Actions.
+- 2026-09-29 · Texto secundario con el token `muted` (#666361), no con `text-black/NN`, para cumplir contraste AA.
