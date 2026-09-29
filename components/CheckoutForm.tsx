@@ -15,9 +15,13 @@ import {
   type ShippingMethod,
 } from "@/lib/pricing";
 import { ESTADOS_MX } from "@/lib/estados-mx";
-import { checkoutSchema, firstIssue, MAX_NOTAS } from "@/lib/validation";
+import { checkoutSchema, firstIssue, isHoneypotFilled, MAX_NOTAS } from "@/lib/validation";
 import { crearPedido } from "@/app/actions/checkout";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
+import Honeypot from "@/components/Honeypot";
+import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
+import FormField from "@/components/FormField";
+import HealthNotice from "@/components/HealthNotice";
 import type { Direccion, DireccionEnvio } from "@/lib/types";
 
 const NUEVA = "nueva";
@@ -34,7 +38,7 @@ const EMPTY_DIRECCION: DireccionEnvio = {
 };
 
 const inputClass =
-  "w-full rounded-full bg-canvas px-5 py-3.5 text-[15px] outline-none transition-shadow placeholder:text-black/35 focus:ring-2 focus:ring-accent/30";
+  "w-full rounded-full bg-canvas px-5 py-3.5 text-base outline-none transition-shadow placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent";
 
 function formatDireccion(d: DireccionEnvio): string {
   return `${d.calle}, ${d.colonia}, ${d.ciudad}, ${d.estado}, C.P. ${d.codigo_postal}`;
@@ -44,10 +48,13 @@ export default function CheckoutForm({
   email: initialEmail,
   direcciones,
   isLoggedIn,
+  requiresBirthDate,
 }: {
   email: string;
   direcciones: Direccion[];
   isLoggedIn: boolean;
+  /** Invitados y cuentas sin fecha registrada deben confirmar su mayoría de edad aquí. */
+  requiresBirthDate: boolean;
 }) {
   const router = useRouter();
   const { items, subtotal, isHydrated, clear, promo, removePromo } = useCart();
@@ -60,6 +67,10 @@ export default function CheckoutForm({
   const [seleccion, setSeleccion] = useState<string>(predeterminada?.id ?? NUEVA);
   const [nueva, setNueva] = useState<DireccionEnvio>(EMPTY_DIRECCION);
   const [notas, setNotas] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
 
   const guardada = direcciones.find((d) => d.id === seleccion);
   const direccion: DireccionEnvio = guardada ?? nueva;
@@ -80,9 +91,8 @@ export default function CheckoutForm({
   if (items.length === 0) {
     return (
       <div className="mx-auto flex max-w-lg flex-col items-center gap-4 rounded-[28px] bg-white px-6 py-16 text-center shadow-card">
-        <span className="text-5xl">🍻</span>
         <h2 className="text-2xl font-semibold tracking-tight">Tu carrito está vacío</h2>
-        <p className="text-black/50">Agrega cervezas del catálogo para hacer tu pedido.</p>
+        <p className="text-muted">Agrega cervezas del catálogo para hacer tu pedido.</p>
         <Link href="/" className="mt-2 rounded-full bg-accent px-7 py-3.5 font-semibold text-white shadow-accent">
           Explorar catálogo
         </Link>
@@ -97,6 +107,7 @@ export default function CheckoutForm({
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    if (isHoneypotFilled(honeypot)) return;
 
     const input = {
       email,
@@ -115,6 +126,9 @@ export default function CheckoutForm({
       items: items.map(({ product, quantity }) => ({ product_id: product.id, cantidad: quantity })),
       // Sólo si ya alcanza la compra mínima; si no, el pedido va sin código.
       promo_code: promo && discount > 0 ? promo.code : null,
+      fecha_nacimiento: requiresBirthDate ? birthDate : null,
+      website: honeypot,
+      turnstileToken,
     };
 
     // Misma validación que el servidor, para avisar sin esperar la red.
@@ -123,9 +137,15 @@ export default function CheckoutForm({
       setError(firstIssue(parsed.error));
       return;
     }
+    if (TURNSTILE_ENABLED && !turnstileToken) {
+      setError("Espera un momento a que terminemos de verificar tu navegador.");
+      return;
+    }
 
     startTransition(async () => {
       const result = await crearPedido(input);
+      // Cada token de Turnstile sirve una sola vez.
+      setTurnstileReset((n) => n + 1);
       if (!result.ok) {
         // El código dejó de servir (se agotó o lo desactivaron): se quita y los totales se recalculan.
         if (result.promoInvalid) removePromo();
@@ -139,23 +159,48 @@ export default function CheckoutForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="grid gap-6 lg:grid-cols-[1fr_380px]">
+    <form onSubmit={handleSubmit} noValidate className="relative grid gap-6 lg:grid-cols-[1fr_380px]">
+      <Honeypot value={honeypot} onChange={setHoneypot} />
       <div className="space-y-4">
         {/* Contacto */}
         <section className="rounded-[28px] bg-white p-6 shadow-card">
           <SectionTitle step={1} title="Contacto" />
-          <input
-            type="email"
-            name="email"
-            autoComplete="email"
-            required
-            placeholder="Correo electrónico"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className={inputClass}
-          />
+          <div className="space-y-3">
+            <FormField id="checkout-email" label="Correo electrónico">
+              <input
+                id="checkout-email"
+                type="email"
+                name="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={inputClass}
+              />
+            </FormField>
+            {requiresBirthDate && (
+              <FormField
+                id="checkout-nacimiento"
+                label="Fecha de nacimiento"
+                hint="Confirmamos que eres mayor de 18 años. Al recibir tu pedido se pedirá identificación oficial."
+              >
+                <input
+                  id="checkout-nacimiento"
+                  type="date"
+                  name="fecha_nacimiento"
+                  autoComplete="bday"
+                  required
+                  min="1900-01-01"
+                  aria-describedby="checkout-nacimiento-hint"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  className={inputClass}
+                />
+              </FormField>
+            )}
+          </div>
           {!isLoggedIn && (
-            <p className="mt-3 px-2 text-sm text-black/50">
+            <p className="mt-3 px-2 text-sm text-muted">
               ¿Ya tienes cuenta?{" "}
               <Link href="/login?next=/checkout" className="font-semibold text-accent hover:underline">
                 Inicia sesión
@@ -198,74 +243,107 @@ export default function CheckoutForm({
 
           {seleccion === NUEVA && (
             <div className="grid gap-3 sm:grid-cols-2">
-              <input
-                className={`${inputClass} sm:col-span-2`}
-                placeholder="Nombre de quien recibe"
-                autoComplete="name"
-                value={nueva.nombre_completo}
-                onChange={(e) => updateNueva("nombre_completo", e.target.value)}
-              />
-              <input
-                className={inputClass}
-                placeholder="Teléfono (10 dígitos)"
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                value={nueva.telefono}
-                onChange={(e) => updateNueva("telefono", e.target.value)}
-              />
-              <input
-                className={inputClass}
-                placeholder="Código postal"
-                inputMode="numeric"
-                maxLength={5}
-                autoComplete="postal-code"
-                value={nueva.codigo_postal}
-                onChange={(e) => updateNueva("codigo_postal", e.target.value.replace(/\D/g, ""))}
-              />
-              <input
-                className={`${inputClass} sm:col-span-2`}
-                placeholder="Calle, número exterior e interior"
-                autoComplete="street-address"
-                value={nueva.calle}
-                onChange={(e) => updateNueva("calle", e.target.value)}
-              />
-              <input
-                className={inputClass}
-                placeholder="Colonia"
-                value={nueva.colonia}
-                onChange={(e) => updateNueva("colonia", e.target.value)}
-              />
-              <input
-                className={inputClass}
-                placeholder="Ciudad o alcaldía"
-                autoComplete="address-level2"
-                value={nueva.ciudad}
-                onChange={(e) => updateNueva("ciudad", e.target.value)}
-              />
-              <select
-                className={`${inputClass} appearance-none sm:col-span-2 ${nueva.estado ? "" : "text-black/35"}`}
-                autoComplete="address-level1"
-                value={nueva.estado}
-                onChange={(e) => updateNueva("estado", e.target.value)}
-              >
-                <option value="" disabled>
-                  Estado
-                </option>
-                {ESTADOS_MX.map((estado) => (
-                  <option key={estado} value={estado} className="text-black">
-                    {estado}
-                  </option>
-                ))}
-              </select>
-              <input
-                className={`${inputClass} sm:col-span-2`}
-                placeholder="Referencias para encontrar el domicilio (opcional)"
-                value={nueva.referencias ?? ""}
-                onChange={(e) => updateNueva("referencias", e.target.value)}
-              />
+              <div className="sm:col-span-2">
+                <FormField id="checkout-nombre" label="Nombre de quien recibe">
+                  <input
+                    className={inputClass}
+                    id="checkout-nombre"
+                    autoComplete="name"
+                    value={nueva.nombre_completo}
+                    onChange={(e) => updateNueva("nombre_completo", e.target.value)}
+                  />
+                </FormField>
+              </div>
+              <div>
+                <FormField id="checkout-telefono" label="Teléfono (10 dígitos)">
+                  <input
+                    className={inputClass}
+                    id="checkout-telefono"
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    value={nueva.telefono}
+                    onChange={(e) => updateNueva("telefono", e.target.value)}
+                  />
+                </FormField>
+              </div>
+              <div>
+                <FormField id="checkout-cp" label="Código postal">
+                  <input
+                    className={inputClass}
+                    id="checkout-cp"
+                    inputMode="numeric"
+                    maxLength={5}
+                    autoComplete="postal-code"
+                    value={nueva.codigo_postal}
+                    onChange={(e) => updateNueva("codigo_postal", e.target.value.replace(/\D/g, ""))}
+                  />
+                </FormField>
+              </div>
+              <div className="sm:col-span-2">
+                <FormField id="checkout-calle" label="Calle, número exterior e interior">
+                  <input
+                    className={inputClass}
+                    id="checkout-calle"
+                    autoComplete="street-address"
+                    value={nueva.calle}
+                    onChange={(e) => updateNueva("calle", e.target.value)}
+                  />
+                </FormField>
+              </div>
+              <div>
+                <FormField id="checkout-colonia" label="Colonia">
+                  <input
+                    className={inputClass}
+                    id="checkout-colonia"
+                    value={nueva.colonia}
+                    onChange={(e) => updateNueva("colonia", e.target.value)}
+                  />
+                </FormField>
+              </div>
+              <div>
+                <FormField id="checkout-ciudad" label="Ciudad o alcaldía">
+                  <input
+                    className={inputClass}
+                    id="checkout-ciudad"
+                    autoComplete="address-level2"
+                    value={nueva.ciudad}
+                    onChange={(e) => updateNueva("ciudad", e.target.value)}
+                  />
+                </FormField>
+              </div>
+              <div className="sm:col-span-2">
+                <FormField id="checkout-estado" label="Estado">
+                  <select
+                    id="checkout-estado"
+                    className={`${inputClass} appearance-none ${nueva.estado ? "" : "text-muted"}`}
+                    autoComplete="address-level1"
+                    value={nueva.estado}
+                    onChange={(e) => updateNueva("estado", e.target.value)}
+                  >
+                    <option value="" disabled>
+                      Elige un estado
+                    </option>
+                    {ESTADOS_MX.map((estado) => (
+                      <option key={estado} value={estado} className="text-black">
+                        {estado}
+                      </option>
+                    ))}
+                  </select>
+                </FormField>
+              </div>
+              <div className="sm:col-span-2">
+                <FormField id="checkout-referencias" label="Referencias para encontrar el domicilio (opcional)">
+                  <input
+                    className={inputClass}
+                    id="checkout-referencias"
+                    value={nueva.referencias ?? ""}
+                    onChange={(e) => updateNueva("referencias", e.target.value)}
+                  />
+                </FormField>
+              </div>
               {isLoggedIn && (
-                <p className="px-2 text-xs text-black/45 sm:col-span-2">
+                <p className="px-2 text-xs text-muted sm:col-span-2">
                   Guardaremos esta dirección en tu cuenta para que tu próxima compra sea en 1 clic.
                 </p>
               )}
@@ -321,16 +399,20 @@ export default function CheckoutForm({
         {/* Notas */}
         <section className="rounded-[28px] bg-white p-6 shadow-card">
           <SectionTitle step={4} title="Notas o instrucciones especiales para su pedido" />
+          <label htmlFor="checkout-notas" className="sr-only">
+            Notas o instrucciones especiales
+          </label>
           <textarea
+            id="checkout-notas"
             name="notas"
             rows={4}
             maxLength={MAX_NOTAS}
             placeholder="Ej. Dejar en recepción, tocar el timbre dos veces, es un regalo…"
             value={notas}
             onChange={(e) => setNotas(e.target.value)}
-            className="w-full resize-none rounded-[20px] bg-canvas px-5 py-4 text-[15px] outline-none transition-shadow placeholder:text-black/35 focus:ring-2 focus:ring-accent/30"
+            className="w-full resize-none rounded-[20px] bg-canvas px-5 py-4 text-base outline-none transition-shadow placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent"
           />
-          <p className="mt-1 px-2 text-right text-xs tabular-nums text-black/35">
+          <p className="mt-1 px-2 text-right text-xs tabular-nums text-muted">
             {notas.length}/{MAX_NOTAS}
           </p>
         </section>
@@ -368,8 +450,10 @@ export default function CheckoutForm({
           </div>
         </div>
 
+        <Turnstile onToken={setTurnstileToken} resetKey={turnstileReset} />
+
         {error && (
-          <p role="alert" className="rounded-[20px] bg-red-50 px-4 py-3 text-sm text-red-600">
+          <p role="alert" className="rounded-[20px] bg-red-50 px-4 py-3 text-sm text-danger">
             {error}
           </p>
         )}
@@ -382,9 +466,10 @@ export default function CheckoutForm({
           {guardada && !isPending && <Zap size={16} fill="currentColor" />}
           {isPending ? "Confirmando…" : guardada ? "Comprar en 1 clic" : "Confirmar pedido"}
         </button>
-        <p className="text-center text-[11px] text-black/35">
-          Te contactaremos para coordinar el pago. Pagos en línea con Stripe / Mercado Pago próximamente.
+        <p className="text-center text-xs text-muted">
+          Te contactaremos para coordinar el pago. Muy pronto podrás pagar en línea con Mercado Pago.
         </p>
+        <HealthNotice className="text-center" />
       </aside>
     </form>
   );

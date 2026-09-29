@@ -5,6 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { calculateOrderTotals, formatMXN } from "@/lib/pricing";
 import { findActivePromo } from "@/lib/promo";
 import { checkoutSchema, firstIssue } from "@/lib/validation";
+import { guardPublicForm } from "@/lib/security/form-guard";
+import { getProfileBirthDate } from "@/lib/profile";
 import type { AppliedPromo, DireccionEnvio } from "@/lib/types";
 
 export type CheckoutResult =
@@ -20,12 +22,23 @@ export type CheckoutResult =
 export async function crearPedido(input: unknown): Promise<CheckoutResult> {
   const parsed = checkoutSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
-  const { email, metodo_envio, direccion, notas, items, promo_code } = parsed.data;
+  const { email, metodo_envio, direccion, notas, items, promo_code, fecha_nacimiento, website, turnstileToken } =
+    parsed.data;
+
+  const guard = await guardPublicForm("checkout", { honeypot: website, turnstileToken });
+  if (!guard.ok) return guard;
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  // Venta de alcohol: toda compra queda ligada a una fecha de nacimiento de mayor de edad
+  // (la de la cuenta o, como invitado, la que se captura aquí; el esquema ya validó los 18 años).
+  const fechaNacimiento = (user && (await getProfileBirthDate(user.id))) || fecha_nacimiento;
+  if (!fechaNacimiento) {
+    return { ok: false, error: "Escribe tu fecha de nacimiento para confirmar que eres mayor de edad." };
+  }
 
   const admin = createAdminClient();
   const productIds = [...new Set(items.map((item) => item.product_id))];
@@ -95,6 +108,7 @@ export async function crearPedido(input: unknown): Promise<CheckoutResult> {
       total,
       direccion: direccionEnvio,
       notas,
+      cliente_fecha_nacimiento: fechaNacimiento,
       // Sólo se envían con cupón: sin él, el checkout funciona aunque falte la migración 004.
       ...(promo ? { promo_code: promo.code, descuento: discount } : {}),
     })

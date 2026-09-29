@@ -25,6 +25,45 @@ export const credentialsSchema = z.object({
 
 export type Credentials = z.infer<typeof credentialsSchema>;
 
+export const MIN_AGE = 18;
+
+/** ¿La fecha (AAAA-MM-DD) es de alguien con 18 años cumplidos a la fecha de `today`? */
+export function isAdult(birthDate: string, today: Date = new Date()): boolean {
+  const [year, month, day] = birthDate.split("-").map(Number);
+  const limit = new Date(Date.UTC(today.getUTCFullYear() - MIN_AGE, today.getUTCMonth(), today.getUTCDate()));
+  return Date.UTC(year, month - 1, day) <= limit.getTime();
+}
+
+/** Fecha de nacimiento de un input `type="date"`: real, desde 1900 y de mayor de edad. */
+export const birthDateSchema = z
+  .string("Escribe tu fecha de nacimiento.")
+  .trim()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Escribe tu fecha de nacimiento.")
+  .refine((value) => {
+    const date = new Date(`${value}T00:00:00Z`);
+    return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value) && value >= "1900-01-01";
+  }, "Escribe una fecha de nacimiento válida.")
+  .refine((value) => isAdult(value), `La venta es exclusiva para mayores de ${MIN_AGE} años.`);
+
+/** Campos anti-spam que viajan con cada formulario público. */
+const antiSpamFields = {
+  [HONEYPOT_FIELD]: z.string().optional(),
+  turnstileToken: z.string().max(2048).nullish(),
+};
+
+export const loginSchema = credentialsSchema.extend(antiSpamFields);
+
+export const signupSchema = credentialsSchema.extend({
+  ...antiSpamFields,
+  fecha_nacimiento: birthDateSchema,
+  next: z.string().max(300).optional(),
+});
+
+export const recoverSchema = z.object({
+  ...antiSpamFields,
+  email: z.email("Escribe un correo electrónico válido.").trim().toLowerCase(),
+});
+
 const trimmed = (max: number, message: string) => z.string().trim().min(1, message).max(max);
 
 export const direccionSchema = z.object({
@@ -77,6 +116,9 @@ export const checkoutSchema = z
       .min(1, "Tu carrito está vacío.")
       .max(100),
     promo_code: promoCodeSchema.nullish().transform((value) => value || null),
+    /** Obligatoria salvo que la cuenta ya tenga una registrada (lo decide el servidor). */
+    fecha_nacimiento: birthDateSchema.nullish().transform((value) => value || null),
+    ...antiSpamFields,
   })
   .refine(
     (data) => data.metodo_envio !== "local" || isLocalShippingState(data.direccion.estado),

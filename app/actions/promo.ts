@@ -1,6 +1,8 @@
 "use server";
 
 import { findActivePromo } from "@/lib/promo";
+import { getClientIp } from "@/lib/security/form-guard";
+import { isWithinRateLimit } from "@/lib/security/rate-limit";
 import { firstIssue, promoCodeSchema } from "@/lib/validation";
 import type { AppliedPromo } from "@/lib/types";
 
@@ -10,6 +12,10 @@ export type PromoResult = { ok: true; promo: AppliedPromo } | { ok: false; error
 export async function validarCodigoPromo(code: string): Promise<PromoResult> {
   const parsed = promoCodeSchema.safeParse(code);
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
+  // Evita adivinar códigos por fuerza bruta.
+  if (!(await isWithinRateLimit("promo", await getClientIp()))) {
+    return { ok: false, error: "Demasiados intentos. Espera unos minutos y vuelve a intentarlo." };
+  }
 
   const result = await findActivePromo(parsed.data);
   if (!result.ok) return result;

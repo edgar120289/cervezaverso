@@ -17,3 +17,6 @@ export const CONTACT = {
   /** Correo de atención: déjalo en null hasta tener uno oficial (la tarjeta se oculta). */
   email: null as string | null,
 } as const;
+
+/** Leyenda sanitaria obligatoria para bebidas alcohólicas (pendiente de revisión legal). */
+export const HEALTH_NOTICE = "El abuso en el consumo de este producto es nocivo para la salud.";

@@ -5,7 +5,12 @@
   --color-canvas: var(--color-canvas-mist);
   --color-surface: #ffffff;
   --color-ink: #000000;
+  /* Texto secundario: #787574 de la referencia oscurecido para cumplir AA (5.4:1 sobre canvas). */
+  --color-muted: #666361;
+  --color-hairline: #ebebeb;
+  --color-danger: #b91c1c;
   --color-accent: #5433eb;
+  --color-accent-wash: #c0b5f3;
   --color-accent-shadow: rgba(69, 36, 219, 0.34);
   --shadow-card: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px;
   --shadow-accent: rgba(69, 36, 219, 0.34) 0px 4px 24px 0px;
@@ -18,11 +23,15 @@
   --color-canvas: var(--color-canvas);
   --color-surface: var(--color-surface);
   --color-ink: var(--color-ink);
+  --color-muted: var(--color-muted);
+  --color-hairline: var(--color-hairline);
+  --color-danger: var(--color-danger);
   --color-accent: var(--color-accent);
+  --color-accent-wash: var(--color-accent-wash);
   --radius-card: var(--radius-card);
   --radius-media: var(--radius-media);
   --radius-pill: var(--radius-pill);
-  --font-sans: "GT Standard", var(--font-inter), "Inter", system-ui, sans-serif;
+  --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
 }
 
 html {
@@ -32,7 +41,7 @@ html {
 body {
   background: var(--color-canvas);
   color: var(--color-ink);
-  font-family: "GT Standard", var(--font-inter), "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-inter), "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   letter-spacing: -0.03em;
 }
 
