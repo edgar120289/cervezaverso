@@ -3,6 +3,7 @@ import MultiverseLogo from "./MultiverseLogo";
 import { FacebookIcon, InstagramIcon, WhatsAppIcon } from "./SocialIcons";
 import { CONTACT } from "@/lib/site";
 import HealthNotice from "./HealthNotice";
+import CookieSettingsButton from "./CookieSettingsButton";
 
 const SOCIAL_LINKS = [
   { icon: InstagramIcon, href: CONTACT.instagramUrl, label: `Instagram ${CONTACT.handle}` },
@@ -32,24 +33,27 @@ export default function Footer({ logoImages, logoFrame }: FooterProps) {
             <MultiverseLogo images={logoImages} frame={logoFrame} size={72} />
             <div>
               <p className="text-lg font-semibold tracking-tight">Cervezaverso</p>
-              <p className="mt-1 text-sm text-black/50">El placer del deber cumplido.</p>
+              <p className="mt-1 text-sm text-muted">El placer del deber cumplido.</p>
             </div>
           </div>
 
           <nav aria-label="Enlaces del sitio">
-            <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm font-semibold text-black/60 md:max-w-sm md:justify-end">
+            <ul className="flex flex-wrap justify-center gap-x-5 text-sm font-semibold text-black/65 md:max-w-sm md:justify-end">
               {FOOTER_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className="transition-colors hover:text-black">
+                  <Link href={link.href} className="inline-flex min-h-11 items-center transition-colors hover:text-black">
                     {link.label}
                   </Link>
                 </li>
               ))}
+              <li>
+                <CookieSettingsButton className="inline-flex min-h-11 items-center font-semibold transition-colors hover:text-black" />
+              </li>
             </ul>
           </nav>
         </div>
 
-        <div className="mt-8 flex flex-col-reverse items-center gap-5 border-t border-black/5 pt-6 text-xs text-black/40 sm:flex-row sm:justify-between">
+        <div className="mt-8 flex flex-col-reverse items-center gap-5 border-t border-black/5 pt-6 text-xs text-muted sm:flex-row sm:justify-between">
           <div className="text-center sm:text-left">
             <p>© {new Date().getFullYear()} Cervezaverso. Todos los derechos reservados.</p>
             <p className="mt-1">Venta exclusiva para mayores de 18 años.</p>
@@ -57,7 +61,7 @@ export default function Footer({ logoImages, logoFrame }: FooterProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="mr-1 font-semibold text-black/50">{CONTACT.handle}</span>
+            <span className="mr-1 font-semibold text-muted">{CONTACT.handle}</span>
             {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
               <a
                 key={label}
@@ -65,7 +69,7 @@ export default function Footer({ logoImages, logoFrame }: FooterProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f2f4f5] text-black/60 transition-colors hover:bg-black hover:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-canvas text-black/65 transition-colors hover:bg-black hover:text-white"
               >
                 <Icon size={18} />
               </a>
