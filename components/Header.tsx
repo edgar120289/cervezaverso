@@ -7,6 +7,7 @@ import Image from "next/image";
 import MultiverseLogo from "./MultiverseLogo";
 import AccountMenu from "./AccountMenu";
 import HeaderSearch from "./HeaderSearch";
+import MobileMenu from "./MobileMenu";
 import { useCart } from "@/lib/cart-context";
 
 export default function Header({ logoImages }: { logoImages: string[] }) {
@@ -14,8 +15,13 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
 
   return (
     <header className="sticky top-0 z-40 px-4 pt-4">
-      <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 rounded-full bg-white/80 px-4 py-2 shadow-card backdrop-blur-lg">
-        <div className="flex shrink-0 items-center gap-2 py-0.5 pr-2">
+      {/* Móvil: hamburguesa | logotipo al centro | carrito. Desde md: logotipo, buscador, cuenta y carrito. */}
+      <div className="relative mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-full bg-white/80 px-3 py-2 shadow-card backdrop-blur-lg md:flex md:justify-between md:px-4">
+        <div className="md:hidden">
+          <MobileMenu />
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2 py-0.5 md:pr-2">
           <MultiverseLogo images={logoImages} size={40} priority />
           {/* El PNG trae ~34% de margen transparente a la izquierda; se recorta para que el logotipo quede pegado al tarro. */}
           <Link
@@ -35,13 +41,17 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
           </Link>
         </div>
 
-        <div className="flex flex-1 items-center justify-end gap-1.5">
-          {/* useSearchParams: el buscador se hidrata aparte para no volver dinámico todo el layout. */}
-          <Suspense fallback={null}>
-            <HeaderSearch />
-          </Suspense>
+        <div className="flex items-center justify-end gap-1.5 md:flex-1">
+          <div className="hidden w-full justify-end md:flex">
+            {/* useSearchParams: el buscador se hidrata aparte para no volver dinámico todo el layout. */}
+            <Suspense fallback={null}>
+              <HeaderSearch />
+            </Suspense>
+          </div>
           <nav aria-label="Cuenta y carrito" className="flex items-center gap-1.5">
-            <AccountMenu />
+            <div className="hidden md:block">
+              <AccountMenu />
+            </div>
             <button
               type="button"
               onClick={openDrawer}

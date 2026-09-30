@@ -1,174 +1,47 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Sparkles } from "lucide-react";
-import { formatMXN, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
-import { useSommelier } from "./SommelierProvider";
-
-export type HeroSlide = { src: string; label: string };
-
-const AUTOPLAY_MS = 4500;
-const EASE = [0.16, 1, 0.3, 1] as const;
+import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 
 type HeroCinematicProps = {
-  slides: HeroSlide[];
-  /** B-roll de fondo; sin él (o si falla al cargar) se usa el degradado Canvas Mist. */
+  /** Video de fondo; sin él (o si falla al cargar) se usa un fondo gris oscuro. */
   videoSrc?: string;
 };
 
-export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) {
-  const { openQuiz } = useSommelier();
+export default function HeroCinematic({ videoSrc }: HeroCinematicProps) {
   const reduceMotion = useReducedMotion();
   const [videoFailed, setVideoFailed] = useState(false);
   // Con "reducir movimiento" no se reproduce video de fondo.
   const hasVideo = Boolean(videoSrc) && !videoFailed && !reduceMotion;
 
-  const [index, setIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const count = slides.length;
-  const goTo = useCallback((next: number) => setIndex(((next % count) + count) % count), [count]);
-
-  useEffect(() => {
-    if (count < 2 || isPaused || reduceMotion) return;
-    const id = window.setTimeout(() => goTo(index + 1), AUTOPLAY_MS);
-    return () => window.clearTimeout(id);
-  }, [index, count, isPaused, reduceMotion, goTo]);
-
-  const slide = slides[index];
-  const dark = hasVideo;
-
-  const reveal = (delay: number) => ({
-    initial: reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8, ease: EASE, delay },
-  });
-
   return (
     <section
       aria-label="Bienvenida"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      className={`relative isolate overflow-hidden rounded-[28px] shadow-card ${
-        dark ? "bg-black text-white" : "bg-canvas text-black"
-      }`}
+      className="relative isolate flex min-h-[420px] items-center justify-center overflow-hidden rounded-[28px] bg-neutral-900 shadow-card md:min-h-[560px]"
     >
-      {/* Fondo */}
-      {hasVideo ? (
-        <>
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="metadata"
-            aria-hidden="true"
-            onError={() => setVideoFailed(true)}
-            className="absolute inset-0 -z-10 h-full w-full scale-105 object-cover"
-            src={videoSrc}
-          />
-          {/* Capa cinematográfica: viñeta + degradado para legibilidad del texto. */}
-          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/85 via-black/55 to-black/10" />
-          <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
-        </>
-      ) : (
-        <div aria-hidden className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-br from-white via-[#f2f4f5] to-[#e7e4fb]" />
-          <div className="absolute -right-24 -top-24 h-[420px] w-[420px] rounded-full bg-accent/15 blur-3xl" />
-          <div className="absolute -bottom-32 left-1/4 h-[360px] w-[360px] rounded-full bg-[#f5b942]/20 blur-3xl" />
-        </div>
+      {hasVideo && (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          aria-hidden="true"
+          onError={() => setVideoFailed(true)}
+          className="object-cover w-full h-full absolute inset-0 z-0"
+          src={videoSrc}
+        />
       )}
+      <div aria-hidden className="absolute inset-0 z-0 bg-black/55" />
 
-      <div className="grid items-center gap-6 px-6 pb-12 pt-12 sm:px-12 md:min-h-[600px] md:grid-cols-[1.25fr_1fr] md:py-16">
-        <div className="flex min-w-0 flex-col items-start">
-          <motion.p
-            {...reveal(0)}
-            className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide backdrop-blur ${
-              dark ? "bg-white/10 text-white/90" : "bg-white/70 text-black/60 shadow-card"
-            }`}
-          >
-            Cervezaverso · Cerveza artesanal nacional e importada
-          </motion.p>
-
-          <motion.h1
-            {...reveal(0.1)}
-            className="mt-6 max-w-full text-[2.5rem] font-semibold leading-[1] tracking-[-0.05em] min-[400px]:text-[2.9rem] sm:text-6xl md:text-[3.25rem] lg:text-7xl xl:text-[4.75rem]"
-          >
-            El placer
-            <br />
-            del{" "}
-            <span
-              className={`inline-block bg-clip-text pb-[0.1em] pr-[0.12em] italic text-transparent ${
-                dark
-                  ? "bg-gradient-to-r from-[#c9bcff] via-white to-[#f5d08a]"
-                  : "bg-gradient-to-r from-[#5433eb] via-[#7b5cf5] to-[#c9892b]"
-              }`}
-            >
-              deber cumplido.
-            </span>
-          </motion.h1>
-
-          <motion.p
-            {...reveal(0.2)}
-            className={`mt-6 max-w-md text-lg leading-relaxed tracking-[-0.01em] ${dark ? "text-white/85" : "text-muted"}`}
-          >
-            Cervezas de más de 20 países. Estilos, orígenes y maridajes seleccionados, con envío gratis desde{" "}
-            {formatMXN(FREE_SHIPPING_THRESHOLD)}.
-          </motion.p>
-
-          <motion.div {...reveal(0.3)} className="mt-8 flex w-full flex-col sm:w-auto">
-            <button
-              type="button"
-              onClick={openQuiz}
-              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full bg-accent px-7 py-4 font-semibold text-white shadow-accent transition-transform hover:brightness-110 active:scale-[0.98]"
-            >
-              {/* Brillo que recorre el botón */}
-              {!reduceMotion && (
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent motion-safe:animate-[shine_3.5s_ease-in-out_infinite]"
-                />
-              )}
-              <Sparkles size={18} className="transition-transform group-hover:rotate-12" />
-              Descubre tu Cerveza Ideal (Sommelier)
-            </button>
-          </motion.div>
-        </div>
-
-        {slide && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: EASE, delay: 0.25 }}
-            className="relative mx-auto aspect-square w-full max-w-[240px] md:max-w-[420px]"
-          >
-            <div
-              aria-hidden
-              className={`absolute inset-[12%] rounded-full blur-3xl ${dark ? "bg-accent/40" : "bg-accent/20"}`}
-            />
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.div
-                key={slide.src}
-                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 40, rotate: 4 }}
-                animate={{ opacity: 1, x: 0, rotate: 0 }}
-                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -40, rotate: -4 }}
-                transition={{ duration: 0.55, ease: EASE }}
-                className="absolute inset-0"
-              >
-                <Image
-                  src={slide.src}
-                  alt={`Tarro Cervezaverso edición ${slide.label}`}
-                  fill
-                  sizes="(min-width: 768px) 420px, 240px"
-                  priority={index === 0}
-                  className="object-contain drop-shadow-[0_28px_40px_rgba(0,0,0,0.45)]"
-                />
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
-        )}
-      </div>
+      <motion.h1
+        initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 max-w-3xl text-balance px-6 text-center text-4xl font-light tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl"
+      >
+        El placer del deber cumplido
+      </motion.h1>
     </section>
   );
 }

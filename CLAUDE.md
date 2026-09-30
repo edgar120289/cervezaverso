@@ -48,6 +48,7 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - Pendiente de revisar en navegador (360, 768, 1024 y 1440 px): no hubo navegador disponible en la sesión.
 - Pendientes de datos del negocio: marcados `[[PENDIENTE]]` en `/terminos` y `/privacidad`.
 - Fase 2.5 · Refactor UI/UX (header con logotipo horizontal, menú de sesión, Hero, Sommelier con tarrito kawaii, filtros sin Estilo, tarjetas simétricas): hecho en código (2026-09-29), pendiente de revisión en navegador y de OK.
+- Fase 2.7 · Refactor UI/UX (Hero con video, Sommelier flotante, menú hamburguesa móvil, filtros en panel lateral con chips): hecho en código (2026-09-29), pendiente de revisión en navegador y de OK.
 - Siguiente: Fase 3 · Construcción (pago con Mercado Pago, Sommelier con Gemini y Tarjetas de Regalo), página por página.
 - Última actualización: 2026-09-29.
 
@@ -74,3 +75,4 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - 2026-09-29 · Texto secundario con el token `muted` (#666361), no con `text-black/NN`, para cumplir contraste AA.
 - 2026-09-29 · Filtro de Estilo eliminado del catálogo (la búsqueda de texto sigue encontrando por estilo). Las fichas muestran país con bandera emoji (`lib/country-flags.ts`), ABV y volumen con íconos de lucide-react, y las fotos de producto usan `object-contain` con respaldo si falla la imagen.
 - 2026-09-29 · IA: se reemplaza OpenAI por Google Gemini (`@google/generative-ai`, `GEMINI_API_KEY`, modelo por defecto `gemini-1.5-flash`, sobrescribible con `GEMINI_MODEL`). El contrato de `/api/generate-description` no cambia (`origen`, `perfil`, `maridaje`). Hero con un solo CTA: el del Sommelier.
+- 2026-09-29 · Fase 2.7: el Hero pierde carrusel y CTA (solo video de fondo con overlay y el lema centrado); el Sommelier pasa a burbuja flotante (`SommelierFloating`, solo en la portada) que abre el quiz; en móvil el header queda en hamburguesa · logotipo · carrito; los filtros viven en un slide-over con chips activos y "Limpiar todos los filtros". Sustituye el "Hero con un solo CTA" anterior.

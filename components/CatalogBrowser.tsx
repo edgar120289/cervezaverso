@@ -2,6 +2,7 @@
 
 import { useDeferredValue, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import type { Product } from "@/lib/types";
@@ -18,6 +19,7 @@ import {
   type FacetOption,
 } from "@/lib/catalog-filters";
 import { formatMXN } from "@/lib/pricing";
+import { useIsClient } from "@/lib/use-is-client";
 import ProductCard from "./ProductCard";
 
 type Facet = "countries" | "breweries";
@@ -219,12 +221,90 @@ function FilterPanel({
   );
 }
 
+/** Panel lateral (slide-over) con los filtros; se monta en <body> para no depender de ningún contenedor. */
+function FilterDrawer({
+  isOpen,
+  onClose,
+  resultCount,
+  children,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  resultCount: number;
+  children: ReactNode;
+}) {
+  const isClient = useIsClient();
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, onClose]);
+
+  if (!isClient) return null;
+
+  return createPortal(
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[60]">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            aria-hidden
+            className="absolute inset-0 bg-black/40"
+          />
+          <motion.aside
+            role="dialog"
+            aria-modal="true"
+            aria-label="Filtros del catálogo"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="absolute inset-y-0 right-0 flex w-[min(24rem,90vw)] flex-col rounded-l-[28px] bg-white shadow-card"
+          >
+            <div className="flex items-center justify-between px-5 pb-2 pt-4">
+              <h2 className="text-lg font-semibold tracking-[-0.03em]">Filtros</h2>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Cerrar filtros"
+                className="flex h-11 w-11 items-center justify-center rounded-full text-black/70 hover:bg-black/5"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-5 py-3">{children}</div>
+            <div className="border-t border-black/5 p-4">
+              <button
+                type="button"
+                onClick={onClose}
+                className="min-h-12 w-full rounded-full bg-accent px-6 text-sm font-semibold text-white shadow-accent"
+              >
+                Ver {resultCount} {resultCount === 1 ? "cerveza" : "cervezas"}
+              </button>
+            </div>
+          </motion.aside>
+        </div>
+      )}
+    </AnimatePresence>,
+    document.body
+  );
+}
+
 /** Catálogo con buscador y filtros en tiempo real (País, Precio, ABV y Marca). */
 export default function CatalogBrowser({ products }: { products: Product[] }) {
   const urlQuery = useSearchParams().get(SEARCH_PARAM) ?? "";
   const [filters, setFilters] = useState<CatalogFilters>(() => ({ ...EMPTY_FILTERS, query: urlQuery }));
   const [appliedUrlQuery, setAppliedUrlQuery] = useState(urlQuery);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Búsqueda nueva desde el header (`/?q=`): se aplica durante el render, sin efecto de más.
   if (urlQuery !== appliedUrlQuery) {
@@ -283,106 +363,86 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
   const panel = <FilterPanel products={products} filters={filters} setFilters={setFilters} />;
 
   return (
-    <div className="lg:grid lg:grid-cols-[250px_1fr] lg:items-start lg:gap-6">
-      {/* Sidebar (escritorio) */}
-      <aside
-        aria-label="Filtros del catálogo"
-        className="hidden max-h-[calc(100dvh-7rem)] overflow-y-auto rounded-[28px] bg-white p-5 shadow-card lg:sticky lg:top-24 lg:block"
-      >
-        {panel}
-      </aside>
+    <div className="min-w-0 space-y-4">
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+          <input
+            type="search"
+            value={filters.query}
+            onChange={(e) => setFilters((c) => ({ ...c, query: e.target.value }))}
+            placeholder="Busca por nombre, estilo, país o cervecería"
+            aria-label="Buscar cervezas"
+            className="w-full rounded-full bg-white py-3.5 pl-11 pr-5 text-sm shadow-card outline-none focus:ring-2 focus:ring-black/15"
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => setDrawerOpen(true)}
+          aria-haspopup="dialog"
+          aria-expanded={drawerOpen}
+          className="flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold shadow-card"
+        >
+          <SlidersHorizontal size={16} />
+          Filtros
+          {activeCount > 0 && (
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[11px] text-white">
+              {activeCount}
+            </span>
+          )}
+        </button>
+      </div>
 
-      <div className="min-w-0 space-y-4">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              type="search"
-              value={filters.query}
-              onChange={(e) => setFilters((c) => ({ ...c, query: e.target.value }))}
-              placeholder="Busca por nombre, estilo, país o cervecería"
-              aria-label="Buscar cervezas"
-              className="w-full rounded-full bg-white py-3.5 pl-11 pr-5 text-sm shadow-card outline-none focus:ring-2 focus:ring-black/15"
-            />
-          </div>
+      <FilterDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} resultCount={results.length}>
+        {panel}
+      </FilterDrawer>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="mr-1 text-sm text-muted" aria-live="polite">
+          {results.length} {results.length === 1 ? "cerveza" : "cervezas"}
+        </p>
+        {activeChips.map((chip) => (
+          <button
+            key={chip.key}
+            type="button"
+            onClick={chip.clear}
+            aria-label={`Quitar filtro ${chip.label}`}
+            className="flex items-center gap-1 rounded-full bg-white py-1.5 pl-3 pr-2 text-xs font-semibold shadow-card hover:bg-black hover:text-white"
+          >
+            {chip.label}
+            <X size={13} />
+          </button>
+        ))}
+        {hasAnyFilter && (
           <button
             type="button"
-            onClick={() => setMobileOpen((open) => !open)}
-            aria-expanded={mobileOpen}
-            className="flex shrink-0 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold shadow-card lg:hidden"
+            onClick={() => setFilters(EMPTY_FILTERS)}
+            className="text-xs font-semibold text-accent hover:underline"
           >
-            <SlidersHorizontal size={16} />
-            Filtros
-            {activeCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[11px] text-white">
-                {activeCount}
-              </span>
-            )}
+            Limpiar todos los filtros
           </button>
-        </div>
-
-        {/* Panel plegable (móvil y tablet) */}
-        <AnimatePresence initial={false}>
-          {mobileOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="overflow-hidden lg:hidden"
-            >
-              <div className="rounded-[28px] bg-white p-5 shadow-card">{panel}</div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="mr-1 text-sm text-muted" aria-live="polite">
-            {results.length} {results.length === 1 ? "cerveza" : "cervezas"}
-          </p>
-          {activeChips.map((chip) => (
-            <button
-              key={chip.key}
-              type="button"
-              onClick={chip.clear}
-              aria-label={`Quitar filtro ${chip.label}`}
-              className="flex items-center gap-1 rounded-full bg-white py-1.5 pl-3 pr-2 text-xs font-semibold shadow-card hover:bg-black hover:text-white"
-            >
-              {chip.label}
-              <X size={13} />
-            </button>
-          ))}
-          {hasAnyFilter && (
-            <button
-              type="button"
-              onClick={() => setFilters(EMPTY_FILTERS)}
-              className="text-xs font-semibold text-accent hover:underline"
-            >
-              Limpiar todo
-            </button>
-          )}
-        </div>
-
-        {results.length === 0 ? (
-          <div className="rounded-[28px] bg-white px-6 py-14 text-center shadow-card">
-            <p className="text-lg font-semibold tracking-[-0.03em]">Ninguna cerveza coincide</p>
-            <p className="mt-1 text-sm text-muted">Prueba con otros filtros o una búsqueda más corta.</p>
-            <button
-              type="button"
-              onClick={() => setFilters(EMPTY_FILTERS)}
-              className="mt-5 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-accent"
-            >
-              Limpiar filtros
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-            {results.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
         )}
       </div>
+
+      {results.length === 0 ? (
+        <div className="rounded-[28px] bg-white px-6 py-14 text-center shadow-card">
+          <p className="text-lg font-semibold tracking-[-0.03em]">Ninguna cerveza coincide</p>
+          <p className="mt-1 text-sm text-muted">Prueba con otros filtros o una búsqueda más corta.</p>
+          <button
+            type="button"
+            onClick={() => setFilters(EMPTY_FILTERS)}
+            className="mt-5 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-accent"
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {results.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
