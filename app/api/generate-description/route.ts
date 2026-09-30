@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI, GoogleGenerativeAIFetchError, SchemaType, type ObjectSchema } from "@google/generative-ai";
+import { GoogleGenerativeAIFetchError, SchemaType, type ObjectSchema } from "@google/generative-ai";
 import { z } from "zod";
+import { generateWithFallback } from "@/lib/gemini";
 import { createClient } from "@/lib/supabase/server";
 import { firstIssue } from "@/lib/validation";
-
-const DEFAULT_MODEL = "gemini-1.5-flash";
 
 const SYSTEM_PROMPT = `Eres el Sommelier Digital de Cervezaverso, una tienda mexicana de cerveza artesanal nacional e importada.
 Escribes para gente curiosa que disfruta la cerveza pero no es experta: tu tono es cálido, cautivador y educativo,
@@ -76,18 +75,21 @@ export async function POST(req: NextRequest) {
   const { name, style, country } = parsed.data;
 
   try {
-    const model = new GoogleGenerativeAI(process.env.GEMINI_API_KEY).getGenerativeModel({
-      model: process.env.GEMINI_MODEL || DEFAULT_MODEL,
-      systemInstruction: SYSTEM_PROMPT,
-      generationConfig: {
-        temperature: 0.8,
-        responseMimeType: "application/json",
-        responseSchema: RESPONSE_SCHEMA,
+    const completion = await generateWithFallback(
+      "generate-description",
+      process.env.GEMINI_API_KEY,
+      {
+        systemInstruction: SYSTEM_PROMPT,
+        generationConfig: {
+          temperature: 0.8,
+          responseMimeType: "application/json",
+          responseSchema: RESPONSE_SCHEMA,
+        },
       },
-    });
-    const completion = await model.generateContent(`Cerveza: ${name}
+      `Cerveza: ${name}
 Estilo: ${style}
-País: ${country}`);
+País: ${country}`
+    );
 
     if (completion.response.promptFeedback?.blockReason) {
       return NextResponse.json({ error: "La IA no quiso generar esta ficha. Intenta de nuevo." }, { status: 502 });
@@ -106,9 +108,11 @@ País: ${country}`);
           : err.status === 429
             ? "Gemini rechazó la solicitud por límite de uso. Espera un momento e intenta de nuevo."
             : err.status === 404
-              ? "El modelo de Gemini no está disponible. Define GEMINI_MODEL en .env.local."
-              : `Error de Gemini (${err.status ?? "sin estado"}).`;
-      console.error("[generate-description]", err.status, err.message);
+              ? "Ningún modelo de Gemini está disponible. Revisa GEMINI_MODEL en .env.local."
+              : err.status === 503
+                ? "Gemini está saturado en este momento. Intenta de nuevo en unos segundos."
+                : `Error de Gemini (${err.status ?? "sin estado"}).`;
+      console.error("[generate-description] error final:", err.status, err.message);
       return NextResponse.json({ error: message }, { status: 502 });
     }
     console.error("[generate-description]", err);

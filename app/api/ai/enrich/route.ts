@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateWithFallback } from "@/lib/gemini";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -57,12 +57,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Producto no encontrado." }, { status: 404 });
   }
 
-  const model = new GoogleGenerativeAI(process.env.GEMINI_API_KEY).getGenerativeModel({
-    model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
-    systemInstruction: SYSTEM_PROMPT,
-    generationConfig: { responseMimeType: "application/json" },
-  });
-  const completion = await model.generateContent(
+  const completion = await generateWithFallback(
+    "ai-enrich",
+    process.env.GEMINI_API_KEY,
+    { systemInstruction: SYSTEM_PROMPT, generationConfig: { responseMimeType: "application/json" } },
     `Cerveza: ${product.name}
 Cervecería: ${product.brewery ?? "N/D"}
 País: ${product.country}
