@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useSommelier } from "./SommelierProvider";
 
@@ -14,6 +15,7 @@ const SWAP_MS = 4000;
 export default function SommelierFloating() {
   const { openQuiz } = useSommelier();
   const reduceMotion = useReducedMotion();
+  const pathname = usePathname();
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -21,6 +23,8 @@ export default function SommelierFloating() {
     const id = window.setInterval(() => setIndex((i) => (i + 1) % MESSAGES.length), SWAP_MS);
     return () => window.clearInterval(id);
   }, [reduceMotion]);
+
+  if (pathname.startsWith("/admin")) return null;
 
   return (
     <button
