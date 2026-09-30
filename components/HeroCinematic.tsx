@@ -80,7 +80,7 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
         </div>
       )}
 
-      <div className="grid items-center gap-6 px-6 pb-16 pt-12 sm:px-12 md:min-h-[600px] md:grid-cols-[1.25fr_1fr] md:py-16">
+      <div className="grid items-center gap-6 px-6 pb-12 pt-12 sm:px-12 md:min-h-[600px] md:grid-cols-[1.25fr_1fr] md:py-16">
         <div className="flex min-w-0 flex-col items-start">
           <motion.p
             {...reveal(0)}
@@ -169,29 +169,6 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
           </motion.div>
         )}
       </div>
-
-      {count > 1 && (
-        <div className="absolute inset-x-0 bottom-5 flex items-center justify-center gap-1.5 sm:justify-end sm:px-12">
-          {slides.map((s, i) => (
-            <button
-              key={s.src}
-              type="button"
-              onClick={() => goTo(i)}
-              aria-label={`Ver tarro ${s.label}`}
-              aria-current={i === index}
-              className="flex h-6 items-center"
-            >
-              <span
-                className={`block h-1.5 rounded-full transition-all duration-300 ${
-                  i === index
-                    ? dark ? "w-5 bg-white" : "w-5 bg-black"
-                    : dark ? "w-1.5 bg-white/30 hover:bg-white/60" : "w-1.5 bg-black/20 hover:bg-black/40"
-                }`}
-              />
-            </button>
-          ))}
-        </div>
-      )}
     </section>
   );
 }

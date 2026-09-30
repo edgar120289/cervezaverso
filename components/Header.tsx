@@ -4,17 +4,19 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
 import Image from "next/image";
+import MultiverseLogo from "./MultiverseLogo";
 import AccountMenu from "./AccountMenu";
 import HeaderSearch from "./HeaderSearch";
 import { useCart } from "@/lib/cart-context";
 
-export default function Header() {
+export default function Header({ logoImages }: { logoImages: string[] }) {
   const { itemCount, openDrawer } = useCart();
 
   return (
     <header className="sticky top-0 z-40 px-4 pt-4">
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 rounded-full bg-white/80 px-4 py-2 shadow-card backdrop-blur-lg">
-        <Link href="/" aria-label="Cervezaverso, inicio" className="flex shrink-0 items-center py-0.5 pr-2">
+        <Link href="/" aria-label="Cervezaverso, inicio" className="flex shrink-0 items-center gap-2 py-0.5 pr-2">
+          <MultiverseLogo images={logoImages} size={40} priority />
           <Image
             src="/img/cervezaverso-logos-v2/marcos/marco-horizontal.png"
             alt="Cervezaverso"
