@@ -10,6 +10,11 @@ import HeaderSearch from "./HeaderSearch";
 import MobileMenu from "./MobileMenu";
 import { useCart } from "@/lib/cart-context";
 
+const MAIN_LINKS = [
+  { href: "/#catalogo", label: "Catálogo" },
+  { href: "/contacto", label: "Contacto" },
+];
+
 export default function Header({ logoImages }: { logoImages: string[] }) {
   const { itemCount, openDrawer } = useCart();
 
@@ -40,6 +45,18 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
             />
           </Link>
         </div>
+
+        <nav aria-label="Principal" className="hidden items-center gap-1 md:flex">
+          {MAIN_LINKS.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="flex min-h-11 items-center rounded-full px-4 text-sm font-semibold text-black/70 transition-colors hover:bg-black/5 hover:text-black"
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
 
         <div className="flex items-center justify-end gap-1.5 md:flex-1">
           <div className="hidden w-full justify-end md:flex">
