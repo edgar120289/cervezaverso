@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Pause, Play, Sparkles } from "lucide-react";
 import { formatMXN, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
@@ -126,7 +125,7 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
             {formatMXN(FREE_SHIPPING_THRESHOLD)}.
           </motion.p>
 
-          <motion.div {...reveal(0.3)} className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+          <motion.div {...reveal(0.3)} className="mt-8 flex w-full flex-col sm:w-auto">
             <button
               type="button"
               onClick={openQuiz}
@@ -142,14 +141,6 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
               <Sparkles size={18} className="transition-transform group-hover:rotate-12" />
               Descubre tu Cerveza Ideal (Sommelier)
             </button>
-            <Link
-              href="#catalogo"
-              className={`flex items-center justify-center rounded-full px-7 py-4 font-semibold transition-colors ${
-                dark ? "bg-white/10 text-white backdrop-blur hover:bg-white/20" : "bg-white text-black shadow-card hover:bg-black hover:text-white"
-              }`}
-            >
-              Explorar catálogo
-            </Link>
           </motion.div>
         </div>
 

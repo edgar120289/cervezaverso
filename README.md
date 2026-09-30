@@ -7,7 +7,7 @@ Router) + TypeScript + Tailwind v4 + Framer Motion + Supabase.
 
 ```bash
 npm install
-cp .env.example .env.local   # completa tus llaves de Supabase / OpenAI
+cp .env.example .env.local   # completa tus llaves de Supabase / Gemini
 npm run dev
 ```
 
@@ -33,7 +33,7 @@ automáticamente con la fórmula obligatoria del SPEC:
 ## Enriquecimiento con IA
 
 `POST /api/ai/enrich` con `{ product_id }` genera `description_ai` y
-`pairing_ai` vía OpenAI (requiere `OPENAI_API_KEY`).
+`pairing_ai` vía Gemini (requiere `GEMINI_API_KEY`).
 
 ## Assets pendientes
 

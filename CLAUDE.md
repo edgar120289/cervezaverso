@@ -28,7 +28,7 @@ Sistema avanzado de filtrado de catálogo de cervezas artesanales.
 
 Integración de tarjetas de regalo (Gift Cards).
 
-Sommelier Digital impulsado por la API de OpenAI.
+Sommelier Digital impulsado por la API de Google Gemini.
 
 Lineamientos de Diseño (UI/UX):
 
@@ -48,13 +48,13 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - Pendiente de revisar en navegador (360, 768, 1024 y 1440 px): no hubo navegador disponible en la sesión.
 - Pendientes de datos del negocio: marcados `[[PENDIENTE]]` en `/terminos` y `/privacidad`.
 - Fase 2.5 · Refactor UI/UX (header con logotipo horizontal, menú de sesión, Hero, Sommelier con tarrito kawaii, filtros sin Estilo, tarjetas simétricas): hecho en código (2026-09-29), pendiente de revisión en navegador y de OK.
-- Siguiente: Fase 3 · Construcción (pago con Mercado Pago, Sommelier con OpenAI y Tarjetas de Regalo), página por página.
+- Siguiente: Fase 3 · Construcción (pago con Mercado Pago, Sommelier con Gemini y Tarjetas de Regalo), página por página.
 - Última actualización: 2026-09-29.
 
 ## Decisiones
 
 - 2026-09-29 · Este CLAUDE.md describe la visión final del proyecto, no solo lo ya construido.
-- 2026-09-29 · El Sommelier actual (cuestionario con reglas en `lib/sommelier.ts`) se migrará a la API de OpenAI en una fase posterior; es una funcionalidad nueva.
+- 2026-09-29 · El Sommelier actual (cuestionario con reglas en `lib/sommelier.ts`) se migrará a la API de Gemini en una fase posterior; es una funcionalidad nueva.
 - 2026-09-29 · Las Tarjetas de Regalo son una funcionalidad nueva con su propio modelo de datos (saldo consumible), independiente de los cupones de descuento (`004_promo_codes.sql`).
 - 2026-09-29 · `brand/design-system.md` (Shop) es solo referencia de arquitectura UI: radios de 28px en tarjetas y 9999px en botones, sombras suaves, densidad compacta y un solo color de acento. La tipografía será Inter o fuentes del sistema (sin GT Standard ni Shopify Sans, que requieren licencia); los logotipos son propios de Cervezaverso.
 - 2026-09-29 · Se conserva `@AGENTS.md` al inicio de este archivo por los cambios importantes de esta versión de Next.js.
@@ -73,3 +73,4 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - 2026-09-29 · Límite de intentos en Supabase (`check_rate_limit`, migración 005) con IP en hash; si la base no responde deja pasar y lo registra en logs. Login, registro y recuperación pasan por Server Actions.
 - 2026-09-29 · Texto secundario con el token `muted` (#666361), no con `text-black/NN`, para cumplir contraste AA.
 - 2026-09-29 · Filtro de Estilo eliminado del catálogo (la búsqueda de texto sigue encontrando por estilo). Las fichas muestran país con bandera emoji (`lib/country-flags.ts`), ABV y volumen con íconos de lucide-react, y las fotos de producto usan `object-contain` con respaldo si falla la imagen.
+- 2026-09-29 · IA: se reemplaza OpenAI por Google Gemini (`@google/generative-ai`, `GEMINI_API_KEY`, modelo por defecto `gemini-1.5-flash`, sobrescribible con `GEMINI_MODEL`). El contrato de `/api/generate-description` no cambia (`origen`, `perfil`, `maridaje`). Hero con un solo CTA: el del Sommelier.

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -14,7 +14,7 @@ español, en JSON válido con las claves "description_ai", "pairing_ai" y "notas
 /**
  * Cascarón de enriquecimiento con IA (SPEC.md #6.4).
  * Recibe un product_id, genera description_ai, pairing_ai y notas_origen con
- * OpenAI, y actualiza el registro en Supabase. Las notas de perfil y maridaje de
+ * Gemini, y actualiza el registro en Supabase. Las notas de perfil y maridaje de
  * la ficha (notas_perfil / notas_maridaje) toman estos textos si están vacías.
  */
 export async function POST(req: NextRequest) {
@@ -34,9 +34,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado." }, { status: 403 });
   }
 
-  if (!process.env.OPENAI_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     return NextResponse.json(
-      { error: "OPENAI_API_KEY no está configurada." },
+      { error: "GEMINI_API_KEY no está configurada." },
       { status: 500 }
     );
   }
@@ -57,20 +57,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Producto no encontrado." }, { status: 404 });
   }
 
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    response_format: { type: "json_object" },
-    messages: [
-      { role: "system", content: SYSTEM_PROMPT },
-      {
-        role: "user",
-        content: `Cerveza: ${product.name}\nCervecería: ${product.brewery ?? "N/D"}\nPaís: ${product.country}\nEstilo: ${product.style}\nABV: ${product.abv}%\nVolumen: ${product.volume_ml}ml`,
-      },
-    ],
+  const model = new GoogleGenerativeAI(process.env.GEMINI_API_KEY).getGenerativeModel({
+    model: process.env.GEMINI_MODEL || "gemini-1.5-flash",
+    systemInstruction: SYSTEM_PROMPT,
+    generationConfig: { responseMimeType: "application/json" },
   });
+  const completion = await model.generateContent(
+    `Cerveza: ${product.name}
+Cervecería: ${product.brewery ?? "N/D"}
+País: ${product.country}
+Estilo: ${product.style}
+ABV: ${product.abv}%
+Volumen: ${product.volume_ml}ml`
+  );
 
-  const content = completion.choices[0]?.message?.content;
+  const content = completion.response.text();
   if (!content) {
     return NextResponse.json({ error: "La IA no devolvió contenido." }, { status: 502 });
   }

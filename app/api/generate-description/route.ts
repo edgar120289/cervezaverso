@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
+import { GoogleGenerativeAI, GoogleGenerativeAIFetchError, SchemaType, type ObjectSchema } from "@google/generative-ai";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { firstIssue } from "@/lib/validation";
 
-const DEFAULT_MODEL = "gpt-4o-mini";
+const DEFAULT_MODEL = "gemini-1.5-flash";
 
 const SYSTEM_PROMPT = `Eres el Sommelier Digital de Cervezaverso, una tienda mexicana de cerveza artesanal nacional e importada.
 Escribes para gente curiosa que disfruta la cerveza pero no es experta: tu tono es cálido, cautivador y educativo,
@@ -20,16 +20,15 @@ Devuelve tres secciones:
 - "perfil" — Perfil Sensorial: notas de cata en orden visual (color, espuma), olfativa (aromas) y gustativa (sabor, cuerpo, final). 3 a 4 frases evocadoras.
 - "maridaje" — El Maridaje Perfecto: 2 o 3 platillos concretos (de preferencia uno de cocina mexicana) y por qué combinan. 2 a 3 frases.`;
 
-const RESPONSE_SCHEMA = {
-  type: "object",
+const RESPONSE_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
   properties: {
-    origen: { type: "string", description: "El Origen: historia breve." },
-    perfil: { type: "string", description: "Perfil Sensorial: notas visuales, olfativas y gustativas." },
-    maridaje: { type: "string", description: "El Maridaje Perfecto." },
+    origen: { type: SchemaType.STRING, description: "El Origen: historia breve." },
+    perfil: { type: SchemaType.STRING, description: "Perfil Sensorial: notas visuales, olfativas y gustativas." },
+    maridaje: { type: SchemaType.STRING, description: "El Maridaje Perfecto." },
   },
   required: ["origen", "perfil", "maridaje"],
-  additionalProperties: false,
-} as const;
+};
 
 const requestSchema = z.object({
   name: z.string().trim().min(1, "Falta el nombre de la cerveza.").max(160),
@@ -63,9 +62,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No autorizado." }, { status: 403 });
   }
 
-  if (!process.env.OPENAI_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     return NextResponse.json(
-      { error: "Falta OPENAI_API_KEY en .env.local (reinicia `npm run dev` después de agregarla)." },
+      { error: "Falta GEMINI_API_KEY en .env.local (reinicia `npm run dev` después de agregarla)." },
       { status: 500 }
     );
   }
@@ -77,38 +76,39 @@ export async function POST(req: NextRequest) {
   const { name, style, country } = parsed.data;
 
   try {
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-    const completion = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || DEFAULT_MODEL,
-      temperature: 0.8,
-      response_format: {
-        type: "json_schema",
-        json_schema: { name: "ficha_sommelier", strict: true, schema: RESPONSE_SCHEMA },
+    const model = new GoogleGenerativeAI(process.env.GEMINI_API_KEY).getGenerativeModel({
+      model: process.env.GEMINI_MODEL || DEFAULT_MODEL,
+      systemInstruction: SYSTEM_PROMPT,
+      generationConfig: {
+        temperature: 0.8,
+        responseMimeType: "application/json",
+        responseSchema: RESPONSE_SCHEMA,
       },
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: `Cerveza: ${name}\nEstilo: ${style}\nPaís: ${country}` },
-      ],
     });
+    const completion = await model.generateContent(`Cerveza: ${name}
+Estilo: ${style}
+País: ${country}`);
 
-    const message = completion.choices[0]?.message;
-    if (message?.refusal) {
+    if (completion.response.promptFeedback?.blockReason) {
       return NextResponse.json({ error: "La IA no quiso generar esta ficha. Intenta de nuevo." }, { status: 502 });
     }
-    const result = responseSchema.safeParse(JSON.parse(message?.content ?? "null"));
+    const result = responseSchema.safeParse(JSON.parse(completion.response.text() || "null"));
     if (!result.success) {
       return NextResponse.json({ error: "La IA devolvió una respuesta incompleta. Intenta de nuevo." }, { status: 502 });
     }
 
     return NextResponse.json(result.data satisfies GeneratedDescription);
   } catch (err) {
-    if (err instanceof OpenAI.APIError) {
+    if (err instanceof GoogleGenerativeAIFetchError) {
       const message =
-        err.status === 401
-          ? "La OPENAI_API_KEY no es válida."
+        err.status === 400 || err.status === 403
+          ? "La GEMINI_API_KEY no es válida."
           : err.status === 429
-            ? "OpenAI rechazó la solicitud por límite de uso o saldo insuficiente."
-            : `Error de OpenAI (${err.status ?? "sin estado"}): ${err.message}`;
+            ? "Gemini rechazó la solicitud por límite de uso. Espera un momento e intenta de nuevo."
+            : err.status === 404
+              ? "El modelo de Gemini no está disponible. Define GEMINI_MODEL en .env.local."
+              : `Error de Gemini (${err.status ?? "sin estado"}).`;
+      console.error("[generate-description]", err.status, err.message);
       return NextResponse.json({ error: message }, { status: 502 });
     }
     console.error("[generate-description]", err);
