@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { LayoutDashboard, User, UserRound } from "lucide-react";
+import { LayoutDashboard, LogOut, User, UserRound } from "lucide-react";
 import { useAccount } from "@/lib/account-context";
 
 const iconButtonClass =
@@ -14,14 +14,17 @@ function SessionDot() {
   return <span aria-hidden className="absolute right-2 top-2 h-2 w-2 rounded-pill border-2 border-white bg-accent" />;
 }
 
-const ADMIN_LINKS = [
-  { href: "/admin", label: "Panel de Administración", icon: LayoutDashboard },
-  { href: "/cuenta", label: "Mi Cuenta Cliente", icon: UserRound },
-];
+const ADMIN_LINKS = [{ href: "/admin", label: "Panel de Administración", icon: LayoutDashboard }];
+const CLIENT_LINKS = [{ href: "/cuenta", label: "Mi cuenta", icon: UserRound }];
 
-/** Ícono de perfil del header: enlace directo para clientes, menú desplegable para admins. */
+/** "edgar@correo.com" → "edgar" */
+function displayName(email: string | undefined): string {
+  return email?.split("@")[0] ?? "";
+}
+
+/** Ícono de perfil del header: enlace a /login sin sesión; con sesión, menú con saludo, accesos y cerrar sesión. */
 export default function AccountMenu() {
-  const { user, role } = useAccount();
+  const { user, role, signOut } = useAccount();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -49,18 +52,19 @@ export default function AccountMenu() {
     };
   }, [isOpen]);
 
-  if (role !== "admin") {
+  if (!user) {
     return (
       <Link
-        href={user ? "/cuenta" : "/login"}
-        aria-label={user ? "Mi cuenta" : "Iniciar sesión"}
+        href="/login"
+        aria-label="Iniciar sesión"
         className={iconButtonClass}
       >
         <User size={20} />
-        {user && <SessionDot />}
       </Link>
     );
   }
+
+  const links = role === "admin" ? ADMIN_LINKS : CLIENT_LINKS;
 
   return (
     <div ref={containerRef} className="relative">
@@ -86,8 +90,8 @@ export default function AccountMenu() {
             transition={{ duration: 0.18, ease: "easeOut" }}
             className="absolute right-0 top-[calc(100%+10px)] w-60 origin-top-right rounded-[22px] bg-white p-1.5 shadow-card ring-1 ring-black/5"
           >
-            <p className="truncate px-3.5 pb-1.5 pt-2 text-xs text-muted">{user?.email}</p>
-            {ADMIN_LINKS.map(({ href, label, icon: Icon }) => (
+            <p className="truncate px-3.5 pb-1.5 pt-2 text-sm font-semibold">Hola, {displayName(user.email)}</p>
+            {links.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}
@@ -99,6 +103,18 @@ export default function AccountMenu() {
                 {label}
               </Link>
             ))}
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setIsOpen(false);
+                void signOut();
+              }}
+              className="mt-1 flex w-full items-center gap-3 rounded-2xl border-t border-black/5 px-3.5 py-2.5 text-left text-sm font-semibold text-muted transition-colors hover:bg-canvas hover:text-black"
+            >
+              <LogOut size={17} className="shrink-0" />
+              Cerrar sesión
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

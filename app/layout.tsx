@@ -42,7 +42,6 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  const tarros = listPublicImages(MEDIA_DIRS.tarros);
   const capasCirculares = listPublicImages(MEDIA_DIRS.capasCirculares);
 
   return (
@@ -57,7 +56,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <AccountProvider>
           <CartProvider>
             <AgeGateModal logoImages={capasCirculares} logoFrame={`/${MEDIA_DIRS.marcoCircular}`} />
-            <Header logoImages={tarros} />
+            <Header />
             <main id="contenido" tabIndex={-1} className="flex-1 outline-none">
               {children}
             </main>

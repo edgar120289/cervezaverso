@@ -47,6 +47,7 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - Para que funcione completo falta: correr `supabase/migrations/005_edad_rate_limit.sql` en Supabase y dar de alta las claves de Turnstile (ver `.env.example`).
 - Pendiente de revisar en navegador (360, 768, 1024 y 1440 px): no hubo navegador disponible en la sesión.
 - Pendientes de datos del negocio: marcados `[[PENDIENTE]]` en `/terminos` y `/privacidad`.
+- Fase 2.5 · Refactor UI/UX (header con logotipo horizontal, menú de sesión, Hero, Sommelier con tarrito kawaii, filtros sin Estilo, tarjetas simétricas): hecho en código (2026-09-29), pendiente de revisión en navegador y de OK.
 - Siguiente: Fase 3 · Construcción (pago con Mercado Pago, Sommelier con OpenAI y Tarjetas de Regalo), página por página.
 - Última actualización: 2026-09-29.
 
@@ -71,3 +72,4 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - 2026-09-29 · CSP sin nonce en `next.config.ts` (con 'unsafe-inline' en scripts) para no volver dinámicas las páginas estáticas; orígenes limitados a los propios, Turnstile, GA y Supabase.
 - 2026-09-29 · Límite de intentos en Supabase (`check_rate_limit`, migración 005) con IP en hash; si la base no responde deja pasar y lo registra en logs. Login, registro y recuperación pasan por Server Actions.
 - 2026-09-29 · Texto secundario con el token `muted` (#666361), no con `text-black/NN`, para cumplir contraste AA.
+- 2026-09-29 · Filtro de Estilo eliminado del catálogo (la búsqueda de texto sigue encontrando por estilo). Las fichas muestran país con bandera emoji (`lib/country-flags.ts`), ABV y volumen con íconos de lucide-react, y las fotos de producto usan `object-contain` con respaldo si falla la imagen.

@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronRight, Heart, LogOut, MapPin, Package } from "lucide-react";
+import { ChevronRight, Heart, MapPin, Package } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PRODUCT_COLUMNS, toProduct } from "@/lib/catalog";
 import { formatMXN } from "@/lib/pricing";
 import { ESTADO_BADGE, folio, formatFecha } from "@/lib/pedidos";
-import { cerrarSesion, eliminarDireccion, hacerPredeterminada } from "@/app/actions/cuenta";
+import { eliminarDireccion, hacerPredeterminada } from "@/app/actions/cuenta";
 import ProductGrid from "@/components/ProductGrid";
+import SignOutButton from "@/components/SignOutButton";
 import type { Direccion, EstadoPedido } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Mi cuenta", robots: { index: false } };
@@ -62,14 +63,7 @@ export default async function CuentaPage() {
           <h1 className="text-3xl font-semibold tracking-[-0.04em]">Mi cuenta</h1>
           <p className="mt-1 text-muted">{user.email}</p>
         </div>
-        <form action={cerrarSesion}>
-          <button
-            type="submit"
-            className="flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold shadow-card transition-transform hover:bg-black/[0.03] active:scale-[0.98]"
-          >
-            <LogOut size={16} /> Cerrar sesión
-          </button>
-        </form>
+        <SignOutButton />
       </div>
 
       {loadError && (

@@ -21,6 +21,8 @@ type AccountContextValue = {
   isFavorite: (productId: string) => boolean;
   /** Sin sesión, manda a /login y regresa a la página actual después. */
   toggleFavorite: (productId: string) => Promise<void>;
+  /** Cierra la sesión (cookies incluidas) y regresa al inicio. */
+  signOut: () => Promise<void>;
 };
 
 const AccountContext = createContext<AccountContextValue | null>(null);
@@ -89,9 +91,15 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     [supabase, user, favoriteIds, router, pathname]
   );
 
+  const signOut = useCallback(async () => {
+    await supabase?.auth.signOut();
+    router.push("/");
+    router.refresh();
+  }, [supabase, router]);
+
   const value = useMemo(
-    () => ({ user, role, isFavorite, toggleFavorite }),
-    [user, role, isFavorite, toggleFavorite]
+    () => ({ user, role, isFavorite, toggleFavorite, signOut }),
+    [user, role, isFavorite, toggleFavorite, signOut]
   );
 
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>;

@@ -4,13 +4,14 @@ import { useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Check, Plus, RotateCcw, ShoppingBag, Sparkles, X } from "lucide-react";
+import { ArrowLeft, Check, Plus, RotateCcw, ShoppingBag, X } from "lucide-react";
 import { QUIZ_STEPS, type QuizAnswers } from "@/lib/data/sommelier-quiz";
 import { recommendProducts } from "@/app/actions/sommelier";
 import type { Recommendation } from "@/lib/sommelier";
 import { formatMXN } from "@/lib/pricing";
 import { useCart } from "@/lib/cart-context";
 import BottleFallback from "./BottleFallback";
+import { SOMMELIER_MASCOT } from "./SommelierSection";
 
 type Partial3 = Partial<QuizAnswers>;
 
@@ -154,7 +155,8 @@ export default function SommelierModal({ isOpen, onClose }: { isOpen: boolean; o
                 </button>
               ) : (
                 <span className="flex items-center gap-2 text-sm font-semibold text-accent">
-                  <Sparkles size={16} /> Sommelier Cervezaverso
+                  <Image src={SOMMELIER_MASCOT} alt="" width={28} height={34} className="h-8 w-auto" />
+                  Sommelier Cervezaverso
                 </span>
               )}
               <button

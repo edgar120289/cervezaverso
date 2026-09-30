@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import SignOutButton from "@/components/SignOutButton";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
@@ -29,6 +30,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           <Link href="/admin/cupones" className="hover:text-black">Cupones</Link>
           <Link href="/admin/import" className="hover:text-black">Importar Excel</Link>
         </nav>
+        <SignOutButton />
       </div>
       {children}
     </div>

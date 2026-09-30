@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Play, Sparkles } from "lucide-react";
 import { formatMXN, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
 import { useSommelier } from "./SommelierProvider";
 
@@ -19,6 +19,12 @@ type HeroCinematicProps = {
   videoSrc?: string;
 };
 
+function arrowClass(dark: boolean) {
+  return `flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors ${
+    dark ? "bg-white/10 text-white hover:bg-white/20" : "bg-white text-black shadow-card hover:bg-black hover:text-white"
+  }`;
+}
+
 export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) {
   const { openQuiz } = useSommelier();
   const reduceMotion = useReducedMotion();
@@ -27,7 +33,9 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
   const hasVideo = Boolean(videoSrc) && !videoFailed && !reduceMotion;
 
   const [index, setIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isStopped, setIsStopped] = useState(false);
+  const isPaused = isHovered || isStopped;
   const count = slides.length;
   const goTo = useCallback((next: number) => setIndex(((next % count) + count) % count), [count]);
 
@@ -49,8 +57,8 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
   return (
     <section
       aria-label="Bienvenida"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={`relative isolate overflow-hidden rounded-[28px] shadow-card ${
         dark ? "bg-black text-white" : "bg-canvas text-black"
       }`}
@@ -81,8 +89,8 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
         </div>
       )}
 
-      <div className="grid items-center gap-6 px-6 pb-16 pt-12 sm:px-12 md:min-h-[600px] md:grid-cols-[1.25fr_1fr] md:py-16">
-        <div className="flex flex-col items-start">
+      <div className="grid items-center gap-6 px-6 pb-12 pt-12 sm:px-12 md:min-h-[600px] md:grid-cols-[1.25fr_1fr] md:py-16">
+        <div className="flex min-w-0 flex-col items-start">
           <motion.p
             {...reveal(0)}
             className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide backdrop-blur ${
@@ -94,13 +102,13 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
 
           <motion.h1
             {...reveal(0.1)}
-            className="mt-6 text-[2.9rem] font-semibold leading-[0.95] tracking-[-0.055em] sm:text-7xl lg:text-[5.25rem]"
+            className="mt-6 max-w-full text-[2.5rem] font-semibold leading-[1] tracking-[-0.05em] min-[400px]:text-[2.9rem] sm:text-6xl md:text-[3.25rem] lg:text-7xl xl:text-[4.75rem]"
           >
             El placer
             <br />
             del{" "}
             <span
-              className={`bg-clip-text italic text-transparent ${
+              className={`inline-block bg-clip-text pb-[0.1em] pr-[0.12em] italic text-transparent ${
                 dark
                   ? "bg-gradient-to-r from-[#c9bcff] via-white to-[#f5d08a]"
                   : "bg-gradient-to-r from-[#5433eb] via-[#7b5cf5] to-[#c9892b]"
@@ -150,8 +158,9 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, ease: EASE, delay: 0.25 }}
-            className="relative mx-auto aspect-square w-full max-w-[240px] md:max-w-[420px]"
+            className="mx-auto flex w-full max-w-[420px] flex-col items-center gap-5"
           >
+            <div className="relative aspect-square w-full max-w-[240px] md:max-w-[380px]">
             <div
               aria-hidden
               className={`absolute inset-[12%] rounded-full blur-3xl ${dark ? "bg-accent/40" : "bg-accent/20"}`}
@@ -159,10 +168,10 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
             <AnimatePresence mode="popLayout" initial={false}>
               <motion.div
                 key={slide.src}
-                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 40, rotate: 4 }}
-                animate={{ opacity: 1, x: 0, rotate: 0 }}
-                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -40, rotate: -4 }}
-                transition={{ duration: 0.55, ease: EASE }}
+                initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 1.05 }}
+                transition={{ duration: 0.6, ease: EASE }}
                 className="absolute inset-0"
               >
                 <Image
@@ -175,32 +184,45 @@ export default function HeroCinematic({ slides, videoSrc }: HeroCinematicProps) 
                 />
               </motion.div>
             </AnimatePresence>
+            </div>
+
+            <div className="flex w-full max-w-[320px] items-center justify-between gap-2" role="group" aria-label="Galería de tarros">
+              <button
+                type="button"
+                onClick={() => goTo(index - 1)}
+                aria-label="Tarro anterior"
+                className={arrowClass(dark)}
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <div className="min-w-0 flex-1 text-center" aria-live="polite">
+                <p className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${dark ? "text-white/70" : "text-muted"}`}>
+                  Edición {String(index + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}
+                </p>
+                <p className="truncate text-base font-semibold tracking-[-0.02em]">{slide.label}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => goTo(index + 1)}
+                aria-label="Tarro siguiente"
+                className={arrowClass(dark)}
+              >
+                <ChevronRight size={20} />
+              </button>
+              {!reduceMotion && (
+                <button
+                  type="button"
+                  onClick={() => setIsStopped((v) => !v)}
+                  aria-label={isStopped ? "Reanudar cambio automático" : "Pausar cambio automático"}
+                  className={arrowClass(dark)}
+                >
+                  {isStopped ? <Play size={16} /> : <Pause size={16} />}
+                </button>
+              )}
+            </div>
           </motion.div>
         )}
       </div>
-
-      {count > 1 && (
-        <div className="absolute inset-x-0 bottom-5 flex items-center justify-center gap-1.5 sm:justify-end sm:px-12">
-          {slides.map((s, i) => (
-            <button
-              key={s.src}
-              type="button"
-              onClick={() => goTo(i)}
-              aria-label={`Ver tarro ${s.label}`}
-              aria-current={i === index}
-              className="flex h-6 items-center"
-            >
-              <span
-                className={`block h-1.5 rounded-full transition-all duration-300 ${
-                  i === index
-                    ? dark ? "w-5 bg-white" : "w-5 bg-black"
-                    : dark ? "w-1.5 bg-white/30 hover:bg-white/60" : "w-1.5 bg-black/20 hover:bg-black/40"
-                }`}
-              />
-            </button>
-          ))}
-        </div>
-      )}
     </section>
   );
 }

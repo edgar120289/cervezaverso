@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Globe2, UtensilsCrossed, Wine } from "lucide-react";
@@ -8,7 +7,7 @@ import { formatMXN } from "@/lib/pricing";
 import AddToCartButton from "@/components/AddToCartButton";
 import HealthNotice from "@/components/HealthNotice";
 import FavoriteButton from "@/components/FavoriteButton";
-import ProductVideoLoop from "@/components/ProductVideoLoop";
+import ProductImage from "@/components/ProductImage";
 
 export async function generateMetadata({ params }: PageProps<"/cervezas/[sku]">): Promise<Metadata> {
   const { sku } = await params;
@@ -56,18 +55,12 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
       <div className="mt-3 grid gap-6 md:grid-cols-2">
         <div className="rounded-[28px] bg-white p-4 shadow-card">
           <div className="relative aspect-square overflow-hidden rounded-[20px] bg-canvas">
-            {product.image_url ? (
-              <Image
-                src={product.image_url}
-                alt={`${product.name}, ${product.style}`}
-                fill
-                priority
-                sizes="(min-width: 768px) 560px, 100vw"
-                className="object-cover"
-              />
-            ) : (
-              <ProductVideoLoop />
-            )}
+            <ProductImage
+              src={product.image_url}
+              alt={`${product.name}, ${product.style}`}
+              sizes="(min-width: 768px) 560px, 100vw"
+              priority
+            />
           </div>
         </div>
 

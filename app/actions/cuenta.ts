@@ -34,9 +34,3 @@ export async function hacerPredeterminada(formData: FormData) {
   await supabase.from("direcciones").update({ predeterminada: true }).eq("id", id.data).eq("user_id", user.id);
   refresh();
 }
-
-export async function cerrarSesion() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect("/");
-}

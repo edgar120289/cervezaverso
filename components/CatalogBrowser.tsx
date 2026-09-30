@@ -20,7 +20,7 @@ import {
 import { formatMXN } from "@/lib/pricing";
 import ProductCard from "./ProductCard";
 
-type Facet = "countries" | "styles" | "breweries";
+type Facet = "countries" | "breweries";
 
 const COLLAPSED_OPTIONS = 6;
 const SEARCHABLE_OPTIONS = 10;
@@ -124,7 +124,6 @@ function FilterPanel({
   setFilters: (update: (current: CatalogFilters) => CatalogFilters) => void;
 }) {
   const countries = useMemo(() => facetOptions(products, filters, "countries"), [products, filters]);
-  const styles = useMemo(() => facetOptions(products, filters, "styles"), [products, filters]);
   const breweries = useMemo(() => facetOptions(products, filters, "breweries"), [products, filters]);
 
   function toggle(facet: Facet, value: string) {
@@ -211,12 +210,6 @@ function FilterPanel({
         </FilterSection>
       )}
 
-      {styles.length > 0 && (
-        <FilterSection title="Estilo">
-          <CheckboxList options={styles} selected={filters.styles} onToggle={(v) => toggle("styles", v)} />
-        </FilterSection>
-      )}
-
       {breweries.length > 0 && (
         <FilterSection title="Marca / Cervecería">
           <CheckboxList options={breweries} selected={filters.breweries} onToggle={(v) => toggle("breweries", v)} />
@@ -226,7 +219,7 @@ function FilterPanel({
   );
 }
 
-/** Catálogo con buscador y filtros en tiempo real (País, Precio, ABV, Estilo y Cervecería). */
+/** Catálogo con buscador y filtros en tiempo real (País, Precio, ABV y Marca). */
 export default function CatalogBrowser({ products }: { products: Product[] }) {
   const urlQuery = useSearchParams().get(SEARCH_PARAM) ?? "";
   const [filters, setFilters] = useState<CatalogFilters>(() => ({ ...EMPTY_FILTERS, query: urlQuery }));
@@ -255,7 +248,7 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
   const hasAnyFilter = activeCount > 0 || filters.query.trim() !== "";
 
   const activeChips: { key: string; label: string; clear: () => void }[] = [
-    ...(["countries", "styles", "breweries"] as const).flatMap((facet) =>
+    ...(["countries", "breweries"] as const).flatMap((facet) =>
       filters[facet].map((value) => ({
         key: `${facet}:${value}`,
         label: value,

@@ -7,7 +7,6 @@ export const SEARCH_PARAM = "q";
 export type CatalogFilters = {
   query: string;
   countries: string[];
-  styles: string[];
   breweries: string[];
   minPrice: number | null;
   maxPrice: number | null;
@@ -17,7 +16,6 @@ export type CatalogFilters = {
 export const EMPTY_FILTERS: CatalogFilters = {
   query: "",
   countries: [],
-  styles: [],
   breweries: [],
   minPrice: null,
   maxPrice: null,
@@ -58,11 +56,10 @@ export function filterableAbv(product: Product): number | null {
   return NON_ALCOHOLIC.test(normalize(`${product.name} ${product.style}`)) ? 0 : null;
 }
 
-type Facet = "countries" | "styles" | "breweries";
+type Facet = "countries" | "breweries";
 
 const FACET_FIELD: Record<Facet, (p: Product) => string | null> = {
   countries: (p) => p.country,
-  styles: (p) => p.style,
   breweries: (p) => p.brewery,
 };
 
@@ -76,7 +73,7 @@ export function matchesFilters(product: Product, filters: CatalogFilters, ignore
     if (!normalize(filters.query).split(/\s+/).every((word) => haystack.includes(word))) return false;
   }
 
-  for (const facet of ["countries", "styles", "breweries"] as const) {
+  for (const facet of ["countries", "breweries"] as const) {
     if (facet === ignore || filters[facet].length === 0) continue;
     const value = FACET_FIELD[facet](product);
     if (!value || !filters[facet].includes(value)) return false;
@@ -118,7 +115,6 @@ export function facetOptions(products: Product[], filters: CatalogFilters, facet
 export function activeFilterCount(filters: CatalogFilters): number {
   return (
     filters.countries.length +
-    filters.styles.length +
     filters.breweries.length +
     (filters.minPrice !== null || filters.maxPrice !== null ? 1 : 0) +
     (filters.abv ? 1 : 0)
