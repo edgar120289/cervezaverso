@@ -15,18 +15,25 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
   return (
     <header className="sticky top-0 z-40 px-4 pt-4">
       <div className="relative mx-auto flex max-w-6xl items-center justify-between gap-3 rounded-full bg-white/80 px-4 py-2 shadow-card backdrop-blur-lg">
-        <Link href="/" aria-label="Cervezaverso, inicio" className="flex shrink-0 items-center gap-2 py-0.5 pr-2">
+        <div className="flex shrink-0 items-center gap-2 py-0.5 pr-2">
           <MultiverseLogo images={logoImages} size={40} priority />
-          <Image
-            src="/img/cervezaverso-logos-v2/marcos/marco-horizontal.png"
-            alt="Cervezaverso"
-            width={922}
-            height={320}
-            priority
-            sizes="(min-width: 640px) 130px, 104px"
-            className="h-9 w-auto sm:h-11"
-          />
-        </Link>
+          {/* El PNG trae ~34% de margen transparente a la izquierda; se recorta para que el logotipo quede pegado al tarro. */}
+          <Link
+            href="/"
+            aria-label="Cervezaverso, inicio"
+            className="relative block h-9 aspect-[574/320] overflow-hidden sm:h-11"
+          >
+            <Image
+              src="/img/cervezaverso-logos-v2/marcos/marco-horizontal.png"
+              alt="Cervezaverso"
+              fill
+              priority
+              quality={100}
+              sizes="(min-width: 640px) 127px, 104px"
+              className="object-cover object-[88.5%_50%]"
+            />
+          </Link>
+        </div>
 
         <div className="flex flex-1 items-center justify-end gap-1.5">
           {/* useSearchParams: el buscador se hidrata aparte para no volver dinámico todo el layout. */}

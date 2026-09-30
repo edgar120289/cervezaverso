@@ -68,7 +68,7 @@ export default function MultiverseLogo({
           transition={{ duration: 0.35, ease: "easeOut" }}
           className="absolute inset-0"
         >
-          <Image src={jar} alt="" fill sizes={`${size}px`} priority={priority} className="object-contain" />
+          <Image src={jar} alt="" fill sizes={`${size}px`} quality={100} priority={priority} className="object-contain" />
         </motion.div>
       </AnimatePresence>
     </button>
