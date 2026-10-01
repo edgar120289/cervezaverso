@@ -49,8 +49,9 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - Pendientes de datos del negocio: marcados `[[PENDIENTE]]` en `/terminos` y `/privacidad`.
 - Fase 2.5 · Refactor UI/UX (header con logotipo horizontal, menú de sesión, Hero, Sommelier con tarrito kawaii, filtros sin Estilo, tarjetas simétricas): hecho en código (2026-09-29), pendiente de revisión en navegador y de OK.
 - Fase 2.7 · Refactor UI/UX (Hero con video, Sommelier flotante, menú hamburguesa móvil, filtros en panel lateral con chips): hecho en código (2026-09-29), pendiente de revisión en navegador y de OK.
-- Siguiente: Fase 3 · Construcción (pago con Mercado Pago, Sommelier con Gemini y Tarjetas de Regalo), página por página.
-- Última actualización: 2026-09-29.
+- Fase 3 · Construcción, avance 1 · Catálogo en `/admin`: carga masiva (.xlsx/.csv) con plantilla descargable y alta manual de cervezas (2026-09-30). Aprobado por el cliente; pendiente de revisión en navegador (360, 768, 1024 y 1440 px).
+- Siguiente en Fase 3: pago con Mercado Pago, Sommelier con Gemini y Tarjetas de Regalo, página por página.
+- Última actualización: 2026-09-30.
 
 ## Decisiones
 
@@ -76,3 +77,7 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - 2026-09-29 · Filtro de Estilo eliminado del catálogo (la búsqueda de texto sigue encontrando por estilo). Las fichas muestran país con bandera emoji (`lib/country-flags.ts`), ABV y volumen con íconos de lucide-react, y las fotos de producto usan `object-contain` con respaldo si falla la imagen.
 - 2026-09-29 · IA: se reemplaza OpenAI por Google Gemini (`@google/generative-ai`, `GEMINI_API_KEY`, modelo por defecto `gemini-1.5-flash`, sobrescribible con `GEMINI_MODEL`). El contrato de `/api/generate-description` no cambia (`origen`, `perfil`, `maridaje`). Hero con un solo CTA: el del Sommelier.
 - 2026-09-29 · Fase 2.7: el Hero pierde carrusel y CTA (solo video de fondo con overlay y el lema centrado); el Sommelier pasa a burbuja flotante (`SommelierFloating` + `SommelierProvider` en `layout.tsx`, en todas las rutas salvo `/admin`) que abre el quiz; en móvil el header queda en hamburguesa · logotipo · carrito; los filtros viven en un slide-over con chips activos y "Limpiar todos los filtros". Sustituye el "Hero con un solo CTA" anterior.
+- 2026-09-30 · Carga masiva en `/admin` (`/api/admin/import`, `lib/catalog-import.ts`): acepta .xlsx y .csv; un .xlsx con la pestaña LISTA MONASTERIO usa el formato del proveedor y cualquier otro archivo, la plantilla (Nombre, País, Estilo, ABV, Volumen (ml), Precio, Stock). UPSERT por SKU o, si no, por nombre + volumen: solo actualiza país, estilo, ABV, volumen, costo, precio de venta y disponibilidad; nunca descripciones, fichas del Sommelier, imagen, insignias ni margen personalizado.
+- 2026-09-30 · En la plantilla, "Precio" es el costo del proveedor (el precio de venta se calcula con el margen). "Stock" es un estado, no una cantidad: acepta número (0 = agotada, 1 a 5 = pocas piezas, más = disponible) o Disponible, Pocas piezas, Agotada, Preventa. País y Estilo son obligatorios. La plantilla va solo con cabeceras. Aprobado por el cliente.
+- 2026-09-30 · Alta manual de cervezas desde el modal de `/admin` mediante la Server Action `crearProducto`: valida con zod y calcula SKU y precio de venta en el servidor. Se eliminó `/admin/import`; todo vive en `/admin`.
+- 2026-09-30 · Acceso a `/admin`: dos capas. (1) HTTP Basic Auth en `proxy.ts` con `ADMIN_USER` y `ADMIN_PASSWORD` (el usuario puede ser texto simple; es el diálogo nativo del navegador). (2) Sesión de Supabase con rol `admin`, iniciada en `/login` con correo electrónico; el campo de correo de `/login` no se cambia porque Supabase Auth identifica por correo.
