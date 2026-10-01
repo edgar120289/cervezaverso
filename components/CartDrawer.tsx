@@ -76,7 +76,7 @@ export default function CartDrawer() {
                       key={product.id}
                       className="flex gap-3 rounded-[20px] bg-white p-3 shadow-card"
                     >
-                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[20px] bg-canvas">
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[20px] bg-white">
                         {product.image_url ? (
                           <Image
                             src={product.image_url}

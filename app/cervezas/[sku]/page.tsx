@@ -54,7 +54,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
 
       <div className="mt-3 grid gap-6 md:grid-cols-2">
         <div className="rounded-[28px] bg-white p-4 shadow-card">
-          <div className="relative aspect-square overflow-hidden rounded-[20px] bg-canvas">
+          <div className="relative aspect-square overflow-hidden rounded-[20px] bg-white">
             <ProductImage
               src={product.image_url}
               alt={`${product.name}, ${product.style}`}

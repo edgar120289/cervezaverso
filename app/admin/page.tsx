@@ -105,7 +105,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
                 className={`space-y-3 rounded-[28px] bg-white p-4 shadow-card ${product.is_active ? "" : "bg-white/70"}`}
               >
                 <div className={`flex items-center gap-3 ${product.is_active ? "" : "opacity-60"}`}>
-                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-canvas">
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-white">
                     {product.image_url && (
                       <Image src={product.image_url} alt="" fill sizes="64px" className="object-contain p-1" />
                     )}
@@ -157,7 +157,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
                     >
                       <td className="px-6 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl bg-canvas">
+                          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl bg-white">
                             {product.image_url && (
                               <Image src={product.image_url} alt="" fill sizes="44px" className="object-contain p-1" />
                             )}

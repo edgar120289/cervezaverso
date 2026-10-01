@@ -23,7 +23,7 @@ export default function ProductCard({ product }: { product: Product }) {
     >
       <Link
         href={`/cervezas/${product.sku}`}
-        className="relative block aspect-square w-full overflow-hidden rounded-[20px] bg-canvas"
+        className="relative block aspect-square w-full overflow-hidden rounded-[20px] bg-white"
       >
         <ProductImage
           src={product.image_url}

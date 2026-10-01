@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, GripVertical, ImageUp, Loader2, Search, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, GripVertical, ImageUp, Loader2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { actualizarGaleriaProducto } from "@/app/actions/admin-productos";
 import {
@@ -25,17 +25,15 @@ const tileButton =
 
 /**
  * Galería de imágenes de una cerveza. La primera es la portada. Cada cambio (subir, quitar,
- * reordenar, traer una imagen de la web) se guarda al instante; si falla, vuelve al estado anterior.
+ * reordenar) se guarda al instante; si falla, vuelve al estado anterior.
  * El orden se cambia arrastrando (ratón) o con las flechas (táctil y teclado).
  */
 export default function ProductGallery({ productId, productName, sku, initialUrls }: ProductGalleryProps) {
   const [urls, setUrls] = useState(initialUrls);
-  const [busy, setBusy] = useState<null | "saving" | "uploading" | "searching">(null);
+  const [busy, setBusy] = useState<null | "saving" | "uploading">(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
-  /** Posición del siguiente resultado de la búsqueda web: cada clic trae una imagen distinta. */
-  const [webSkip, setWebSkip] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isFull = urls.length >= MAX_PRODUCT_IMAGES;
@@ -117,32 +115,6 @@ export default function ProductGallery({ productId, productName, sku, initialUrl
     }
   }
 
-  async function handleWebSearch() {
-    setError(null);
-    setNotice(null);
-    setBusy("searching");
-    try {
-      const res = await fetch("/api/admin/image-search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, skip: webSkip }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error ?? "No se pudo buscar la imagen.");
-
-      setWebSkip((current) => current + 1);
-      setBusy(null);
-      const saved = await persist([...urls, data.url as string]);
-      if (saved) {
-        setNotice("Imagen de referencia agregada al final de la galería. Revísala: si no corresponde, quítala con la X.");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo buscar la imagen.");
-    } finally {
-      setBusy(null);
-    }
-  }
-
   function handleDrop(e: DragEvent<HTMLLIElement>, to: number) {
     e.preventDefault();
     if (dragIndex !== null) reorder(dragIndex, to);
@@ -164,15 +136,6 @@ export default function ProductGallery({ productId, productName, sku, initialUrl
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <button
-            type="button"
-            onClick={handleWebSearch}
-            disabled={isBusy || isFull}
-            className="flex min-h-11 items-center justify-center gap-2 rounded-full bg-canvas px-5 text-sm font-semibold transition-colors hover:bg-black hover:text-white disabled:pointer-events-none disabled:opacity-60"
-          >
-            {busy === "searching" ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
-            {busy === "searching" ? "Buscando…" : "Buscar imagen en web"}
-          </button>
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
@@ -197,7 +160,7 @@ export default function ProductGallery({ productId, productName, sku, initialUrl
 
       {urls.length === 0 ? (
         <p className="mt-4 rounded-[20px] bg-canvas px-4 py-10 text-center text-sm text-muted">
-          Sin imágenes. Sube fotos o busca una de referencia en la web.
+          Sin imágenes. Sube las fotos de la cerveza.
         </p>
       ) : (
         <ul className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -209,7 +172,7 @@ export default function ProductGallery({ productId, productName, sku, initialUrl
               onDragEnd={() => setDragIndex(null)}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => handleDrop(e, index)}
-              className={`space-y-2 rounded-[20px] bg-canvas p-2 transition-opacity ${
+              className={`space-y-2 rounded-[20px] border border-black/5 bg-white p-2 transition-opacity ${
                 index === 0 ? "ring-2 ring-accent" : ""
               } ${dragIndex === index ? "opacity-40" : ""}`}
             >

@@ -41,7 +41,7 @@ export default function CarritoPage() {
               key={product.id}
               className="flex gap-4 rounded-[28px] bg-white p-4 shadow-card"
             >
-              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[20px] bg-canvas">
+              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[20px] bg-white">
                 {product.image_url ? (
                   <Image
                     src={product.image_url}
