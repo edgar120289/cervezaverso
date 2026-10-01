@@ -44,3 +44,5 @@ next-env.d.ts
 # hojas de cálculo (listas de precios confidenciales)
 *.xlsx
 LISTA DE PRECIOS BODEGA MONASTERIO*
+
+.vercel
