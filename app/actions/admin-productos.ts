@@ -3,8 +3,16 @@
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
+import { findExistingProduct, slugify } from "@/lib/monasterio";
 import { calculateSalePrice } from "@/lib/pricing";
-import { firstIssue, PRODUCT_IMAGE_BUCKET, productUpdateSchema, type ProductUpdate } from "@/lib/validation";
+import {
+  firstIssue,
+  PRODUCT_IMAGE_BUCKET,
+  productCreateSchema,
+  productUpdateSchema,
+  type ProductCreate,
+  type ProductUpdate,
+} from "@/lib/validation";
 
 export type AdminActionResult = { ok: true; sale_price?: number } | { ok: false; error: string };
 
@@ -55,4 +63,29 @@ export async function actualizarImagenProducto(id: string, image_url: string): P
 
   refresh();
   return { ok: true };
+}
+
+/** Alta manual de una cerveza (plan B de la carga masiva). El sku y el precio de venta se derivan en el servidor. */
+export async function crearProducto(input: ProductCreate): Promise<AdminActionResult> {
+  const parsed = productCreateSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
+
+  const supabase = await requireAdmin();
+  const fields = parsed.data;
+  const sale_price = calculateSalePrice(fields.cost_price, fields.margin_pct);
+  const sku = slugify(fields.country, fields.name, String(fields.volume_ml));
+
+  try {
+    if (await findExistingProduct(supabase, { sku, name: fields.name, volume_ml: fields.volume_ml })) {
+      return { ok: false, error: "Ya existe una cerveza con ese nombre y volumen. Edítala desde la tabla." };
+    }
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "No se pudo verificar el catálogo." };
+  }
+
+  const { error } = await supabase.from("products").insert({ ...fields, sku, sale_price });
+  if (error) return { ok: false, error: error.code === "23505" ? "Ya existe una cerveza con ese país, nombre y volumen." : error.message };
+
+  refresh();
+  return { ok: true, sale_price };
 }

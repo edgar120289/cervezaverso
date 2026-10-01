@@ -4,6 +4,8 @@ import { Pencil, Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
 import type { StockStatus } from "@/lib/types";
+import CatalogImporter from "@/components/admin/CatalogImporter";
+import ManualProductDialog from "@/components/admin/ManualProductDialog";
 
 type ProductRow = {
   id: string;
@@ -57,9 +59,14 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
         ))}
       </div>
 
+      <section id="ingesta" className="scroll-mt-6">
+        <CatalogImporter />
+      </section>
+
       <section className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold tracking-tight">Productos</h2>
+          <ManualProductDialog />
           <form action="/admin" className="relative w-full sm:w-80">
             <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
             <input
@@ -78,7 +85,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
           </div>
         ) : products.length === 0 ? (
           <div className="rounded-[28px] bg-white p-10 text-center text-sm text-muted shadow-card">
-            {search ? `No hay productos que coincidan con “${search}”.` : "Todavía no hay productos. Importa el Excel para empezar."}
+            {search ? `No hay productos que coincidan con “${search}”.` : "Todavía no hay productos. Sube un archivo o añade una cerveza manualmente."}
           </div>
         ) : (
           <div className="overflow-hidden rounded-[28px] bg-white shadow-card">
@@ -139,20 +146,6 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
           </div>
         )}
       </section>
-
-      <div className="rounded-[28px] bg-white p-6 shadow-card">
-        <h2 className="text-lg font-semibold tracking-tight">Ingesta de catálogo</h2>
-        <p className="mt-1 text-sm text-muted">
-          Sube el Excel &ldquo;LISTA MONASTERIO&rdquo; para actualizar precios y stock
-          automáticamente.
-        </p>
-        <Link
-          href="/admin/import"
-          className="mt-4 inline-block rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-accent"
-        >
-          Ir al importador
-        </Link>
-      </div>
     </div>
   );
 }

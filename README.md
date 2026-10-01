@@ -23,12 +23,16 @@ Abre [http://localhost:3000](http://localhost:3000).
    actualiza manualmente su fila en `public.users` con
    `role = 'admin'`.
 
-## Importar catálogo desde Excel
+## Carga masiva y alta manual del catálogo
 
-Como administrador, entra a `/admin/import` y sube el archivo `.xlsx`
-con la pestaña **LISTA MONASTERIO**. El precio de venta se calcula
-automáticamente con la fórmula obligatoria del SPEC:
-`Math.floor((cost_price * 1.5) / 5) * 5`.
+Como administrador, en `/admin` arrastra el archivo semanal (`.xlsx` o
+`.csv`) al cargador; **Descargar plantilla** entrega el CSV con las
+cabeceras esperadas (Nombre, País, Estilo, ABV, Volumen (ml), Precio, Stock).
+Un `.xlsx` con la pestaña **LISTA MONASTERIO** se lee con el formato del
+proveedor. La carga es un UPSERT (por SKU o por nombre + volumen): actualiza
+precio y disponibilidad sin tocar descripciones, fichas del Sommelier ni
+imagen. El precio de venta se calcula con `calculateSalePrice`. También hay
+**Añadir cerveza manualmente** para altas individuales.
 
 ## Enriquecimiento con IA
 
