@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { MonasterioFormatError, parseMonasterio, upsertMonasterio } from "@/lib/monasterio";
-import { excelUploadSchema, firstIssue, HONEYPOT_FIELD, isHoneypotFilled } from "@/lib/validation";
+import { parseCatalogFile } from "@/lib/catalog-import";
+import { MonasterioFormatError, upsertMonasterio } from "@/lib/monasterio";
+import { catalogUploadSchema, firstIssue, HONEYPOT_FIELD, isHoneypotFilled } from "@/lib/validation";
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
@@ -26,15 +27,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Solicitud rechazada." }, { status: 400 });
   }
 
-  const parsed = excelUploadSchema.safeParse({ file: formData.get("file") });
+  const parsed = catalogUploadSchema.safeParse({ file: formData.get("file") });
   if (!parsed.success) {
     return NextResponse.json({ error: firstIssue(parsed.error) }, { status: 400 });
   }
 
   try {
-    const { rows, skipped } = await parseMonasterio(await parsed.data.file.arrayBuffer());
+    const { rows, skipped, errors } = await parseCatalogFile(parsed.data.file);
     const result = await upsertMonasterio(createAdminClient(), rows, skipped);
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, errors: [...errors, ...result.errors] });
   } catch (err) {
     if (err instanceof MonasterioFormatError) {
       return NextResponse.json({ error: err.message }, { status: 400 });

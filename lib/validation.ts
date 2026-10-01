@@ -156,6 +156,13 @@ export const productUpdateSchema = z.object({
   notas_maridaje: optionalText(4000),
 });
 
+/** Alta manual desde el panel. `sku` y `sale_price` los calcula el servidor. */
+export const productCreateSchema = productUpdateSchema
+  .pick({ name: true, brewery: true, country: true, style: true, abv: true, volume_ml: true, cost_price: true, margin_pct: true, stock_status: true })
+  .extend({ margin_pct: productUpdateSchema.shape.margin_pct.default(50) });
+
+export type ProductCreate = z.input<typeof productCreateSchema>;
+
 export type ProductUpdate = z.input<typeof productUpdateSchema>;
 
 export const PRODUCT_IMAGE_BUCKET = "product-images";
@@ -185,10 +192,10 @@ export type PromoCreate = z.input<typeof promoCreateSchema>;
 
 const MAX_EXCEL_BYTES = 10 * 1024 * 1024;
 
-export const excelUploadSchema = z.object({
+export const catalogUploadSchema = z.object({
   file: z
     .instanceof(File, { message: "No se recibió ningún archivo." })
-    .refine((file) => file.name.toLowerCase().endsWith(".xlsx"), "El archivo debe ser .xlsx.")
+    .refine((file) => /\.(xlsx|csv)$/i.test(file.name), "El archivo debe ser .xlsx o .csv.")
     .refine((file) => file.size > 0, "El archivo está vacío.")
     .refine((file) => file.size <= MAX_EXCEL_BYTES, "El archivo supera los 10 MB."),
 });

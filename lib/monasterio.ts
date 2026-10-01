@@ -14,7 +14,7 @@ import type { StockStatus } from "@/lib/types";
 export const SHEET_NAME = "LISTA MONASTERIO";
 const DATA_START_ROW = 12;
 const HEADER_SEARCH_ROWS = 15;
-const LITERS_THRESHOLD = 20;
+export const LITERS_THRESHOLD = 20;
 
 const HEADER_ALIASES: Record<string, keyof ColumnMap> = {
   PAIS: "country",
@@ -70,14 +70,14 @@ function cellText(row: ExcelJS.Row, col: number | undefined): string {
   return col ? row.getCell(col).text.replace(/\s+/g, " ").trim() : "";
 }
 
-function toNumber(value: unknown): number {
+export function toNumber(value: unknown): number {
   if (typeof value === "number") return value;
   const parsed = parseFloat(String(value ?? "0").replace(/[^0-9.\-]/g, ""));
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
 /** La columna %ABV tiene formato de porcentaje en Excel: 0.055 → 5.5. */
-function toAbvPercent(value: number): number {
+export function toAbvPercent(value: number): number {
   return value > 0 && value < 1 ? Math.round(value * 10000) / 100 : value;
 }
 
@@ -104,7 +104,7 @@ function trailingNotes(row: ExcelJS.Row, afterCol: number): string {
   return notes.join(" ");
 }
 
-function slugify(...parts: string[]): string {
+export function slugify(...parts: string[]): string {
   return parts
     .join("-")
     .toLowerCase()
@@ -179,7 +179,36 @@ export async function parseMonasterio(
   return { rows, skipped };
 }
 
-/** Inserta o actualiza (por `sku`) cada fila en `products`. Requiere un cliente con service_role. */
+/**
+ * Busca el producto ya existente de una fila: primero por `sku` y, si no, por
+ * nombre + volumen (así una lista que escribe el volumen en ml no duplica lo
+ * que Monasterio registró en litros). Requiere un cliente con permiso de lectura.
+ */
+export async function findExistingProduct(
+  client: SupabaseClient,
+  row: Pick<MonasterioRow, "sku" | "name" | "volume_ml">
+) {
+  // `*` (y no "id, margin_pct") para que funcione aunque la migración 003 aún no se haya aplicado.
+  const bySku = await client.from("products").select("*").eq("sku", row.sku).maybeSingle();
+  if (bySku.error) throw bySku.error;
+  if (bySku.data) return bySku.data;
+
+  const byName = await client
+    .from("products")
+    .select("*")
+    .ilike("name", row.name.replace(/[\\%_]/g, "\\$&"))
+    .eq("volume_ml", row.volume_ml)
+    .limit(1);
+  if (byName.error) throw byName.error;
+  return byName.data?.[0] ?? null;
+}
+
+/**
+ * Inserta o actualiza cada fila en `products` (UPSERT por sku, o por nombre + volumen).
+ * Al actualizar solo se escriben los campos de la lista (precio, disponibilidad,
+ * estilo, país, ABV, volumen): descripciones, fichas del Sommelier, imagen,
+ * insignias y margen personalizado quedan intactos. Requiere un cliente con service_role.
+ */
 export async function upsertMonasterio(
   admin: SupabaseClient,
   rows: MonasterioRow[],
@@ -189,21 +218,16 @@ export async function upsertMonasterio(
 
   for (const { rowNumber, ...payload } of rows) {
     try {
-      // `*` (y no "id, margin_pct") para que el import siga funcionando aunque la
-      // migración 003 aún no se haya aplicado.
-      const { data: existing, error: selectError } = await admin
-        .from("products")
-        .select("*")
-        .eq("sku", payload.sku)
-        .maybeSingle();
-      if (selectError) throw selectError;
+      const existing = await findExistingProduct(admin, payload);
 
       if (existing) {
-        // Respeta el margen personalizado que el admin haya fijado en el panel.
+        // El sku del producto existente no cambia; el margen personalizado se respeta.
+        const { sku: _sku, ...fields } = payload;
+        void _sku;
         const margin = Number(existing.margin_pct);
         const update = Number.isFinite(margin)
-          ? { ...payload, sale_price: calculateSalePrice(payload.cost_price, margin) }
-          : payload;
+          ? { ...fields, sale_price: calculateSalePrice(payload.cost_price, margin) }
+          : fields;
         const { error } = await admin.from("products").update(update).eq("id", existing.id);
         if (error) throw error;
         result.updated++;
