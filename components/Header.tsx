@@ -1,13 +1,14 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
-import { ShoppingBag } from "lucide-react";
+import { Search, ShoppingBag, X } from "lucide-react";
 import Image from "next/image";
 import MultiverseLogo from "./MultiverseLogo";
 import AccountMenu from "./AccountMenu";
 import HeaderSearch from "./HeaderSearch";
 import MobileMenu from "./MobileMenu";
+import MobileSearchBar, { MOBILE_SEARCH_ID } from "./MobileSearchBar";
 import { useCart } from "@/lib/cart-context";
 
 const MAIN_LINKS = [
@@ -17,11 +18,12 @@ const MAIN_LINKS = [
 
 export default function Header({ logoImages }: { logoImages: string[] }) {
   const { itemCount, openDrawer } = useCart();
+  const [searchOpen, setSearchOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 px-4 pt-4">
       {/* Móvil: hamburguesa | logotipo al centro | carrito. Desde md: logotipo, buscador, cuenta y carrito. */}
-      <div className="relative mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-full bg-white/80 px-3 py-2 shadow-card backdrop-blur-lg md:flex md:justify-between md:px-4">
+      <div className="relative mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-full bg-white/95 px-3 py-2 shadow-card md:flex md:backdrop-blur-lg md:justify-between md:px-4">
         <div className="md:hidden">
           <MobileMenu />
         </div>
@@ -71,6 +73,16 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
             </div>
             <button
               type="button"
+              onClick={() => setSearchOpen((open) => !open)}
+              aria-label={searchOpen ? "Cerrar búsqueda" : "Buscar cervezas"}
+              aria-expanded={searchOpen}
+              aria-controls={MOBILE_SEARCH_ID}
+              className="flex h-11 w-11 items-center justify-center rounded-full text-black/70 transition-colors hover:bg-black/5 md:hidden"
+            >
+              {searchOpen ? <X size={20} /> : <Search size={20} />}
+            </button>
+            <button
+              type="button"
               onClick={openDrawer}
               aria-label={itemCount > 0 ? `Ver carrito, ${itemCount} productos` : "Ver carrito"}
               className="relative flex h-11 w-11 items-center justify-center rounded-full text-black/70 transition-colors hover:bg-black/5"
@@ -88,6 +100,7 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
           </nav>
         </div>
       </div>
+      {searchOpen && <MobileSearchBar onClose={() => setSearchOpen(false)} />}
     </header>
   );
 }

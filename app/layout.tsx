@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import AgeGateModal from "@/components/AgeGateModal";
 import WhatsAppFAB from "@/components/WhatsAppFAB";
+import ScrollToTop from "@/components/ScrollToTop";
 import SommelierFloating from "@/components/SommelierFloating";
 import { SommelierProvider } from "@/components/SommelierProvider";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
@@ -83,6 +84,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               />
               <CartDrawer />
               <WhatsAppFAB />
+              <ScrollToTop />
               <SommelierFloating />
             </SommelierProvider>
           </CartProvider>
