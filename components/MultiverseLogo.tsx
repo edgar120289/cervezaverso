@@ -51,10 +51,7 @@ export default function MultiverseLogo({
     <button
       type="button"
       aria-label="Cervezaverso"
-      onPointerEnter={(e) => {
-        // En táctil el toque dispara también onClick: sólo el ratón cambia el tarro al pasar.
-        if (e.pointerType === "mouse") setJar((current) => pickRandom(jars, current));
-      }}
+      onMouseEnter={() => setJar((current) => pickRandom(jars, current))}
       onClick={() => setJar((current) => pickRandom(jars, current))}
       className="relative flex shrink-0 cursor-pointer items-center justify-center"
       style={{ width: size, height: size }}
@@ -71,7 +68,7 @@ export default function MultiverseLogo({
           transition={{ duration: 0.35, ease: "easeOut" }}
           className="absolute inset-0"
         >
-          <Image src={jar} alt="" fill sizes={`${size}px`} quality={75} priority={priority} className="object-contain" />
+          <Image src={jar} alt="" fill sizes={`${size}px`} quality={100} priority={priority} className="object-contain" />
         </motion.div>
       </AnimatePresence>
     </button>

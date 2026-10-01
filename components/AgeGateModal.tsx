@@ -130,7 +130,7 @@ export default function AgeGateModal({ logoImages, logoFrame }: AgeGateModalProp
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={reduceMotion ? { duration: 0 } : { duration: 0.4 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-canvas/95 p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-canvas/40 p-4 backdrop-blur-xl backdrop-saturate-150"
         >
           <motion.div
             ref={dialogRef}
@@ -149,7 +149,9 @@ export default function AgeGateModal({ logoImages, logoFrame }: AgeGateModalProp
             <MultiverseLogo
               images={logoImages}
               frame={logoFrame}
-              size={view === "settings" ? 96 : 140}
+              size={view === "settings" ? 96 : 180}
+              autoCycleMs={1800}
+              priority
             />
 
             <AnimatePresence mode="wait" initial={false}>
