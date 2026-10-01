@@ -1,7 +1,63 @@
 import { createServerClient } from "@supabase/ssr";
+import { createHash, timingSafeEqual } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 
+const DEV_ADMIN_USER = "admin";
+const DEV_ADMIN_PASSWORD = "cerveza2026";
+
+function isAdminPath(pathname: string) {
+  return (
+    pathname === "/admin" ||
+    pathname.startsWith("/admin/") ||
+    pathname === "/api/admin" ||
+    pathname.startsWith("/api/admin/")
+  );
+}
+
+function safeEqual(a: string, b: string) {
+  const hashA = createHash("sha256").update(a).digest();
+  const hashB = createHash("sha256").update(b).digest();
+  return timingSafeEqual(hashA, hashB);
+}
+
+function basicAuthChallenge() {
+  return new NextResponse("Autenticación requerida.", {
+    status: 401,
+    headers: { "WWW-Authenticate": 'Basic realm="Cervezaverso Admin", charset="UTF-8"' },
+  });
+}
+
+// HTTP Basic Auth para /admin. Los valores por defecto solo aplican fuera de producción.
+function guardAdmin(request: NextRequest) {
+  const isProduction = process.env.NODE_ENV === "production";
+  const user = process.env.ADMIN_USER || (isProduction ? undefined : DEV_ADMIN_USER);
+  const password = process.env.ADMIN_PASSWORD || (isProduction ? undefined : DEV_ADMIN_PASSWORD);
+
+  if (!user || !password) {
+    console.error("ADMIN_USER y ADMIN_PASSWORD no están definidas: /admin bloqueado.");
+    return new NextResponse("Servicio no disponible.", { status: 503 });
+  }
+
+  const header = request.headers.get("authorization") ?? "";
+  const [scheme, encoded] = header.split(" ");
+  if (scheme?.toLowerCase() === "basic" && encoded) {
+    const decoded = Buffer.from(encoded, "base64").toString("utf-8");
+    const separator = decoded.indexOf(":");
+    if (separator !== -1) {
+      const userOk = safeEqual(decoded.slice(0, separator), user);
+      const passwordOk = safeEqual(decoded.slice(separator + 1), password);
+      if (userOk && passwordOk) return null;
+    }
+  }
+  return basicAuthChallenge();
+}
+
 export async function proxy(request: NextRequest) {
+  if (isAdminPath(request.nextUrl.pathname)) {
+    const denied = guardAdmin(request);
+    if (denied) return denied;
+  }
+
   let response = NextResponse.next({ request });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
