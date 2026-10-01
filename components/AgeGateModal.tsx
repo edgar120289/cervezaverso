@@ -130,7 +130,7 @@ export default function AgeGateModal({ logoImages, logoFrame }: AgeGateModalProp
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={reduceMotion ? { duration: 0 } : { duration: 0.4 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-canvas/40 p-4 backdrop-blur-xl backdrop-saturate-150"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-canvas/95 p-4"
         >
           <motion.div
             ref={dialogRef}

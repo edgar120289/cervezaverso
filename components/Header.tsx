@@ -23,7 +23,7 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
   return (
     <header className="sticky top-0 z-40 px-4 pt-4">
       {/* Móvil: hamburguesa | logotipo al centro | carrito. Desde md: logotipo, buscador, cuenta y carrito. */}
-      <div className="relative mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-full bg-white/95 px-3 py-2 shadow-card md:flex md:backdrop-blur-lg md:justify-between md:px-4">
+      <div className="relative mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-full bg-white/80 px-3 py-2 shadow-card backdrop-blur-lg md:flex md:justify-between md:px-4">
         <div className="md:hidden">
           <MobileMenu />
         </div>
