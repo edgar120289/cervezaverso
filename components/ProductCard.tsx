@@ -6,7 +6,7 @@ import { Droplet, GlassWater, Plus } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { formatMXN } from "@/lib/pricing";
 import { useCart } from "@/lib/cart-context";
-import { countryFlag } from "@/lib/country-flags";
+import CountryFlag from "./CountryFlag";
 import ProductImage from "./ProductImage";
 import FavoriteButton from "./FavoriteButton";
 
@@ -82,9 +82,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </ul>
 
         <p className="flex items-center gap-1.5 text-sm font-bold text-black">
-          <span aria-hidden className="text-base leading-none">
-            {countryFlag(product.country)}
-          </span>
+          <CountryFlag country={product.country} />
           {product.country}
         </p>
 

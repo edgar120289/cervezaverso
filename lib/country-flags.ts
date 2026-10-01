@@ -1,71 +1,113 @@
-/** Países en español (sin acentos, minúsculas) → código ISO 3166-1 alfa-2. */
+/**
+ * País tal como llega del catálogo → código de FlagCDN (https://flagcdn.com).
+ * Las claves van en minúsculas, sin acentos ni puntuación, así que "EE.UU.",
+ * "U.S.A." y "Estados Unidos" resuelven igual. Escocia, Inglaterra y Gales
+ * tienen bandera propia (gb-sct, gb-eng, gb-wls): no son la de Reino Unido.
+ */
 const COUNTRY_CODES: Record<string, string> = {
-  alemania: "DE",
-  argentina: "AR",
-  australia: "AU",
-  austria: "AT",
-  belgica: "BE",
-  brasil: "BR",
-  canada: "CA",
-  chequia: "CZ",
-  chile: "CL",
-  china: "CN",
-  colombia: "CO",
-  "corea del sur": "KR",
-  croacia: "HR",
-  cuba: "CU",
-  dinamarca: "DK",
-  escocia: "GB",
-  espana: "ES",
-  "estados unidos": "US",
-  eeuu: "US",
-  filipinas: "PH",
-  finlandia: "FI",
-  francia: "FR",
-  grecia: "GR",
-  guatemala: "GT",
-  holanda: "NL",
-  hungria: "HU",
-  inglaterra: "GB",
-  india: "IN",
-  irlanda: "IE",
-  islandia: "IS",
-  israel: "IL",
-  italia: "IT",
-  jamaica: "JM",
-  japon: "JP",
-  mexico: "MX",
-  noruega: "NO",
-  "nueva zelanda": "NZ",
-  "paises bajos": "NL",
-  peru: "PE",
-  polonia: "PL",
-  portugal: "PT",
-  "puerto rico": "PR",
-  "reino unido": "GB",
-  "republica checa": "CZ",
-  rusia: "RU",
-  singapur: "SG",
-  sudafrica: "ZA",
-  suecia: "SE",
-  suiza: "CH",
-  tailandia: "TH",
-  turquia: "TR",
-  ucrania: "UA",
-  uruguay: "UY",
-  vietnam: "VN",
+  alemania: "de",
+  argentina: "ar",
+  australia: "au",
+  austria: "at",
+  belgica: "be",
+  bolivia: "bo",
+  brasil: "br",
+  bulgaria: "bg",
+  canada: "ca",
+  chequia: "cz",
+  chile: "cl",
+  china: "cn",
+  colombia: "co",
+  "corea del sur": "kr",
+  "costa rica": "cr",
+  croacia: "hr",
+  cuba: "cu",
+  dinamarca: "dk",
+  ecuador: "ec",
+  eslovaquia: "sk",
+  eslovenia: "si",
+  espana: "es",
+  "estados unidos": "us",
+  "estados unidos de america": "us",
+  "united states": "us",
+  usa: "us",
+  "u s a": "us",
+  eua: "us",
+  "e u a": "us",
+  eeuu: "us",
+  "ee uu": "us",
+  estonia: "ee",
+  filipinas: "ph",
+  finlandia: "fi",
+  francia: "fr",
+  escocia: "gb-sct",
+  scotland: "gb-sct",
+  inglaterra: "gb-eng",
+  england: "gb-eng",
+  gales: "gb-wls",
+  "pais de gales": "gb-wls",
+  grecia: "gr",
+  guatemala: "gt",
+  holanda: "nl",
+  "hong kong": "hk",
+  hungria: "hu",
+  india: "in",
+  indonesia: "id",
+  irlanda: "ie",
+  islandia: "is",
+  israel: "il",
+  italia: "it",
+  jamaica: "jm",
+  japon: "jp",
+  letonia: "lv",
+  lituania: "lt",
+  luxemburgo: "lu",
+  malasia: "my",
+  mexico: "mx",
+  noruega: "no",
+  "nueva zelanda": "nz",
+  "paises bajos": "nl",
+  panama: "pa",
+  peru: "pe",
+  polonia: "pl",
+  portugal: "pt",
+  "puerto rico": "pr",
+  "reino unido": "gb",
+  "republica checa": "cz",
+  "republica dominicana": "do",
+  rumania: "ro",
+  rusia: "ru",
+  serbia: "rs",
+  singapur: "sg",
+  sudafrica: "za",
+  suecia: "se",
+  suiza: "ch",
+  tailandia: "th",
+  taiwan: "tw",
+  turquia: "tr",
+  ucrania: "ua",
+  uruguay: "uy",
+  venezuela: "ve",
+  vietnam: "vn",
 };
 
-const FALLBACK_FLAG = "🌍";
-
-/** "Bélgica" → "🇧🇪". Si el país no está en la lista devuelve un globo. */
-export function countryFlag(country: string): string {
-  const key = country
+function normalize(country: string): string {
+  return country
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
     .trim();
-  const code = COUNTRY_CODES[key];
-  if (!code) return FALLBACK_FLAG;
-  return String.fromCodePoint(...[...code].map((letter) => 0x1f1e6 + letter.charCodeAt(0) - 65));
+}
+
+/** "Escocia" → "gb-sct", "EE.UU." → "us". `null` si el país no está en el diccionario. */
+export function countryFlagCode(country: string): string | null {
+  const key = normalize(country);
+  return COUNTRY_CODES[key] ?? COUNTRY_CODES[key.replace(/ /g, "")] ?? null;
+}
+
+/** URL del SVG de la bandera en FlagCDN, o `null` si el país no se reconoce. */
+export function countryFlagUrl(country: string): string | null {
+  const code = countryFlagCode(country);
+  return code ? `https://flagcdn.com/${code}.svg` : null;
 }
