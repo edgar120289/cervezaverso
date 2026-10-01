@@ -1,7 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+
+const DESKTOP_QUERY = "(min-width: 768px)";
+
+function subscribeDesktop(onChange: () => void) {
+  const query = window.matchMedia(DESKTOP_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+/** Video sólo en pantallas ≥768 px y sin "ahorro de datos": en móvil son 4.8 MB y decodificación continua. */
+function useCanPlayVideo(): boolean {
+  return useSyncExternalStore(
+    subscribeDesktop,
+    () => {
+      const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+      return window.matchMedia(DESKTOP_QUERY).matches && !connection?.saveData;
+    },
+    () => false,
+  );
+}
 
 type HeroCinematicProps = {
   /** Video de fondo; sin él (o si falla al cargar) se usa un fondo gris oscuro. */
@@ -12,7 +32,8 @@ export default function HeroCinematic({ videoSrc }: HeroCinematicProps) {
   const reduceMotion = useReducedMotion();
   const [videoFailed, setVideoFailed] = useState(false);
   // Con "reducir movimiento" no se reproduce video de fondo.
-  const hasVideo = Boolean(videoSrc) && !videoFailed && !reduceMotion;
+  const canPlayVideo = useCanPlayVideo();
+  const hasVideo = Boolean(videoSrc) && !videoFailed && !reduceMotion && canPlayVideo;
 
   return (
     <section
