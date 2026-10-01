@@ -21,6 +21,9 @@ export default async function EditProductPage({ params }: PageProps<"/admin/prod
 
   const product = toProduct(data);
   const margin = Number(data.margin_pct);
+  const gallery = Array.isArray(data.image_urls) ? (data.image_urls as string[]) : [];
+  // Productos anteriores a la migración 006 conservan su imagen única como portada.
+  const initialImages = gallery.length > 0 ? gallery : product.image_url ? [product.image_url] : [];
 
   return (
     <div className="space-y-6">
@@ -34,6 +37,7 @@ export default async function EditProductPage({ params }: PageProps<"/admin/prod
       <ProductEditForm
         product={product}
         initialMargin={Number.isFinite(margin) ? margin : DEFAULT_MARGIN_PCT}
+        initialImages={initialImages}
       />
     </div>
   );

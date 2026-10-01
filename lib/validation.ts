@@ -166,6 +166,8 @@ export type ProductCreate = z.input<typeof productCreateSchema>;
 export type ProductUpdate = z.input<typeof productUpdateSchema>;
 
 export const PRODUCT_IMAGE_BUCKET = "product-images";
+/** Debe coincidir con `products_image_urls_max_check` (migración 006). */
+export const MAX_PRODUCT_IMAGES = 10;
 export const MAX_PRODUCT_IMAGE_BYTES = 5 * 1024 * 1024;
 export const PRODUCT_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 

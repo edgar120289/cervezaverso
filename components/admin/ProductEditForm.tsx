@@ -1,12 +1,10 @@
 "use client";
 
-import { useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
-import Image from "next/image";
-import { ImageUp, Loader2, Sparkles } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { actualizarImagenProducto, actualizarProducto } from "@/app/actions/admin-productos";
+import { useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
+import { Loader2, Sparkles } from "lucide-react";
+import { actualizarProducto } from "@/app/actions/admin-productos";
 import { calculateSalePrice, DEFAULT_MARGIN_PCT, formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
-import { firstIssue, PRODUCT_IMAGE_BUCKET, PRODUCT_IMAGE_TYPES, productImageSchema } from "@/lib/validation";
+import ProductGallery from "./ProductGallery";
 import type { Product, StockStatus } from "@/lib/types";
 
 const inputClass =
@@ -48,7 +46,15 @@ function toNumber(value: string): number {
   return value.trim() === "" ? NaN : Number(value);
 }
 
-export default function ProductEditForm({ product, initialMargin }: { product: Product; initialMargin: number }) {
+export default function ProductEditForm({
+  product,
+  initialMargin,
+  initialImages,
+}: {
+  product: Product;
+  initialMargin: number;
+  initialImages: string[];
+}) {
   const [form, setForm] = useState<FormState>({
     name: product.name,
     brewery: product.brewery ?? "",
@@ -66,13 +72,10 @@ export default function ProductEditForm({ product, initialMargin }: { product: P
     notas_perfil: product.notas_perfil ?? "",
     notas_maridaje: product.notas_maridaje ?? "",
   });
-  const [imageUrl, setImageUrl] = useState(product.image_url);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const cost = toNumber(form.cost_price);
   const margin = toNumber(form.margin_pct);
@@ -84,41 +87,6 @@ export default function ProductEditForm({ product, initialMargin }: { product: P
   function update<K extends keyof FormState>(key: K) {
     return (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm((current) => ({ ...current, [key]: e.target.value }));
-  }
-
-  async function handleImage(e: ChangeEvent<HTMLInputElement>) {
-    setError(null);
-    setNotice(null);
-    const parsed = productImageSchema.safeParse(e.target.files?.[0]);
-    e.target.value = "";
-    if (!parsed.success) {
-      setError(firstIssue(parsed.error));
-      return;
-    }
-    const file = parsed.data;
-
-    setIsUploading(true);
-    try {
-      const supabase = createClient();
-      const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      // Nombre único: evita que la CDN sirva una versión anterior cacheada.
-      const path = `${product.sku}/${Date.now()}.${extension}`;
-      const { error: uploadError } = await supabase.storage
-        .from(PRODUCT_IMAGE_BUCKET)
-        .upload(path, file, { contentType: file.type, cacheControl: "31536000", upsert: false });
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path);
-      const result = await actualizarImagenProducto(product.id, data.publicUrl);
-      if (!result.ok) throw new Error(result.error);
-
-      setImageUrl(data.publicUrl);
-      setNotice("Imagen actualizada.");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo subir la imagen.");
-    } finally {
-      setIsUploading(false);
-    }
   }
 
   async function handleGenerate() {
@@ -194,41 +162,16 @@ export default function ProductEditForm({ product, initialMargin }: { product: P
 
   return (
     <form onSubmit={handleSubmit} noValidate className="grid gap-6 lg:grid-cols-[320px_1fr]">
-      {/* Imagen */}
-      <div className="space-y-4">
-        <div className="rounded-[28px] bg-white p-6 shadow-card">
-          <div className="relative aspect-square overflow-hidden rounded-[20px] bg-canvas">
-            {imageUrl ? (
-              <Image src={imageUrl} alt={form.name} fill sizes="320px" className="object-contain p-4" />
-            ) : (
-              <div className="flex h-full items-center justify-center text-sm text-muted">Sin imagen</div>
-            )}
-            {isUploading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-sm">
-                <Loader2 className="animate-spin text-muted" />
-              </div>
-            )}
-          </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept={PRODUCT_IMAGE_TYPES.join(",")}
-            onChange={handleImage}
-            className="sr-only"
-            id="product-image"
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-canvas py-3 text-sm font-semibold transition-colors hover:bg-black hover:text-white disabled:opacity-60"
-          >
-            <ImageUp size={16} />
-            {isUploading ? "Subiendo…" : imageUrl ? "Cambiar imagen" : "Subir imagen"}
-          </button>
-          <p className="mt-2 text-center text-xs text-muted">JPG, PNG, WebP o AVIF · máx. 5 MB</p>
-        </div>
+      <div className="lg:col-span-2">
+        <ProductGallery
+          productId={product.id}
+          productName={product.name}
+          sku={product.sku}
+          initialUrls={initialImages}
+        />
+      </div>
 
+      <div className="space-y-4">
         {/* Precio */}
         <div className="rounded-[28px] bg-white p-6 shadow-card">
           <p className="text-sm text-muted">Precio de venta</p>
@@ -353,7 +296,7 @@ export default function ProductEditForm({ product, initialMargin }: { product: P
 
         <button
           type="submit"
-          disabled={isSaving || isUploading || isGenerating}
+          disabled={isSaving || isGenerating}
           className="w-full rounded-full bg-accent py-3.5 font-semibold text-white shadow-accent transition-transform active:scale-[0.98] disabled:opacity-60 sm:w-auto sm:px-10"
         >
           {isSaving ? "Guardando…" : "Guardar cambios"}
