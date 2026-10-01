@@ -1,11 +1,11 @@
-import Link from "next/link";
 import Image from "next/image";
-import { Pencil, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
 import type { StockStatus } from "@/lib/types";
 import CatalogImporter from "@/components/admin/CatalogImporter";
 import ManualProductDialog from "@/components/admin/ManualProductDialog";
+import ProductRowActions from "@/components/admin/ProductRowActions";
 
 type ProductRow = {
   id: string;
@@ -17,7 +17,16 @@ type ProductRow = {
   sale_price: number;
   stock_status: StockStatus;
   image_url: string | null;
+  is_active: boolean;
 };
+
+function InactiveBadge() {
+  return (
+    <span className="ml-2 inline-block rounded-full bg-black/10 px-2 py-0.5 align-middle text-[11px] font-semibold text-black/70">
+      Inactiva
+    </span>
+  );
+}
 
 export default async function AdminDashboard({ searchParams }: PageProps<"/admin">) {
   const { q } = await searchParams;
@@ -33,7 +42,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
 
   let productsQuery = supabase
     .from("products")
-    .select("id, sku, name, country, style, cost_price, sale_price, stock_status, image_url")
+    .select("id, sku, name, country, style, cost_price, sale_price, stock_status, image_url, is_active")
     .order("name", { ascending: true });
   if (search) {
     // Se quitan los caracteres con significado en el filtro `or` de PostgREST.
@@ -88,9 +97,46 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
             {search ? `No hay productos que coincidan con “${search}”.` : "Todavía no hay productos. Sube un archivo o añade una cerveza manualmente."}
           </div>
         ) : (
-          <div className="overflow-hidden rounded-[28px] bg-white shadow-card">
+          <>
+          <ul className="space-y-3 md:hidden">
+            {products.map((product) => (
+              <li
+                key={product.id}
+                className={`space-y-3 rounded-[28px] bg-white p-4 shadow-card ${product.is_active ? "" : "bg-white/70"}`}
+              >
+                <div className={`flex items-center gap-3 ${product.is_active ? "" : "opacity-60"}`}>
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-canvas">
+                    {product.image_url && (
+                      <Image src={product.image_url} alt="" fill sizes="64px" className="object-contain p-1" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold leading-snug">
+                      {product.name}
+                      {!product.is_active && <InactiveBadge />}
+                    </p>
+                    <p className="truncate text-xs text-muted">
+                      {product.country} · {product.style}
+                    </p>
+                    <p className="truncate text-xs text-muted">
+                      {product.sku} · {STOCK_STATUS_LABEL[product.stock_status]}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-baseline justify-between px-1 text-sm">
+                  <span className="text-muted">
+                    Costo <span className="tabular-nums">{formatMXN(Number(product.cost_price))}</span>
+                  </span>
+                  <span className="font-semibold tabular-nums">{formatMXN(Number(product.sale_price))}</span>
+                </div>
+                <ProductRowActions id={product.id} name={product.name} isActive={product.is_active} layout="card" />
+              </li>
+            ))}
+          </ul>
+
+          <div className="hidden overflow-hidden rounded-[28px] bg-white shadow-card md:block">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] text-sm">
+              <table className="w-full min-w-[860px] text-sm">
                 <thead>
                   <tr className="border-b border-black/5 text-left text-xs font-semibold uppercase tracking-wide text-muted">
                     <th className="px-6 py-4">Cerveza</th>
@@ -105,7 +151,10 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
                 </thead>
                 <tbody>
                   {products.map((product) => (
-                    <tr key={product.id} className="border-b border-black/5 last:border-0 hover:bg-black/[0.02]">
+                    <tr
+                      key={product.id}
+                      className={`border-b border-black/5 last:border-0 hover:bg-black/[0.02] ${product.is_active ? "" : "opacity-60"}`}
+                    >
                       <td className="px-6 py-3">
                         <div className="flex items-center gap-3">
                           <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl bg-canvas">
@@ -114,7 +163,10 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
                             )}
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate font-semibold">{product.name}</p>
+                            <p className="truncate font-semibold">
+                              {product.name}
+                              {!product.is_active && <InactiveBadge />}
+                            </p>
                             <p className="truncate text-xs text-muted">
                               {product.country} · {product.sku}
                             </p>
@@ -130,13 +182,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
                         {formatMXN(Number(product.sale_price))}
                       </td>
                       <td className="px-6 py-3 text-right">
-                        <Link
-                          href={`/admin/productos/${product.id}`}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-canvas px-4 py-2 text-xs font-semibold transition-colors hover:bg-black hover:text-white"
-                        >
-                          <Pencil size={13} />
-                          Editar
-                        </Link>
+                        <ProductRowActions id={product.id} name={product.name} isActive={product.is_active} layout="row" />
                       </td>
                     </tr>
                   ))}
@@ -144,6 +190,7 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
               </table>
             </div>
           </div>
+          </>
         )}
       </section>
     </div>

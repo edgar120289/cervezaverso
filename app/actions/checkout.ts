@@ -44,7 +44,7 @@ export async function crearPedido(input: unknown): Promise<CheckoutResult> {
   const productIds = [...new Set(items.map((item) => item.product_id))];
   const { data: products, error: productsError } = await admin
     .from("products")
-    .select("id, sku, name, sale_price, stock_status")
+    .select("id, sku, name, sale_price, stock_status, is_active")
     .in("id", productIds);
   if (productsError) return { ok: false, error: "No pudimos confirmar los precios. Intenta de nuevo." };
 
@@ -52,7 +52,8 @@ export async function crearPedido(input: unknown): Promise<CheckoutResult> {
   const lineas = [];
   for (const { product_id, cantidad } of items) {
     const product = byId.get(product_id);
-    if (!product) return { ok: false, error: "Uno de los productos ya no está disponible. Revisa tu carrito." };
+    // La service role no pasa por RLS: un producto inactivo se trata aquí como no disponible.
+    if (!product || !product.is_active) return { ok: false, error: "Uno de los productos ya no está disponible. Revisa tu carrito." };
     if (product.stock_status === "out_of_stock") {
       return { ok: false, error: `${product.name} se agotó. Quítala del carrito para continuar.` };
     }
