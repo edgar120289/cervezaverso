@@ -1,11 +1,27 @@
+import { getHeroSettings } from "@/lib/hero-settings";
 import { listPublicVideos, MEDIA_DIRS, publicFileExists } from "@/lib/media";
-import HeroCinematic from "./HeroCinematic";
+import HeroCarousel from "./HeroCarousel";
+import HeroVideo from "./HeroVideo";
 
-export default function Hero() {
-  // Prioridad: public/hero-beer.mp4 → primer video de public/video/hero/ → sin video (fondo oscuro).
-  const videoSrc = publicFileExists(MEDIA_DIRS.heroVideo)
-    ? `/${MEDIA_DIRS.heroVideo}`
-    : listPublicVideos(MEDIA_DIRS.heroVideos)[0];
+/** Portada configurable desde /admin/hero (tabla `store_settings`). */
+export default async function Hero() {
+  const settings = await getHeroSettings();
 
-  return <HeroCinematic videoSrc={videoSrc} />;
+  // Apagado, la página conserva su H1 para lectores de pantalla y buscadores.
+  if (!settings.is_hero_active) {
+    return <h1 className="sr-only">Cervezaverso, tienda de cerveza artesanal e importada</h1>;
+  }
+
+  if (settings.hero_type === "carousel" && settings.hero_banners.length > 0) {
+    return (
+      <HeroCarousel banners={settings.hero_banners} intervalSeconds={settings.hero_carousel_interval_seconds} />
+    );
+  }
+
+  // Prioridad: URL configurada → public/hero-beer.mp4 → primer video de public/video/hero/ → sin video (fondo oscuro).
+  const videoSrc =
+    settings.hero_video_url ??
+    (publicFileExists(MEDIA_DIRS.heroVideo) ? `/${MEDIA_DIRS.heroVideo}` : listPublicVideos(MEDIA_DIRS.heroVideos)[0]);
+
+  return <HeroVideo videoSrc={videoSrc} autoPause={settings.hero_video_autopause} ctas={settings.hero_video_ctas} />;
 }

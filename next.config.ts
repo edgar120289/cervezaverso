@@ -24,7 +24,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${GA_SCRIPT} https://*.google-analytics.com https://flagcdn.com`,
   "font-src 'self'",
-  "media-src 'self'",
+  `media-src 'self' ${supabaseOrigin ?? ""}`,
   `connect-src 'self' ${supabaseOrigin ?? ""} ${GA_COLLECT}`,
   `frame-src ${TURNSTILE}`,
   "object-src 'none'",
