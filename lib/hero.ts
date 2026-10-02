@@ -56,6 +56,8 @@ export const heroSettingsSchema = z.object({
     .regex(/^(https:\/\/|\/)\S+$/i, "La URL del video debe ser una ruta que empiece con / o una URL https://.")
     .nullable(),
   hero_video_autopause: z.boolean(),
+  hero_video_title: z.string().trim().max(120, "El título admite 120 caracteres.").nullable(),
+  hero_video_subtitle: z.string().trim().max(240, "El subtítulo admite 240 caracteres.").nullable(),
   hero_video_ctas: heroCtasSchema,
   hero_banners: z.array(heroBannerSchema).max(MAX_HERO_BANNERS, `Máximo ${MAX_HERO_BANNERS} banners.`),
   hero_carousel_interval_seconds: z.union([z.literal(3), z.literal(5), z.literal(7)]),
@@ -71,6 +73,8 @@ export const DEFAULT_HERO_SETTINGS: HeroSettings = {
   hero_type: "video",
   hero_video_url: null,
   hero_video_autopause: true,
+  hero_video_title: null,
+  hero_video_subtitle: null,
   hero_video_ctas: [],
   hero_banners: [],
   hero_carousel_interval_seconds: 5,

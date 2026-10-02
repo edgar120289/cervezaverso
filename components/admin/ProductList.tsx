@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { Search } from "lucide-react";
+import { ArrowUpDown, ChevronDown, Filter, Search } from "lucide-react";
 import { normalize } from "@/lib/catalog-filters";
 import { formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
 import type { StockStatus } from "@/lib/types";
@@ -29,12 +29,12 @@ const STATUS_OPTIONS = [
 ] as const;
 
 const SORT_OPTIONS = [
-  { id: "name-asc", label: "Nombre (A-Z)" },
-  { id: "name-desc", label: "Nombre (Z-A)" },
-  { id: "price-asc", label: "Precio (menor a mayor)" },
-  { id: "price-desc", label: "Precio (mayor a menor)" },
-  { id: "stock-available", label: "Stock (disponibles primero)" },
-  { id: "stock-out", label: "Stock (agotadas primero)" },
+  { id: "name-asc", label: "Nombre A-Z" },
+  { id: "name-desc", label: "Nombre Z-A" },
+  { id: "price-asc", label: "Precio: menor a mayor" },
+  { id: "price-desc", label: "Precio: mayor a menor" },
+  { id: "stock-available", label: "Stock: disponibles" },
+  { id: "stock-out", label: "Stock: agotadas" },
   { id: "newest", label: "Más recientes" },
 ] as const;
 
@@ -57,7 +57,7 @@ const COMPARATORS: Record<SortId, (a: AdminProductRow, b: AdminProductRow) => nu
 };
 
 const selectClass =
-  "min-h-11 w-full cursor-pointer rounded-full bg-white px-4 text-sm font-semibold shadow-card outline-none focus:ring-2 focus:ring-black/15";
+  "h-12 w-full cursor-pointer appearance-none truncate rounded-full bg-white pl-10 pr-10 text-sm font-semibold shadow-card outline-none focus:ring-2 focus:ring-black/15";
 
 function InactiveBadge() {
   return (
@@ -87,7 +87,7 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+      <div className="grid gap-4 sm:grid-cols-[1fr_auto_auto]">
         <div className="relative">
           <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
           <input
@@ -96,33 +96,41 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por nombre o SKU"
             aria-label="Buscar productos por nombre o SKU"
-            className="min-h-11 w-full rounded-full bg-white py-3 pl-10 pr-5 text-sm shadow-card outline-none focus:ring-2 focus:ring-black/15"
+            className="h-12 w-full rounded-full bg-white pl-11 pr-5 text-sm shadow-card outline-none focus:ring-2 focus:ring-black/15"
           />
         </div>
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value as StatusFilter)}
-          aria-label="Filtrar por estado"
-          className={`${selectClass} sm:w-44`}
-        >
-          {STATUS_OPTIONS.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortId)}
-          aria-label="Ordenar por"
-          className={`${selectClass} sm:w-60`}
-        >
-          {SORT_OPTIONS.map((option) => (
-            <option key={option.id} value={option.id}>
-              Ordenar: {option.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative sm:w-48">
+          <Filter size={16} aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2" />
+          <select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as StatusFilter)}
+            aria-label="Filtrar por estado"
+            className={selectClass}
+          >
+            {STATUS_OPTIONS.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown size={16} aria-hidden className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" />
+        </div>
+        <div className="relative sm:w-48">
+          <ArrowUpDown size={16} aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2" />
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortId)}
+            aria-label="Ordenar por"
+            className={selectClass}
+          >
+            {SORT_OPTIONS.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown size={16} aria-hidden className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" />
+        </div>
       </div>
 
       <p className="text-sm text-muted" aria-live="polite">

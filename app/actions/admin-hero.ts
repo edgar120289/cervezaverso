@@ -20,6 +20,8 @@ export async function guardarHero(input: HeroSettings): Promise<HeroActionResult
   const parsed = heroSettingsSchema.safeParse({
     ...input,
     hero_video_url: input.hero_video_url?.trim() ? input.hero_video_url : null,
+    hero_video_title: input.hero_video_title?.trim() ? input.hero_video_title : null,
+    hero_video_subtitle: input.hero_video_subtitle?.trim() ? input.hero_video_subtitle : null,
   });
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
 

@@ -23,5 +23,12 @@ export default async function Hero() {
     settings.hero_video_url ??
     (publicFileExists(MEDIA_DIRS.heroVideo) ? `/${MEDIA_DIRS.heroVideo}` : listPublicVideos(MEDIA_DIRS.heroVideos)[0]);
 
-  return <HeroVideo videoSrc={videoSrc} ctas={settings.hero_video_ctas} />;
+  return (
+    <HeroVideo
+      videoSrc={videoSrc}
+      ctas={settings.hero_video_ctas}
+      title={settings.hero_video_title}
+      subtitle={settings.hero_video_subtitle}
+    />
+  );
 }

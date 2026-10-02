@@ -13,6 +13,7 @@ import {
   type HeroBanner,
 } from "@/lib/hero";
 import HeroCtaEditor from "./HeroCtaEditor";
+import HeroTextFields from "./HeroTextFields";
 
 type HeroBannerListProps = {
   banners: HeroBanner[];
@@ -195,6 +196,12 @@ export default function HeroBannerList({ banners, onChange }: HeroBannerListProp
                   </div>
                 </div>
               </div>
+              <HeroTextFields
+                title={banner.title ?? ""}
+                subtitle={banner.subtitle ?? ""}
+                onTitleChange={(title) => patch(index, { title })}
+                onSubtitleChange={(subtitle) => patch(index, { subtitle })}
+              />
               <HeroCtaEditor
                 label={`Banner ${index + 1}`}
                 ctas={banner.ctas}

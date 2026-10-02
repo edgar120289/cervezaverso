@@ -62,9 +62,10 @@ export default function HeroCarousel({ banners, intervalSeconds }: HeroCarouselP
         />
       ))}
       <div aria-hidden className="absolute inset-0 z-0 bg-black/45" />
+      <div aria-hidden className="absolute inset-0 z-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
       <div className="relative z-10 flex flex-col items-center gap-8">
-        <HeroHeading />
+        <HeroHeading key={index} title={active.title} subtitle={active.subtitle} />
         <HeroCtas key={index} ctas={active.ctas} />
       </div>
 

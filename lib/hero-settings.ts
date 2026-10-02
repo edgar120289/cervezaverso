@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_HERO_SETTINGS, parseHeroRow, type HeroSettings } from "@/lib/hero";
 
 const HERO_COLUMNS =
-  "is_hero_active, hero_type, hero_video_url, hero_video_autopause, hero_video_ctas, hero_banners, hero_carousel_interval_seconds";
+  "is_hero_active, hero_type, hero_video_url, hero_video_autopause, hero_video_title, hero_video_subtitle, hero_video_ctas, hero_banners, hero_carousel_interval_seconds";
 
 /** Lee la configuración del Hero (lectura pública por RLS). Ante cualquier error, el Hero por defecto. */
 export async function getHeroSettings(): Promise<HeroSettings> {

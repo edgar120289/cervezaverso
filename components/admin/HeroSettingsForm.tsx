@@ -6,6 +6,7 @@ import { guardarHero } from "@/app/actions/admin-hero";
 import { HERO_INTERVALS, type HeroSettings } from "@/lib/hero";
 import HeroBannerList from "./HeroBannerList";
 import HeroCtaEditor from "./HeroCtaEditor";
+import HeroTextFields from "./HeroTextFields";
 
 const sectionClass = "space-y-4 rounded-[28px] bg-white p-6 shadow-card";
 
@@ -132,6 +133,12 @@ export default function HeroSettingsForm({ initial }: { initial: HeroSettings })
               Ruta del sitio (por ejemplo, /video/hero/mi-video.mp4) o URL https:// de Supabase Storage.
             </span>
           </label>
+          <HeroTextFields
+            title={settings.hero_video_title ?? ""}
+            subtitle={settings.hero_video_subtitle ?? ""}
+            onTitleChange={(hero_video_title) => update({ hero_video_title })}
+            onSubtitleChange={(hero_video_subtitle) => update({ hero_video_subtitle })}
+          />
           <HeroCtaEditor
             label="Video"
             ctas={settings.hero_video_ctas}
