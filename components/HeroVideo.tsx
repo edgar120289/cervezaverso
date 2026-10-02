@@ -9,22 +9,21 @@ import HeroHeading from "./HeroHeading";
 type HeroVideoProps = {
   /** Sin video (o si falla al cargar) queda un fondo gris oscuro. */
   videoSrc?: string;
-  /** Pausa el video cuando sale del viewport y lo reanuda al volver. */
-  autoPause: boolean;
   ctas: HeroCta[];
 };
 
-export default function HeroVideo({ videoSrc, autoPause, ctas }: HeroVideoProps) {
+export default function HeroVideo({ videoSrc, ctas }: HeroVideoProps) {
   const reduceMotion = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoFailed, setVideoFailed] = useState(false);
   // Con "reducir movimiento" no se reproduce video de fondo.
   const hasVideo = Boolean(videoSrc) && !videoFailed && !reduceMotion;
 
-  // Un video fuera de pantalla sigue gastando CPU y batería: se pausa al salir y se reanuda al volver.
+  // Regla de rendimiento obligatoria: un video fuera de pantalla gasta CPU y batería, así que siempre
+  // se pausa al salir del viewport y se reanuda al volver (no depende de la configuración).
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !autoPause) return;
+    if (!video) return;
 
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) video.play().catch(() => {});
@@ -32,7 +31,7 @@ export default function HeroVideo({ videoSrc, autoPause, ctas }: HeroVideoProps)
     });
     observer.observe(video);
     return () => observer.disconnect();
-  }, [autoPause, hasVideo]);
+  }, [hasVideo]);
 
   return (
     <section

@@ -132,12 +132,6 @@ export default function HeroSettingsForm({ initial }: { initial: HeroSettings })
               Ruta del sitio (por ejemplo, /video/hero/mi-video.mp4) o URL https:// de Supabase Storage.
             </span>
           </label>
-          <Switch
-            checked={settings.hero_video_autopause}
-            onChange={(value) => update({ hero_video_autopause: value })}
-            label="Pausar el video al salir de pantalla"
-            description="Ahorra batería y datos: se pausa al hacer scroll y reanuda al volver. Recomendado."
-          />
           <HeroCtaEditor
             label="Video"
             ctas={settings.hero_video_ctas}
