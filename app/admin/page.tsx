@@ -136,27 +136,27 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
 
           <div className="hidden overflow-hidden rounded-[28px] bg-white shadow-card md:block">
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[860px] text-sm">
+              <table className="w-full min-w-[900px] text-sm">
                 <thead>
                   <tr className="border-b border-black/5 text-left text-xs font-semibold uppercase tracking-wide text-muted">
-                    <th className="px-6 py-4">Cerveza</th>
+                    <th className="sticky left-0 z-20 w-[11.5rem] bg-white px-4 py-4">Acciones</th>
+                    <th className="sticky left-[11.5rem] z-20 min-w-[16rem] border-r border-black/5 bg-white px-4 py-4">
+                      Cerveza
+                    </th>
                     <th className="px-4 py-4">Estilo</th>
                     <th className="px-4 py-4">Disponibilidad</th>
                     <th className="px-4 py-4 text-right">Costo</th>
                     <th className="px-4 py-4 text-right">Venta</th>
-                    <th className="px-6 py-4 text-right">
-                      <span className="sr-only">Acciones</span>
-                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {products.map((product) => (
-                    <tr
-                      key={product.id}
-                      className={`border-b border-black/5 last:border-0 hover:bg-black/[0.02] ${product.is_active ? "" : "opacity-60"}`}
-                    >
-                      <td className="px-6 py-3">
-                        <div className="flex items-center gap-3">
+                    <tr key={product.id} className="border-b border-black/5 last:border-0 hover:bg-black/[0.02]">
+                      <td className="sticky left-0 z-10 w-[11.5rem] bg-white px-4 py-3">
+                        <ProductRowActions id={product.id} name={product.name} isActive={product.is_active} layout="row" />
+                      </td>
+                      <td className="sticky left-[11.5rem] z-10 min-w-[16rem] border-r border-black/5 bg-white px-4 py-3">
+                        <div className={`flex items-center gap-3 ${product.is_active ? "" : "opacity-60"}`}>
                           <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl bg-white">
                             {product.image_url && (
                               <Image src={product.image_url} alt="" fill sizes="44px" className="object-contain p-1" />
@@ -173,16 +173,15 @@ export default async function AdminDashboard({ searchParams }: PageProps<"/admin
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-black/60">{product.style}</td>
-                      <td className="px-4 py-3 text-black/60">{STOCK_STATUS_LABEL[product.stock_status]}</td>
-                      <td className="px-4 py-3 text-right tabular-nums text-black/60">
+                      <td className={`px-4 py-3 text-black/60 ${product.is_active ? "" : "opacity-60"}`}>{product.style}</td>
+                      <td className={`px-4 py-3 text-black/60 ${product.is_active ? "" : "opacity-60"}`}>
+                        {STOCK_STATUS_LABEL[product.stock_status]}
+                      </td>
+                      <td className={`px-4 py-3 text-right tabular-nums text-black/60 ${product.is_active ? "" : "opacity-60"}`}>
                         {formatMXN(Number(product.cost_price))}
                       </td>
-                      <td className="px-4 py-3 text-right font-semibold tabular-nums">
+                      <td className={`px-4 py-3 text-right font-semibold tabular-nums ${product.is_active ? "" : "opacity-60"}`}>
                         {formatMXN(Number(product.sale_price))}
-                      </td>
-                      <td className="px-6 py-3 text-right">
-                        <ProductRowActions id={product.id} name={product.name} isActive={product.is_active} layout="row" />
                       </td>
                     </tr>
                   ))}
