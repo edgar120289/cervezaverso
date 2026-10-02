@@ -33,16 +33,16 @@ const SORT_OPTIONS = [
   { id: "name-desc", label: "Nombre (Z-A)" },
   { id: "price-asc", label: "Precio (menor a mayor)" },
   { id: "price-desc", label: "Precio (mayor a menor)" },
-  { id: "stock-asc", label: "Stock (menor a mayor)" },
-  { id: "stock-desc", label: "Stock (mayor a menor)" },
+  { id: "stock-available", label: "Stock (disponibles primero)" },
+  { id: "stock-out", label: "Stock (agotadas primero)" },
   { id: "newest", label: "Más recientes" },
 ] as const;
 
 type StatusFilter = (typeof STATUS_OPTIONS)[number]["id"];
 type SortId = (typeof SORT_OPTIONS)[number]["id"];
 
-/** El stock es un estado, no una cantidad: se ordena de lo más urgente (agotada) a lo más holgado. */
-const STOCK_RANK: Record<StockStatus, number> = { out_of_stock: 0, low_stock: 1, preorder: 2, in_stock: 3 };
+/** El stock es un estado, no una cantidad: igual que la tienda, lo disponible va primero y lo agotado al final. */
+const STOCK_RANK: Record<StockStatus, number> = { in_stock: 0, low_stock: 1, preorder: 2, out_of_stock: 3 };
 
 const byName = (a: AdminProductRow, b: AdminProductRow) => a.name.localeCompare(b.name, "es", { sensitivity: "base" });
 
@@ -51,8 +51,8 @@ const COMPARATORS: Record<SortId, (a: AdminProductRow, b: AdminProductRow) => nu
   "name-desc": (a, b) => byName(b, a),
   "price-asc": (a, b) => Number(a.sale_price) - Number(b.sale_price) || byName(a, b),
   "price-desc": (a, b) => Number(b.sale_price) - Number(a.sale_price) || byName(a, b),
-  "stock-asc": (a, b) => STOCK_RANK[a.stock_status] - STOCK_RANK[b.stock_status] || byName(a, b),
-  "stock-desc": (a, b) => STOCK_RANK[b.stock_status] - STOCK_RANK[a.stock_status] || byName(a, b),
+  "stock-available": (a, b) => STOCK_RANK[a.stock_status] - STOCK_RANK[b.stock_status] || byName(a, b),
+  "stock-out": (a, b) => STOCK_RANK[b.stock_status] - STOCK_RANK[a.stock_status] || byName(a, b),
   newest: (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at) || byName(a, b),
 };
 
@@ -134,100 +134,41 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
           No hay productos que coincidan con los filtros.
         </div>
       ) : (
-        <>
-          <ul className="space-y-3 md:hidden">
-            {visible.map((product) => (
-              <li
-                key={product.id}
-                className={`space-y-3 rounded-[28px] bg-white p-4 shadow-card ${product.is_active ? "" : "bg-white/70"}`}
-              >
-                <div className={`flex items-center gap-3 ${product.is_active ? "" : "opacity-60"}`}>
-                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-white">
-                    {product.image_url && (
-                      <Image src={product.image_url} alt="" fill sizes="64px" className="object-contain p-1" />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold leading-snug">
-                      {product.name}
-                      {!product.is_active && <InactiveBadge />}
-                    </p>
-                    <p className="truncate text-xs text-muted">
-                      {product.country} · {product.style}
-                    </p>
-                    <p className="truncate text-xs text-muted">
-                      {product.sku} · {STOCK_STATUS_LABEL[product.stock_status]}
-                    </p>
-                  </div>
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {visible.map((product) => (
+            <li
+              key={product.id}
+              className={`space-y-3 rounded-[28px] p-4 shadow-card ${product.is_active ? "bg-white" : "bg-white/70"}`}
+            >
+              <div className={`flex items-center gap-3 ${product.is_active ? "" : "opacity-60"}`}>
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-white">
+                  {product.image_url && (
+                    <Image src={product.image_url} alt="" fill sizes="64px" className="object-contain p-1" />
+                  )}
                 </div>
-                <div className="flex items-baseline justify-between px-1 text-sm">
-                  <span className="text-muted">
-                    Costo <span className="tabular-nums">{formatMXN(Number(product.cost_price))}</span>
-                  </span>
-                  <span className="font-semibold tabular-nums">{formatMXN(Number(product.sale_price))}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold leading-snug">
+                    {product.name}
+                    {!product.is_active && <InactiveBadge />}
+                  </p>
+                  <p className="truncate text-xs text-muted">
+                    {product.country} · {product.style}
+                  </p>
+                  <p className="truncate text-xs text-muted">
+                    {product.sku} · {STOCK_STATUS_LABEL[product.stock_status]}
+                  </p>
                 </div>
-                <ProductRowActions id={product.id} name={product.name} isActive={product.is_active} layout="card" />
-              </li>
-            ))}
-          </ul>
-
-          <div className="hidden overflow-hidden rounded-[28px] bg-white shadow-card md:block">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-sm">
-                <thead>
-                  <tr className="border-b border-black/5 text-left text-xs font-semibold uppercase tracking-wide text-muted">
-                    <th className="sticky left-0 z-20 w-[11.5rem] bg-white px-4 py-4">Acciones</th>
-                    <th className="sticky left-[11.5rem] z-20 min-w-[16rem] border-r border-black/5 bg-white px-4 py-4">
-                      Cerveza
-                    </th>
-                    <th className="px-4 py-4">Estilo</th>
-                    <th className="px-4 py-4">Disponibilidad</th>
-                    <th className="px-4 py-4 text-right">Costo</th>
-                    <th className="px-4 py-4 text-right">Venta</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visible.map((product) => {
-                    const dim = product.is_active ? "" : "opacity-60";
-                    return (
-                      <tr key={product.id} className="border-b border-black/5 last:border-0 hover:bg-black/[0.02]">
-                        <td className="sticky left-0 z-10 w-[11.5rem] bg-white px-4 py-3">
-                          <ProductRowActions id={product.id} name={product.name} isActive={product.is_active} layout="row" />
-                        </td>
-                        <td className="sticky left-[11.5rem] z-10 min-w-[16rem] border-r border-black/5 bg-white px-4 py-3">
-                          <div className={`flex items-center gap-3 ${dim}`}>
-                            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-2xl bg-white">
-                              {product.image_url && (
-                                <Image src={product.image_url} alt="" fill sizes="44px" className="object-contain p-1" />
-                              )}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="truncate font-semibold">
-                                {product.name}
-                                {!product.is_active && <InactiveBadge />}
-                              </p>
-                              <p className="truncate text-xs text-muted">
-                                {product.country} · {product.sku}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className={`px-4 py-3 text-black/60 ${dim}`}>{product.style}</td>
-                        <td className={`px-4 py-3 text-black/60 ${dim}`}>{STOCK_STATUS_LABEL[product.stock_status]}</td>
-                        <td className={`px-4 py-3 text-right tabular-nums text-black/60 ${dim}`}>
-                          {formatMXN(Number(product.cost_price))}
-                        </td>
-                        <td className={`px-4 py-3 text-right font-semibold tabular-nums ${dim}`}>
-                          {formatMXN(Number(product.sale_price))}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
+              </div>
+              <div className="flex items-baseline justify-between px-1 text-sm">
+                <span className="text-muted">
+                  Costo <span className="tabular-nums">{formatMXN(Number(product.cost_price))}</span>
+                </span>
+                <span className="font-semibold tabular-nums">{formatMXN(Number(product.sale_price))}</span>
+              </div>
+              <ProductRowActions id={product.id} name={product.name} isActive={product.is_active} layout="card" />
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

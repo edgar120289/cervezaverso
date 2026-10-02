@@ -11,10 +11,10 @@ type ProductRowActionsProps = {
   name: string;
   isActive: boolean;
   /**
-   * `card` reparte los botones a todo el ancho (móvil); `row` los deja solo con ícono (columna fija de la tabla);
+   * `card` reparte los botones a todo el ancho de la tarjeta;
    * `header` omite "Editar" (ya se está en la edición) y manda a /admin tras borrar.
    */
-  layout: "card" | "row" | "header";
+  layout: "card" | "header";
 };
 
 /** Editar, activar/desactivar (ocultar sin borrar) y borrar: todo a un toque. */
@@ -44,17 +44,14 @@ export default function ProductRowActions({ id, name, isActive, layout }: Produc
     );
   }
 
-  const iconOnly = layout === "row";
-  const base = `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full text-xs font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50 ${
-    iconOnly ? "w-11" : "px-4"
-  }`;
+  const base =
+    "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-colors disabled:pointer-events-none disabled:opacity-50";
   const grow = layout === "card" ? "flex-1" : "";
   const toggleLabel = isActive ? "Desactivar" : "Activar";
-  const label = (text: string) => (iconOnly ? <span className="sr-only">{text}</span> : text);
 
   return (
     <div className="space-y-2">
-      <div className={`flex items-center gap-2 ${layout === "header" ? "justify-end" : ""}`}>
+      <div className={`flex flex-wrap items-center gap-2 ${layout === "header" ? "justify-end" : ""}`}>
         {layout !== "header" && (
           <Link
             href={`/admin/productos/${id}`}
@@ -62,7 +59,7 @@ export default function ProductRowActions({ id, name, isActive, layout }: Produc
             className={`${base} ${grow} bg-canvas hover:bg-black hover:text-white`}
           >
             <Pencil size={14} aria-hidden />
-            {label("Editar")}
+            Editar
           </Link>
         )}
         <button
@@ -75,7 +72,7 @@ export default function ProductRowActions({ id, name, isActive, layout }: Produc
           className={`${base} ${grow} ${isActive ? "bg-canvas hover:bg-black hover:text-white" : "bg-accent text-white hover:brightness-110"}`}
         >
           {isPending ? <Loader2 size={14} className="animate-spin" aria-hidden /> : isActive ? <EyeOff size={14} aria-hidden /> : <Eye size={14} aria-hidden />}
-          {label(toggleLabel)}
+          {toggleLabel}
         </button>
         <button
           type="button"
@@ -86,7 +83,7 @@ export default function ProductRowActions({ id, name, isActive, layout }: Produc
           className={`${base} ${grow} bg-canvas text-danger hover:bg-danger hover:text-white`}
         >
           <Trash2 size={14} aria-hidden />
-          {label("Borrar")}
+          Borrar
         </button>
       </div>
       {error && (

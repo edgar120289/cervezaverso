@@ -1,3 +1,4 @@
+import { UploadCloud } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import CatalogImporter from "@/components/admin/CatalogImporter";
 import ManualProductDialog from "@/components/admin/ManualProductDialog";
@@ -40,9 +41,18 @@ export default async function AdminDashboard() {
       </section>
 
       <section className="space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold tracking-tight">Productos</h2>
-          <ManualProductDialog />
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <a
+              href="#ingesta"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold shadow-card transition-colors hover:bg-black hover:text-white"
+            >
+              <UploadCloud size={16} aria-hidden />
+              Carga masiva
+            </a>
+            <ManualProductDialog />
+          </div>
         </div>
 
         {error ? (

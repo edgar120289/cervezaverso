@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import AdminNav from "@/components/admin/AdminNav";
 import SignOutButton from "@/components/SignOutButton";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
@@ -22,16 +22,12 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold tracking-tight">Panel de Administración</h1>
-        <nav className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold text-muted">
-          <Link href="/admin" className="hover:text-black">Resumen</Link>
-          <Link href="/admin/pedidos" className="hover:text-black">Pedidos</Link>
-          <Link href="/admin/cupones" className="hover:text-black">Cupones</Link>
-          <Link href="/admin/hero" className="hover:text-black">Hero</Link>
-          <Link href="/admin#ingesta" className="hover:text-black">Carga masiva</Link>
-        </nav>
-        <SignOutButton />
+      <h1 className="mb-4 text-2xl font-semibold tracking-tight">Panel de Administración</h1>
+      <div className="mb-8 flex flex-wrap items-center gap-x-3 gap-y-2">
+        <AdminNav />
+        <div className="ml-auto">
+          <SignOutButton variant="outline" />
+        </div>
       </div>
       {children}
     </div>
