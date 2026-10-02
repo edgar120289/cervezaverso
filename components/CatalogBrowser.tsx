@@ -15,8 +15,11 @@ import {
   normalize,
   PRICE_PRESETS,
   SEARCH_PARAM,
+  SORT_OPTIONS,
+  sortProducts,
   type CatalogFilters,
   type FacetOption,
+  type SortId,
 } from "@/lib/catalog-filters";
 import { formatMXN } from "@/lib/pricing";
 import { useIsClient } from "@/lib/use-is-client";
@@ -305,6 +308,7 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
   const [filters, setFilters] = useState<CatalogFilters>(() => ({ ...EMPTY_FILTERS, query: urlQuery }));
   const [appliedUrlQuery, setAppliedUrlQuery] = useState(urlQuery);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [sort, setSort] = useState<SortId>("default");
 
   // Búsqueda nueva desde el header (`/?q=`): se aplica durante el render, sin efecto de más.
   if (urlQuery !== appliedUrlQuery) {
@@ -321,8 +325,8 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
   const deferredFilters = useDeferredValue(filters);
 
   const results = useMemo(
-    () => products.filter((product) => matchesFilters(product, deferredFilters)),
-    [products, deferredFilters]
+    () => sortProducts(products.filter((product) => matchesFilters(product, deferredFilters)), sort),
+    [products, deferredFilters, sort]
   );
   const activeCount = activeFilterCount(filters);
   const hasAnyFilter = activeCount > 0 || filters.query.trim() !== "";
@@ -422,6 +426,20 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
             Limpiar todos los filtros
           </button>
         )}
+        <label className="ml-auto flex items-center gap-2 text-sm text-muted">
+          <span className="whitespace-nowrap">Ordenar por</span>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortId)}
+            className="min-h-11 max-w-[11.5rem] cursor-pointer rounded-full bg-white px-4 text-sm font-semibold text-black shadow-card outline-none focus:ring-2 focus:ring-black/15 sm:max-w-none"
+          >
+            {SORT_OPTIONS.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
       {results.length === 0 ? (

@@ -22,6 +22,7 @@ export type Product = {
   image_url: string | null;
   /** Galería ordenada; la primera es la portada (`image_url`). */
   image_urls: string[];
+  created_at: string;
 };
 
 export type DiscountType = "percent" | "fixed";

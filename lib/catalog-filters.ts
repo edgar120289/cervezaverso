@@ -120,3 +120,34 @@ export function activeFilterCount(filters: CatalogFilters): number {
     (filters.abv ? 1 : 0)
   );
 }
+
+export const SORT_OPTIONS = [
+  { id: "default", label: "Recomendados" },
+  { id: "price-asc", label: "Precio (menor a mayor)" },
+  { id: "price-desc", label: "Precio (mayor a menor)" },
+  { id: "name-asc", label: "Nombre (A-Z)" },
+  { id: "name-desc", label: "Nombre (Z-A)" },
+  { id: "country", label: "País" },
+  { id: "newest", label: "Más recientes" },
+  { id: "abv-desc", label: "Graduación alcohólica (mayor a menor)" },
+] as const;
+
+export type SortId = (typeof SORT_OPTIONS)[number]["id"];
+
+const byName = (a: Product, b: Product) => a.name.localeCompare(b.name, "es", { sensitivity: "base" });
+
+const COMPARATORS: Record<Exclude<SortId, "default">, (a: Product, b: Product) => number> = {
+  "price-asc": (a, b) => a.sale_price - b.sale_price || byName(a, b),
+  "price-desc": (a, b) => b.sale_price - a.sale_price || byName(a, b),
+  "name-asc": byName,
+  "name-desc": (a, b) => byName(b, a),
+  country: (a, b) => a.country.localeCompare(b.country, "es", { sensitivity: "base" }) || byName(a, b),
+  newest: (a, b) => Date.parse(b.created_at ?? "") - Date.parse(a.created_at ?? "") || byName(a, b),
+  // Los productos sin ABV conocido (`null`) van al final.
+  "abv-desc": (a, b) => (filterableAbv(b) ?? -1) - (filterableAbv(a) ?? -1) || byName(a, b),
+};
+
+/** Ordena sin mutar; `default` conserva el orden del servidor (disponibilidad y nombre). */
+export function sortProducts(products: Product[], sort: SortId): Product[] {
+  return sort === "default" ? products : [...products].sort(COMPARATORS[sort]);
+}

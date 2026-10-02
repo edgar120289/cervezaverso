@@ -14,7 +14,7 @@ import type { Product } from "@/lib/types";
  */
 
 export const PRODUCT_COLUMNS =
-  "id, sku, name, brewery, country, style, abv, volume_ml, cost_price, sale_price, stock_status, badges, description_ai, pairing_ai, notas_origen, notas_perfil, notas_maridaje, image_url, image_urls";
+  "id, sku, name, brewery, country, style, abv, volume_ml, cost_price, sale_price, stock_status, badges, description_ai, pairing_ai, notas_origen, notas_perfil, notas_maridaje, image_url, image_urls, created_at";
 
 let client: SupabaseClient | null | undefined;
 
