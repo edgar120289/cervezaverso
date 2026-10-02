@@ -14,7 +14,7 @@ import type { Product } from "@/lib/types";
  */
 
 export const PRODUCT_COLUMNS =
-  "id, sku, name, brewery, country, style, abv, volume_ml, cost_price, sale_price, stock_status, badges, description_ai, pairing_ai, notas_origen, notas_perfil, notas_maridaje, image_url";
+  "id, sku, name, brewery, country, style, abv, volume_ml, cost_price, sale_price, stock_status, badges, description_ai, pairing_ai, notas_origen, notas_perfil, notas_maridaje, image_url, image_urls";
 
 let client: SupabaseClient | null | undefined;
 
@@ -40,6 +40,7 @@ export function toProduct(row: Record<string, unknown>): Product {
     cost_price: Number(row.cost_price),
     sale_price: Number(row.sale_price),
     badges: Array.isArray(row.badges) ? (row.badges as string[]) : [],
+    image_urls: Array.isArray(row.image_urls) ? (row.image_urls as string[]) : [],
   };
 }
 

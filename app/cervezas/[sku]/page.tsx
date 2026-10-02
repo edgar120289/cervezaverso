@@ -7,7 +7,7 @@ import { formatMXN } from "@/lib/pricing";
 import AddToCartButton from "@/components/AddToCartButton";
 import HealthNotice from "@/components/HealthNotice";
 import FavoriteButton from "@/components/FavoriteButton";
-import ProductImage from "@/components/ProductImage";
+import ProductGallery from "@/components/ProductGallery";
 
 export async function generateMetadata({ params }: PageProps<"/cervezas/[sku]">): Promise<Metadata> {
   const { sku } = await params;
@@ -54,14 +54,10 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
 
       <div className="mt-3 grid gap-6 md:grid-cols-2">
         <div className="rounded-[28px] bg-white p-4 shadow-card">
-          <div className="relative aspect-square overflow-hidden rounded-[20px] bg-white">
-            <ProductImage
-              src={product.image_url}
-              alt={`${product.name}, ${product.style}`}
-              sizes="(min-width: 768px) 560px, 100vw"
-              priority
-            />
-          </div>
+          <ProductGallery
+            images={product.image_urls.length > 0 ? product.image_urls : product.image_url ? [product.image_url] : []}
+            alt={`${product.name}, ${product.style}`}
+          />
         </div>
 
         <div className="flex flex-col justify-center gap-5 rounded-[28px] bg-white p-6 shadow-card sm:p-8">
