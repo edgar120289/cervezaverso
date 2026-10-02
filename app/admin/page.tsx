@@ -1,6 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import BulkUploadAccordion from "@/components/admin/BulkUploadAccordion";
-import CatalogImporter from "@/components/admin/CatalogImporter";
 import ManualProductDialog from "@/components/admin/ManualProductDialog";
 import ProductList, { type AdminProductRow } from "@/components/admin/ProductList";
 
@@ -16,7 +14,7 @@ export default async function AdminDashboard() {
   // Se cargan todos y la búsqueda, el filtro y el orden se resuelven en el cliente (respuesta inmediata).
   const { data, error } = await supabase
     .from("products")
-    .select("id, sku, name, country, style, cost_price, sale_price, stock_status, image_url, is_active, created_at")
+    .select("id, sku, name, brewery, country, style, abv, cost_price, sale_price, stock_status, image_url, is_active, created_at")
     .order("name", { ascending: true });
   const products = (data ?? []) as AdminProductRow[];
 
@@ -36,10 +34,6 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
-      <BulkUploadAccordion>
-        <CatalogImporter />
-      </BulkUploadAccordion>
-
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg font-semibold tracking-tight">Productos</h2>
@@ -52,7 +46,7 @@ export default async function AdminDashboard() {
           </div>
         ) : products.length === 0 ? (
           <div className="rounded-[28px] bg-white p-10 text-center text-sm text-muted shadow-card">
-            Todavía no hay productos. Sube un archivo o añade una cerveza manualmente.
+            Todavía no hay productos. Usa la carga masiva o añade una cerveza manualmente.
           </div>
         ) : (
           <ProductList products={products} />

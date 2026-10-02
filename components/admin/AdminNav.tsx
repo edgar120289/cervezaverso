@@ -8,7 +8,7 @@ const LINKS = [
   { href: "/admin/pedidos", label: "Pedidos" },
   { href: "/admin/cupones", label: "Cupones" },
   { href: "/admin/hero", label: "Hero" },
-  { href: "/admin#ingesta", label: "Carga masiva" },
+  { href: "/admin/carga-masiva", label: "Carga masiva" },
 ] as const;
 
 /** Navegación del panel: enlaces tipo píldora, con la sección actual resaltada. */
@@ -18,7 +18,7 @@ export default function AdminNav() {
   return (
     <nav aria-label="Secciones del panel" className="flex flex-wrap items-center gap-1.5">
       {LINKS.map(({ href, label }) => {
-        const current = !href.includes("#") && (href === "/admin" ? pathname === href : pathname.startsWith(href));
+        const current = (href === "/admin" ? pathname === href : pathname.startsWith(href));
         return (
           <Link
             key={href}

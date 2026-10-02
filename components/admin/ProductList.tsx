@@ -2,18 +2,27 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { ArrowUpDown, ChevronDown, Filter, Search } from "lucide-react";
-import { normalize } from "@/lib/catalog-filters";
+import { ArrowUpDown, ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
+import {
+  activeFilterCount,
+  EMPTY_FILTERS,
+  matchesFilters,
+  normalize,
+  type CatalogFilters,
+} from "@/lib/catalog-filters";
 import { formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
 import type { StockStatus } from "@/lib/types";
+import { activeFilterChips, chipClass, FilterDrawer, FilterPanel, FilterSection } from "@/components/CatalogFilterPanel";
 import ProductRowActions from "./ProductRowActions";
 
 export type AdminProductRow = {
   id: string;
   sku: string;
   name: string;
+  brewery: string;
   country: string;
   style: string;
+  abv: number;
   cost_price: number;
   sale_price: number;
   stock_status: StockStatus;
@@ -56,9 +65,6 @@ const COMPARATORS: Record<SortId, (a: AdminProductRow, b: AdminProductRow) => nu
   newest: (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at) || byName(a, b),
 };
 
-const selectClass =
-  "h-12 w-full cursor-pointer appearance-none truncate rounded-full bg-white pl-10 pr-10 text-sm font-semibold shadow-card outline-none focus:ring-2 focus:ring-black/15";
-
 function InactiveBadge() {
   return (
     <span className="ml-2 inline-block rounded-full bg-black/10 px-2 py-0.5 align-middle text-[11px] font-semibold text-black/70">
@@ -67,11 +73,13 @@ function InactiveBadge() {
   );
 }
 
-/** Lista del inventario con búsqueda en tiempo real (nombre o SKU), filtro por estado y orden. */
+/** Inventario: búsqueda en tiempo real (nombre o SKU), orden y «Filtros avanzados» (estado, precio, ABV, país y cervecería). */
 export default function ProductList({ products }: { products: AdminProductRow[] }) {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [sort, setSort] = useState<SortId>("name-asc");
+  const [filters, setFilters] = useState<CatalogFilters>(EMPTY_FILTERS);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const visible = useMemo(() => {
     const words = normalize(search).split(/\s+/).filter(Boolean);
@@ -79,16 +87,25 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
       .filter((product) => {
         if (status === "active" && !product.is_active) return false;
         if (status === "inactive" && product.is_active) return false;
+        if (!matchesFilters(product, filters)) return false;
         const haystack = normalize(`${product.name} ${product.sku}`);
         return words.every((word) => haystack.includes(word));
       })
       .sort(COMPARATORS[sort]);
-  }, [products, search, status, sort]);
+  }, [products, search, status, filters, sort]);
+
+  const activeCount = activeFilterCount(filters) + (status !== "all" ? 1 : 0);
+  const chips = [
+    ...(status !== "all"
+      ? [{ key: "status", label: STATUS_OPTIONS.find((o) => o.id === status)!.label, clear: () => setStatus("all") }]
+      : []),
+    ...activeFilterChips(filters, setFilters),
+  ];
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-[1fr_auto_auto]">
-        <div className="relative">
+      <div className="flex flex-wrap gap-4">
+        <div className="relative min-w-full flex-1 md:min-w-0">
           <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
           <input
             type="search"
@@ -99,29 +116,13 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
             className="h-12 w-full rounded-full bg-white pl-11 pr-5 text-sm shadow-card outline-none focus:ring-2 focus:ring-black/15"
           />
         </div>
-        <div className="relative sm:w-48">
-          <Filter size={16} aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2" />
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as StatusFilter)}
-            aria-label="Filtrar por estado"
-            className={selectClass}
-          >
-            {STATUS_OPTIONS.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <ChevronDown size={16} aria-hidden className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" />
-        </div>
-        <div className="relative sm:w-48">
+        <div className="relative min-w-0 flex-1 md:w-48 md:flex-none">
           <ArrowUpDown size={16} aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2" />
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortId)}
             aria-label="Ordenar por"
-            className={selectClass}
+            className="h-12 w-full cursor-pointer appearance-none truncate rounded-full bg-white pl-10 pr-10 text-sm font-semibold shadow-card outline-none focus:ring-2 focus:ring-black/15"
           >
             {SORT_OPTIONS.map((option) => (
               <option key={option.id} value={option.id}>
@@ -131,11 +132,78 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
           </select>
           <ChevronDown size={16} aria-hidden className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" />
         </div>
+        <button
+          type="button"
+          onClick={() => setDrawerOpen(true)}
+          aria-haspopup="dialog"
+          aria-expanded={drawerOpen}
+          className="flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold shadow-card md:w-52 md:flex-none"
+        >
+          <SlidersHorizontal size={16} />
+          Filtros avanzados
+          {activeCount > 0 && (
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[11px] text-white">
+              {activeCount}
+            </span>
+          )}
+        </button>
       </div>
 
-      <p className="text-sm text-muted" aria-live="polite">
-        {visible.length} de {products.length} {products.length === 1 ? "producto" : "productos"}
-      </p>
+      <FilterDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        resultCount={visible.length}
+        noun={["producto", "productos"]}
+      >
+        <div className="space-y-4">
+          <FilterSection title="Estado">
+            <div className="flex flex-wrap gap-1.5">
+              {STATUS_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-pressed={status === option.id}
+                  onClick={() => setStatus(option.id)}
+                  className={chipClass(status === option.id)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </FilterSection>
+          <FilterPanel products={products} filters={filters} setFilters={setFilters} />
+        </div>
+      </FilterDrawer>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="mr-1 text-sm text-muted" aria-live="polite">
+          {visible.length} de {products.length} {products.length === 1 ? "producto" : "productos"}
+        </p>
+        {chips.map((chip) => (
+          <button
+            key={chip.key}
+            type="button"
+            onClick={chip.clear}
+            aria-label={`Quitar filtro ${chip.label}`}
+            className="flex items-center gap-1 rounded-full bg-white py-1.5 pl-3 pr-2 text-xs font-semibold shadow-card hover:bg-black hover:text-white"
+          >
+            {chip.label}
+            <X size={13} />
+          </button>
+        ))}
+        {activeCount > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              setStatus("all");
+              setFilters(EMPTY_FILTERS);
+            }}
+            className="text-xs font-semibold text-accent hover:underline"
+          >
+            Limpiar todos los filtros
+          </button>
+        )}
+      </div>
 
       {visible.length === 0 ? (
         <div className="rounded-[28px] bg-white p-10 text-center text-sm text-muted shadow-card">

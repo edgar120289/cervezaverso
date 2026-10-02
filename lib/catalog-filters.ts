@@ -3,6 +3,9 @@ import type { Product } from "@/lib/types";
 /** Parámetro de URL con el texto buscado desde el header (`/?q=…`). */
 export const SEARCH_PARAM = "q";
 
+/** Lo mínimo que necesitan los filtros: lo comparten la tienda (`Product`) y el inventario del admin. */
+export type FilterableProduct = Pick<Product, "name" | "brewery" | "country" | "style" | "abv" | "sale_price">;
+
 /** Filtros del catálogo de la tienda. Se aplican en el cliente sobre el catálogo ya cargado. */
 export type CatalogFilters = {
   query: string;
@@ -51,20 +54,20 @@ const NON_ALCOHOLIC = /\b0[.,]0\b|\bcero\b|sin alcohol|alcohol ?fre[ei]|alkoholf
  * como "sin dato" (paquetes con copa, varios estilos): sólo se toma como 0 si
  * el nombre o el estilo dicen que es sin alcohol; si no, queda fuera del filtro.
  */
-export function filterableAbv(product: Product): number | null {
+export function filterableAbv(product: FilterableProduct): number | null {
   if (product.abv > 0) return product.abv;
   return NON_ALCOHOLIC.test(normalize(`${product.name} ${product.style}`)) ? 0 : null;
 }
 
 type Facet = "countries" | "breweries";
 
-const FACET_FIELD: Record<Facet, (p: Product) => string | null> = {
+const FACET_FIELD: Record<Facet, (p: FilterableProduct) => string | null> = {
   countries: (p) => p.country,
   breweries: (p) => p.brewery,
 };
 
 /** ¿El producto pasa todos los filtros? `ignore` omite una faceta (para contar sus opciones). */
-export function matchesFilters(product: Product, filters: CatalogFilters, ignore?: Facet): boolean {
+export function matchesFilters(product: FilterableProduct, filters: CatalogFilters, ignore?: Facet): boolean {
   if (filters.query) {
     const haystack = normalize(
       [product.name, product.brewery, product.style, product.country].filter(Boolean).join(" ")
@@ -98,7 +101,7 @@ export type FacetOption = { value: string; count: number };
  * Opciones de una faceta con su conteo, aplicando el resto de los filtros:
  * así el número junto a "Bélgica" dice cuántas quedarían al marcarla.
  */
-export function facetOptions(products: Product[], filters: CatalogFilters, facet: Facet): FacetOption[] {
+export function facetOptions(products: FilterableProduct[], filters: CatalogFilters, facet: Facet): FacetOption[] {
   const all = new Set<string>();
   const counts = new Map<string, number>();
   for (const product of products) {
