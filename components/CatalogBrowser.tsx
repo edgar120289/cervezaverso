@@ -4,7 +4,7 @@ import { useDeferredValue, useEffect, useMemo, useState, type ReactNode } from "
 import { useSearchParams } from "next/navigation";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { ArrowUpDown, ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
 import type { Product } from "@/lib/types";
 import {
   ABV_RANGES,
@@ -368,8 +368,8 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
 
   return (
     <div className="min-w-0 space-y-4">
-      <div className="grid grid-cols-2 gap-2 md:flex md:items-center md:gap-3">
-        <div className="relative col-span-2 md:max-w-md md:flex-1">
+      <div className="flex flex-wrap gap-4">
+        <div className="relative min-w-full flex-1 md:min-w-0">
           <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
           <input
             type="search"
@@ -377,27 +377,31 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
             onChange={(e) => setFilters((c) => ({ ...c, query: e.target.value }))}
             placeholder="Busca por nombre, estilo, país o cervecería"
             aria-label="Buscar cervezas"
-            className="min-h-11 w-full rounded-full bg-white py-3.5 pl-11 pr-5 text-sm shadow-card outline-none focus:ring-2 focus:ring-black/15"
+            className="h-12 w-full rounded-full bg-white pl-11 pr-5 text-sm shadow-card outline-none focus:ring-2 focus:ring-black/15"
           />
         </div>
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value as SortId)}
-          aria-label="Ordenar por"
-          className="min-h-11 w-full min-w-0 cursor-pointer rounded-full bg-white px-4 text-sm font-semibold shadow-card outline-none focus:ring-2 focus:ring-black/15 md:w-auto md:shrink-0"
-        >
-          {SORT_OPTIONS.map((option) => (
-            <option key={option.id} value={option.id}>
-              Ordenar por: {option.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative min-w-0 flex-1 md:w-48 md:flex-none">
+          <ArrowUpDown size={16} aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2" />
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as SortId)}
+            aria-label="Ordenar por"
+            className="h-12 w-full cursor-pointer appearance-none truncate rounded-full bg-white pl-10 pr-10 text-sm font-semibold shadow-card outline-none focus:ring-2 focus:ring-black/15"
+          >
+            {SORT_OPTIONS.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown size={16} aria-hidden className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" />
+        </div>
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
           aria-haspopup="dialog"
           aria-expanded={drawerOpen}
-          className="flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold shadow-card md:w-auto md:shrink-0"
+          className="flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold shadow-card md:w-48 md:flex-none"
         >
           <SlidersHorizontal size={16} />
           Filtros

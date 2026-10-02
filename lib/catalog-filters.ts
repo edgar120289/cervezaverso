@@ -122,14 +122,15 @@ export function activeFilterCount(filters: CatalogFilters): number {
 }
 
 export const SORT_OPTIONS = [
-  { id: "default", label: "Recomendados" },
-  { id: "price-asc", label: "Precio (menor a mayor)" },
-  { id: "price-desc", label: "Precio (mayor a menor)" },
-  { id: "name-asc", label: "Nombre (A-Z)" },
-  { id: "name-desc", label: "Nombre (Z-A)" },
+  // `default` conserva el orden del servidor; solo sirve de estado inicial y de «quitar orden».
+  { id: "default", label: "Ordenar" },
+  { id: "price-asc", label: "Precio: menor a mayor" },
+  { id: "price-desc", label: "Precio: mayor a menor" },
+  { id: "name-asc", label: "Nombre A-Z" },
+  { id: "name-desc", label: "Nombre Z-A" },
   { id: "country", label: "País" },
   { id: "newest", label: "Más recientes" },
-  { id: "abv-desc", label: "Graduación alcohólica (mayor a menor)" },
+  { id: "abv-desc", label: "Mayor graduación" },
 ] as const;
 
 export type SortId = (typeof SORT_OPTIONS)[number]["id"];

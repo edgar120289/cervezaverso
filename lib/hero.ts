@@ -41,6 +41,8 @@ const heroCtasSchema = z.array(heroCtaSchema).max(MAX_HERO_CTAS, `Máximo ${MAX_
 const heroBannerSchema = z.object({
   image_url: z.url({ protocol: /^https?$/ }),
   alt: z.string().trim().max(200, "El texto alternativo admite 200 caracteres."),
+  title: z.string().trim().max(120, "El título admite 120 caracteres.").optional(),
+  subtitle: z.string().trim().max(240, "El subtítulo admite 240 caracteres.").optional(),
   ctas: heroCtasSchema,
 });
 
