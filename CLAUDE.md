@@ -52,6 +52,7 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - Fase 3 · Construcción, avance 1 · Catálogo en `/admin`: carga masiva (.xlsx/.csv) con plantilla descargable y alta manual de cervezas (2026-09-30). Aprobado por el cliente; pendiente de revisión en navegador (360, 768, 1024 y 1440 px).
 - Fase 3 · Construcción, avance 2 · Actualización mayor (2026-09-30): cookies y rendimiento móvil, header móvil con lupa y botón "Volver arriba", banderas SVG, `/admin` con tarjetas en móvil, activar/desactivar y borrar productos, galería de imágenes y búsqueda de imagen en la web. Hecho en código; migración `006_producto_activo_galeria.sql` ya ejecutada en Supabase. Pendiente de revisión en celular real (360 y 768 px) y de OK.
 - Próximos pasos propuestos (aprobados por el cliente, sin desarrollar): mostrar la galería completa en la ficha pública de la cerveza y agregar un filtro "Inactivas" en `/admin`.
+- Fase 3 · Construcción, avance 3 (2026-10-02): galería pública en la ficha (carrusel móvil / miniaturas PC), acciones fijas en la tabla de `/admin` y botones Activar/Borrar en la edición, selector «Ordenar por» en el catálogo. Hecho en código; pendiente de revisión en navegador. Hero administrable: migración `007_store_settings_hero.sql` entregada, **pendiente de ejecutar en Supabase**; las Misiones 5 y 6 (UI admin y Hero dinámico) esperan esa confirmación.
 - Siguiente en Fase 3: pago con Mercado Pago, Sommelier con Gemini y Tarjetas de Regalo, página por página.
 - Última actualización: 2026-09-30.
 
