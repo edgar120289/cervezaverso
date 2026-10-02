@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /** Límites por acción: `max` intentos por IP dentro de `windowSeconds`. */
-export const RATE_LIMITS = {
+const RATE_LIMITS = {
   login: { max: 8, windowSeconds: 15 * 60 },
   signup: { max: 5, windowSeconds: 60 * 60 },
   recover: { max: 5, windowSeconds: 60 * 60 },

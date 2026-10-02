@@ -47,13 +47,6 @@ export type CartItem = {
 
 export type UserRole = "admin" | "client";
 
-export type AppUser = {
-  id: string;
-  email: string;
-  full_name: string | null;
-  role: UserRole;
-};
-
 export const ESTADOS_PEDIDO = ["Pendiente", "Pagado", "Enviado", "Entregado", "Cancelado"] as const;
 
 export type EstadoPedido = (typeof ESTADOS_PEDIDO)[number];
@@ -67,7 +60,7 @@ export type Pedido = {
   estado: EstadoPedido;
 };
 
-export type MetodoEnvio = "nacional" | "local";
+type MetodoEnvio = "nacional" | "local";
 
 export type Direccion = {
   id: string;
@@ -85,7 +78,7 @@ export type Direccion = {
 /** Copia de la dirección guardada en el pedido (no cambia si luego se edita la libreta). */
 export type DireccionEnvio = Omit<Direccion, "id" | "predeterminada">;
 
-export type PedidoItem = {
+type PedidoItem = {
   id: string;
   product_id: string | null;
   sku: string;

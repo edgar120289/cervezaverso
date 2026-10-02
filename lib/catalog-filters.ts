@@ -37,7 +37,7 @@ export const ABV_RANGES = [
   { id: "extra", label: "Extra fuerte · 10%+", min: 10, max: Infinity },
 ] as const;
 
-export type AbvRangeId = (typeof ABV_RANGES)[number]["id"];
+type AbvRangeId = (typeof ABV_RANGES)[number]["id"];
 
 /** Minúsculas y sin acentos: "Bélgica" encuentra "belgica". */
 export function normalize(text: string): string {

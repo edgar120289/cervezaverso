@@ -25,7 +25,7 @@ export const STOCK_STATUS_LABEL: Record<StockStatus, string> = {
 export type ShippingMethod = "nacional" | "local";
 
 /** Estados cubiertos por el envío local (CDMX y Área Metropolitana). */
-export const LOCAL_SHIPPING_STATES = ["Ciudad de México", "Estado de México"] as const;
+const LOCAL_SHIPPING_STATES = ["Ciudad de México", "Estado de México"] as const;
 
 export const SHIPPING_METHODS: Record<
   ShippingMethod,
@@ -54,7 +54,7 @@ export function calculateShippingCost(subtotal: number, method: ShippingMethod =
  * Descuento de un código sobre el subtotal de productos (en pesos enteros).
  * 0 si no alcanza la compra mínima. Un monto fijo nunca excede el subtotal.
  */
-export function calculateDiscount(subtotal: number, promo: AppliedPromo | null): number {
+function calculateDiscount(subtotal: number, promo: AppliedPromo | null): number {
   if (!promo || subtotal <= 0 || subtotal < promo.min_purchase) return 0;
   const raw = promo.discount_type === "percent" ? (subtotal * promo.value) / 100 : promo.value;
   return Math.min(Math.floor(raw), subtotal);

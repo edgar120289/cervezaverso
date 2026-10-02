@@ -6,13 +6,10 @@ import { crearCupon } from "@/app/actions/admin-cupones";
 import { formatMXN } from "@/lib/pricing";
 import { firstIssue, promoCreateSchema } from "@/lib/validation";
 import type { DiscountType } from "@/lib/types";
+import { parseFieldNumber } from "@/lib/parse-number";
 
 const inputClass =
   "w-full rounded-full bg-canvas px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-black/15";
-
-function toNumber(value: string): number {
-  return value.trim() === "" ? NaN : Number(value);
-}
 
 const PRESETS: { label: string; type: DiscountType; value: string; maxUses: string; hint: string }[] = [
   { label: "Tarjeta de regalo", type: "fixed", value: "500", maxUses: "1", hint: "Monto fijo, un solo uso" },
@@ -37,9 +34,9 @@ export default function PromoCreateForm() {
     const input = {
       code,
       discount_type: type,
-      value: toNumber(value),
-      min_purchase: minPurchase.trim() === "" ? 0 : toNumber(minPurchase),
-      max_uses: maxUses.trim() === "" ? null : toNumber(maxUses),
+      value: parseFieldNumber(value),
+      min_purchase: minPurchase.trim() === "" ? 0 : parseFieldNumber(minPurchase),
+      max_uses: maxUses.trim() === "" ? null : parseFieldNumber(maxUses),
     };
     const parsed = promoCreateSchema.safeParse(input);
     if (!parsed.success) {
@@ -156,9 +153,9 @@ export default function PromoCreateForm() {
         </span>
       </label>
 
-      {type === "fixed" && toNumber(value) > 0 && (
+      {type === "fixed" && parseFieldNumber(value) > 0 && (
         <p className="rounded-[20px] bg-canvas px-4 py-3 text-xs text-muted">
-          Si el pedido es menor a {formatMXN(toNumber(value))}, el descuento se limita al subtotal y el saldo
+          Si el pedido es menor a {formatMXN(parseFieldNumber(value))}, el descuento se limita al subtotal y el saldo
           restante no se conserva.
         </p>
       )}

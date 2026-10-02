@@ -12,7 +12,7 @@ const FALLBACK_MODELS = ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.5-
 
 const RETRYABLE_STATUS = new Set([404, 429, 500, 503]);
 
-export function geminiModelChain(): string[] {
+function geminiModelChain(): string[] {
   const configured = process.env.GEMINI_MODEL?.trim();
   return [...new Set([configured, ...FALLBACK_MODELS].filter((m): m is string => Boolean(m)))];
 }

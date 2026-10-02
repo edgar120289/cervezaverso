@@ -4,7 +4,7 @@ import { useState } from "react";
 import BottleFallback from "./BottleFallback";
 
 /** Cinemagraph genérico (cerveza sirviéndose). Ver `public/video/README.md`. */
-export const PRODUCT_LOOP_SRC = "/video/producto-loop.mp4";
+const PRODUCT_LOOP_SRC = "/video/producto-loop.mp4";
 
 /**
  * Fondo para cervezas sin foto individual (MASTER PROMPT V2 · Bloque 2.4):

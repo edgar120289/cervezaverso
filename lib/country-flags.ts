@@ -101,7 +101,7 @@ function normalize(country: string): string {
 }
 
 /** "Escocia" → "gb-sct", "EE.UU." → "us". `null` si el país no está en el diccionario. */
-export function countryFlagCode(country: string): string | null {
+function countryFlagCode(country: string): string | null {
   const key = normalize(country);
   return COUNTRY_CODES[key] ?? COUNTRY_CODES[key.replace(/ /g, "")] ?? null;
 }

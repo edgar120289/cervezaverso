@@ -23,12 +23,11 @@ export const credentialsSchema = z.object({
     .max(72, "La contraseña no puede tener más de 72 caracteres."),
 });
 
-export type Credentials = z.infer<typeof credentialsSchema>;
 
-export const MIN_AGE = 18;
+const MIN_AGE = 18;
 
 /** ¿La fecha (AAAA-MM-DD) es de alguien con 18 años cumplidos a la fecha de `today`? */
-export function isAdult(birthDate: string, today: Date = new Date()): boolean {
+function isAdult(birthDate: string, today: Date = new Date()): boolean {
   const [year, month, day] = birthDate.split("-").map(Number);
   const limit = new Date(Date.UTC(today.getUTCFullYear() - MIN_AGE, today.getUTCMonth(), today.getUTCDate()));
   return Date.UTC(year, month - 1, day) <= limit.getTime();
@@ -66,7 +65,7 @@ export const recoverSchema = z.object({
 
 const trimmed = (max: number, message: string) => z.string().trim().min(1, message).max(max);
 
-export const direccionSchema = z.object({
+const direccionSchema = z.object({
   nombre_completo: trimmed(120, "Escribe el nombre de quien recibe."),
   telefono: z
     .string()
@@ -168,7 +167,7 @@ export type ProductUpdate = z.input<typeof productUpdateSchema>;
 export const PRODUCT_IMAGE_BUCKET = "product-images";
 /** Debe coincidir con `products_image_urls_max_check` (migración 006). */
 export const MAX_PRODUCT_IMAGES = 10;
-export const MAX_PRODUCT_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_PRODUCT_IMAGE_BYTES = 5 * 1024 * 1024;
 export const PRODUCT_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
 export const productImageSchema = z

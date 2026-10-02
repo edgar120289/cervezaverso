@@ -7,7 +7,7 @@ function Bone({ className = "" }: { className?: string }) {
   return <div className={`animate-pulse bg-black/[0.06] motion-reduce:animate-none ${className}`} />;
 }
 
-export function ProductCardSkeleton() {
+function ProductCardSkeleton() {
   return (
     <div className="flex flex-col rounded-[28px] bg-white p-4 shadow-card" aria-hidden="true">
       <Bone className="aspect-square w-full rounded-[20px]" />

@@ -70,7 +70,7 @@ function cellText(row: ExcelJS.Row, col: number | undefined): string {
   return col ? row.getCell(col).text.replace(/\s+/g, " ").trim() : "";
 }
 
-export function toNumber(value: unknown): number {
+function toNumber(value: unknown): number {
   if (typeof value === "number") return value;
   const parsed = parseFloat(String(value ?? "0").replace(/[^0-9.\-]/g, ""));
   return Number.isFinite(parsed) ? parsed : 0;

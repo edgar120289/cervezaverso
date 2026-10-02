@@ -8,6 +8,7 @@ import { calculateSalePrice, DEFAULT_MARGIN_PCT, formatMXN, STOCK_STATUS_LABEL }
 import type { StockStatus } from "@/lib/types";
 import FormField, { INPUT_CLASS } from "@/components/FormField";
 import FormMessage from "@/components/FormMessage";
+import { parseFieldNumber } from "@/lib/parse-number";
 
 type FormState = {
   name: string;
@@ -33,10 +34,6 @@ const EMPTY_FORM: FormState = {
   stock_status: "in_stock",
 };
 
-function toNumber(value: string): number {
-  return value.trim() === "" ? NaN : Number(value);
-}
-
 export default function ManualProductDialog() {
   const router = useRouter();
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -44,8 +41,8 @@ export default function ManualProductDialog() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const cost = toNumber(form.cost_price);
-  const margin = toNumber(form.margin_pct);
+  const cost = parseFieldNumber(form.cost_price);
+  const margin = parseFieldNumber(form.margin_pct);
   const salePrice = cost >= 0 && margin >= 0 ? calculateSalePrice(cost, margin) : null;
 
   function update<K extends keyof FormState>(key: K) {
@@ -69,8 +66,8 @@ export default function ManualProductDialog() {
         brewery: form.brewery,
         country: form.country,
         style: form.style,
-        abv: form.abv.trim() === "" ? 0 : toNumber(form.abv),
-        volume_ml: form.volume_ml.trim() === "" ? 0 : toNumber(form.volume_ml),
+        abv: form.abv.trim() === "" ? 0 : parseFieldNumber(form.abv),
+        volume_ml: form.volume_ml.trim() === "" ? 0 : parseFieldNumber(form.volume_ml),
         cost_price: cost,
         margin_pct: margin,
         stock_status: form.stock_status,

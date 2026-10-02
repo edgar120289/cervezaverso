@@ -6,7 +6,7 @@
 
 export type FlavorId = "ligera" | "lupulada" | "tostada" | "frutal" | "belga";
 export type OccasionId = "tacos" | "carnes" | "mariscos" | "postres" | "sola";
-export type IntensityId = "suave" | "media" | "intensa" | "sin";
+type IntensityId = "suave" | "media" | "intensa" | "sin";
 
 export type QuizAnswers = { flavor: FlavorId; occasion: OccasionId; intensity: IntensityId };
 

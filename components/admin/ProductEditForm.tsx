@@ -6,6 +6,7 @@ import { actualizarProducto } from "@/app/actions/admin-productos";
 import { calculateSalePrice, DEFAULT_MARGIN_PCT, formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
 import ProductGallery from "./ProductGallery";
 import type { Product, StockStatus } from "@/lib/types";
+import { parseFieldNumber } from "@/lib/parse-number";
 
 const inputClass =
   "w-full rounded-full bg-canvas px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-black/15";
@@ -42,10 +43,6 @@ type FormState = {
 
 type SommelierNotes = { origen: string; perfil: string; maridaje: string };
 
-function toNumber(value: string): number {
-  return value.trim() === "" ? NaN : Number(value);
-}
-
 export default function ProductEditForm({
   product,
   initialMargin,
@@ -77,8 +74,8 @@ export default function ProductEditForm({
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const cost = toNumber(form.cost_price);
-  const margin = toNumber(form.margin_pct);
+  const cost = parseFieldNumber(form.cost_price);
+  const margin = parseFieldNumber(form.margin_pct);
   const salePrice =
     Number.isFinite(cost) && Number.isFinite(margin) && cost >= 0 && margin >= 0
       ? calculateSalePrice(cost, margin)
@@ -136,8 +133,8 @@ export default function ProductEditForm({
         brewery: form.brewery,
         country: form.country,
         style: form.style,
-        abv: toNumber(form.abv),
-        volume_ml: toNumber(form.volume_ml),
+        abv: parseFieldNumber(form.abv),
+        volume_ml: parseFieldNumber(form.volume_ml),
         cost_price: cost,
         margin_pct: margin,
         stock_status: form.stock_status,

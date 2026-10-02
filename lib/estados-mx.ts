@@ -34,4 +34,3 @@ export const ESTADOS_MX = [
   "Zacatecas",
 ] as const;
 
-export type EstadoMX = (typeof ESTADOS_MX)[number];
