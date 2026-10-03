@@ -13,6 +13,7 @@ import {
 import { formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
 import type { StockStatus } from "@/lib/types";
 import { activeFilterChips, chipClass, FilterDrawer, FilterPanel, FilterSection } from "@/components/CatalogFilterPanel";
+import FeaturedToggle from "./FeaturedToggle";
 import ProductRowActions from "./ProductRowActions";
 
 export type AdminProductRow = {
@@ -28,6 +29,7 @@ export type AdminProductRow = {
   stock_status: StockStatus;
   image_url: string | null;
   is_active: boolean;
+  is_featured: boolean;
   created_at: string;
 };
 
@@ -52,6 +54,9 @@ type SortId = (typeof SORT_OPTIONS)[number]["id"];
 
 /** El stock es un estado, no una cantidad: igual que la tienda, lo disponible va primero y lo agotado al final. */
 const STOCK_RANK: Record<StockStatus, number> = { in_stock: 0, low_stock: 1, preorder: 2, out_of_stock: 3 };
+
+/** Estados cuya foto se atenúa y lleva etiqueta; el resto de la tarjeta no cambia. */
+const DIMMED_STOCK: ReadonlySet<StockStatus> = new Set(["out_of_stock", "low_stock"]);
 
 const byName = (a: AdminProductRow, b: AdminProductRow) => a.name.localeCompare(b.name, "es", { sensitivity: "base" });
 
@@ -216,24 +221,38 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
               key={product.id}
               className={`space-y-3 rounded-[28px] p-4 shadow-card ${product.is_active ? "bg-white" : "bg-white/70"}`}
             >
-              <div className={`flex items-center gap-3 ${product.is_active ? "" : "opacity-60"}`}>
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-white">
-                  {product.image_url && (
-                    <Image src={product.image_url} alt="" fill sizes="64px" className="object-contain p-1" />
-                  )}
+              <div className="flex items-center gap-3">
+                <div className={`flex min-w-0 flex-1 items-center gap-3 ${product.is_active ? "" : "opacity-60"}`}>
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-white">
+                    {product.image_url && (
+                      <Image
+                        src={product.image_url}
+                        alt=""
+                        fill
+                        sizes="64px"
+                        className={`object-contain p-1 ${DIMMED_STOCK.has(product.stock_status) ? "opacity-50" : ""}`}
+                      />
+                    )}
+                    {DIMMED_STOCK.has(product.stock_status) && (
+                      <span className="absolute inset-x-0 bottom-0 bg-black/75 py-0.5 text-center text-[9px] font-semibold uppercase leading-tight text-white">
+                        {STOCK_STATUS_LABEL[product.stock_status]}
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold leading-snug">
+                      {product.name}
+                      {!product.is_active && <InactiveBadge />}
+                    </p>
+                    <p className="truncate text-xs text-muted">
+                      {product.country} · {product.style}
+                    </p>
+                    <p className="truncate text-xs text-muted">
+                      {product.sku} · {STOCK_STATUS_LABEL[product.stock_status]}
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold leading-snug">
-                    {product.name}
-                    {!product.is_active && <InactiveBadge />}
-                  </p>
-                  <p className="truncate text-xs text-muted">
-                    {product.country} · {product.style}
-                  </p>
-                  <p className="truncate text-xs text-muted">
-                    {product.sku} · {STOCK_STATUS_LABEL[product.stock_status]}
-                  </p>
-                </div>
+                <FeaturedToggle id={product.id} name={product.name} isFeatured={product.is_featured} />
               </div>
               <div className="flex items-baseline justify-between px-1 text-sm">
                 <span className="text-muted">

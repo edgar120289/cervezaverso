@@ -3,7 +3,7 @@ import { listPublicVideos, MEDIA_DIRS, publicFileExists } from "@/lib/media";
 import HeroCarousel from "./HeroCarousel";
 import HeroVideo from "./HeroVideo";
 
-/** Portada configurable desde /admin/hero (tabla `store_settings`). */
+/** Portada configurable desde /admin/apariencia (`store_settings.landing_settings`). */
 export default async function Hero() {
   const settings = await getHeroSettings();
 

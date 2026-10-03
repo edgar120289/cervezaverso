@@ -2,11 +2,14 @@
 
 import { useState, useTransition } from "react";
 import { Loader2, Save } from "lucide-react";
-import { guardarHero } from "@/app/actions/admin-hero";
+import { guardarApariencia } from "@/app/actions/admin-apariencia";
 import { HERO_INTERVALS, type HeroSettings } from "@/lib/hero";
+import type { LandingModule, LandingSettings } from "@/lib/landing";
 import HeroBannerList from "./HeroBannerList";
 import HeroCtaEditor from "./HeroCtaEditor";
 import HeroTextFields from "./HeroTextFields";
+import LandingModulesEditor from "./LandingModulesEditor";
+import Switch from "./Switch";
 
 const sectionClass = "space-y-4 rounded-[28px] bg-white p-6 shadow-card";
 
@@ -16,65 +19,37 @@ function segmentClass(active: boolean) {
   }`;
 }
 
-function Switch({
-  checked,
-  onChange,
-  label,
-  description,
-}: {
-  checked: boolean;
-  onChange: (value: boolean) => void;
-  label: string;
-  description: string;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <div>
-        <p className="font-semibold tracking-tight">{label}</p>
-        <p className="text-xs text-muted">{description}</p>
-      </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        aria-label={label}
-        onClick={() => onChange(!checked)}
-        className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${checked ? "bg-accent" : "bg-black/20"}`}
-      >
-        <span
-          aria-hidden
-          className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-all ${checked ? "left-7" : "left-1"}`}
-        />
-      </button>
-    </div>
-  );
-}
-
-/** Administrador del Hero: interruptor, tipo (video o carrusel), banners, velocidad y botones. */
-export default function HeroSettingsForm({ initial }: { initial: HeroSettings }) {
+/** Centro de control de la landing: Hero (video o carrusel, textos, banners y botones) y 3 bloques modulares. */
+export default function AppearanceForm({ initial }: { initial: LandingSettings }) {
   const [saved, setSaved] = useState(initial);
-  const [settings, setSettings] = useState(initial);
+  const [landing, setLanding] = useState(initial);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const isDirty = JSON.stringify(settings) !== JSON.stringify(saved);
+  const settings = landing.hero;
+  const isDirty = JSON.stringify(landing) !== JSON.stringify(saved);
 
   function update(patch: Partial<HeroSettings>) {
     setNotice(null);
-    setSettings((current) => ({ ...current, ...patch }));
+    setLanding((current) => ({ ...current, hero: { ...current.hero, ...patch } }));
+  }
+
+  function updateModules(modules: LandingModule[]) {
+    setNotice(null);
+    setLanding((current) => ({ ...current, modules }));
   }
 
   function handleSave() {
     setError(null);
     setNotice(null);
     startTransition(async () => {
-      const result = await guardarHero(settings);
+      const result = await guardarApariencia(landing);
       if (!result.ok) {
         setError(result.error);
         return;
       }
-      setSaved(settings);
+      setSaved(landing);
       setNotice("Cambios guardados. Ya se ven en la tienda.");
     });
   }
@@ -171,6 +146,8 @@ export default function HeroSettingsForm({ initial }: { initial: HeroSettings })
           <HeroBannerList banners={settings.hero_banners} onChange={(hero_banners) => update({ hero_banners })} />
         </section>
       )}
+
+      <LandingModulesEditor modules={landing.modules} onChange={updateModules} />
 
       <div className="sticky bottom-4 z-10 flex flex-col gap-2 rounded-[28px] bg-white p-4 shadow-card sm:flex-row sm:items-center sm:justify-between">
         <div aria-live="polite" className="text-sm">

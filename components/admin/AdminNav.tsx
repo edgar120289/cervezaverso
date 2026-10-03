@@ -7,7 +7,7 @@ const LINKS = [
   { href: "/admin", label: "Resumen" },
   { href: "/admin/pedidos", label: "Pedidos" },
   { href: "/admin/cupones", label: "Cupones" },
-  { href: "/admin/hero", label: "Hero" },
+  { href: "/admin/apariencia", label: "Apariencia" },
   { href: "/admin/carga-masiva", label: "Carga masiva" },
 ] as const;
 

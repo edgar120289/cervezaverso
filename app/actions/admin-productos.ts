@@ -116,6 +116,24 @@ export async function cambiarActivoProducto(id: string, isActive: boolean): Prom
   return { ok: true };
 }
 
+/** Marca o desmarca una cerveza como destacada (`is_featured`) para la landing. */
+export async function cambiarDestacadoProducto(id: string, isFeatured: boolean): Promise<AdminActionResult> {
+  const parsed = z.object({ id: productIdSchema, isFeatured: z.boolean() }).safeParse({ id, isFeatured });
+  if (!parsed.success) return { ok: false, error: "Solicitud inválida." };
+
+  const supabase = await requireAdmin();
+  const { data, error } = await supabase
+    .from("products")
+    .update({ is_featured: parsed.data.isFeatured })
+    .eq("id", parsed.data.id)
+    .select("id");
+  if (error) return { ok: false, error: error.message };
+  if (!data?.length) return { ok: false, error: "No se pudo actualizar: el producto no existe o no tienes permiso." };
+
+  refresh();
+  return { ok: true };
+}
+
 /** Borra la cerveza y las fotos de su galería. Los pedidos conservan su historial (FK `on delete set null`). */
 export async function eliminarProducto(id: string): Promise<AdminActionResult> {
   const parsed = productIdSchema.safeParse(id);
