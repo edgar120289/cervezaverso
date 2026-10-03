@@ -25,7 +25,7 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sort, setSort] = useState<SortId>("default");
 
-  // Búsqueda nueva desde el header (`/?q=`): se aplica durante el render, sin efecto de más.
+  // Búsqueda nueva desde el header (`/tienda?q=`): se aplica durante el render, sin efecto de más.
   if (urlQuery !== appliedUrlQuery) {
     setAppliedUrlQuery(urlQuery);
     setFilters((current) => ({ ...current, query: urlQuery }));

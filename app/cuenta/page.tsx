@@ -76,7 +76,7 @@ export default async function CuentaPage() {
       <section aria-labelledby="mis-pedidos" className="space-y-4">
         <SectionHeading id="mis-pedidos" icon={<Package size={20} />} title="Mis pedidos" count={pedidos.length} />
         {pedidos.length === 0 ? (
-          <EmptyState text="Todavía no tienes pedidos." cta="Explorar catálogo" href="/#catalogo" />
+          <EmptyState text="Todavía no tienes pedidos." cta="Explorar catálogo" href="/tienda" />
         ) : (
           <ul className="space-y-3">
             {pedidos.map((pedido) => {
@@ -116,7 +116,7 @@ export default async function CuentaPage() {
           <EmptyState
             text="Toca el corazón de cualquier cerveza para guardarla aquí."
             cta="Descubrir cervezas"
-            href="/#catalogo"
+            href="/tienda"
           />
         ) : (
           <ProductGrid products={favoritos} />

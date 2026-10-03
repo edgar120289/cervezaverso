@@ -20,3 +20,6 @@ export const CONTACT = {
 
 /** Leyenda sanitaria obligatoria para bebidas alcohólicas (pendiente de revisión legal). */
 export const HEALTH_NOTICE = "El abuso en el consumo de este producto es nocivo para la salud.";
+
+/** Tarrito kawaii del Sommelier (botón flotante, quiz y presentación en la landing). */
+export const SOMMELIER_MASCOT = "/img/cervezaverso-tarros-sin-fondo/tarros-sin-fondo/14-kawaii-sonriente.png";

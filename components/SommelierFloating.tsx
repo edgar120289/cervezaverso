@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { SOMMELIER_MASCOT } from "@/lib/site";
 import { useSommelier } from "./SommelierProvider";
-
-export const SOMMELIER_MASCOT = "/img/cervezaverso-tarros-sin-fondo/tarros-sin-fondo/14-kawaii-sonriente.png";
 
 const MESSAGES = ["¿Qué cerveza elegir?", "Yo te ayudo a elegir cerveza"];
 const SWAP_MS = 4000;
+/** Solo donde se compra. El estado del quiz vive en `SommelierProvider` (layout), así que sobrevive a la navegación. */
+const FLOATING_ROUTES = ["/tienda", "/carrito", "/checkout"];
 
 /** Sommelier flotante estilo chatbot: alterna dos frases y abre el quiz al pulsarlo. */
 export default function SommelierFloating() {
@@ -24,7 +25,7 @@ export default function SommelierFloating() {
     return () => window.clearInterval(id);
   }, [reduceMotion]);
 
-  if (pathname.startsWith("/admin")) return null;
+  if (!FLOATING_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))) return null;
 
   return (
     <button

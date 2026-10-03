@@ -45,7 +45,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6">
       <Link
-        href="/#catalogo"
+        href="/tienda"
         className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold text-muted transition-colors hover:bg-black/5 hover:text-black"
       >
         <ArrowLeft size={16} />

@@ -11,7 +11,7 @@ import type { Recommendation } from "@/lib/sommelier";
 import { formatMXN } from "@/lib/pricing";
 import { useCart } from "@/lib/cart-context";
 import BottleFallback from "./BottleFallback";
-import { SOMMELIER_MASCOT } from "./SommelierFloating";
+import { SOMMELIER_MASCOT } from "@/lib/site";
 
 type Partial3 = Partial<QuizAnswers>;
 

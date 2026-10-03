@@ -18,7 +18,7 @@ export default function MobileSearchBar({ onClose }: { onClose: () => void }) {
   return (
     <Form
       id={MOBILE_SEARCH_ID}
-      action="/"
+      action="/tienda"
       role="search"
       onSubmit={onClose}
       onKeyDown={(e) => e.key === "Escape" && onClose()}

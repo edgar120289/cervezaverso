@@ -7,7 +7,7 @@ type SommelierContextValue = { openQuiz: () => void };
 
 const SommelierContext = createContext<SommelierContextValue | null>(null);
 
-/** Un solo quiz por página: el Hero y la sección del Sommelier lo abren desde aquí. */
+/** Un solo quiz para todo el sitio. Vive en el layout: ir de /tienda a Inicio y volver no reinicia la conversación. */
 export function SommelierProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const value = useMemo(() => ({ openQuiz: () => setIsOpen(true) }), []);

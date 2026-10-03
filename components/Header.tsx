@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Search, ShoppingBag, X } from "lucide-react";
 import Image from "next/image";
 import MultiverseLogo from "./MultiverseLogo";
@@ -12,13 +13,15 @@ import MobileSearchBar, { MOBILE_SEARCH_ID } from "./MobileSearchBar";
 import { useCart } from "@/lib/cart-context";
 
 const MAIN_LINKS = [
-  { href: "/#catalogo", label: "Catálogo" },
+  { href: "/", label: "Inicio" },
+  { href: "/tienda", label: "Tienda" },
   { href: "/contacto", label: "Contacto" },
 ];
 
 export default function Header({ logoImages }: { logoImages: string[] }) {
   const { itemCount, openDrawer } = useCart();
   const [searchOpen, setSearchOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-40 px-4 pt-4">
@@ -49,15 +52,21 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
         </div>
 
         <nav aria-label="Principal" className="hidden items-center gap-1 md:flex">
-          {MAIN_LINKS.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex min-h-11 items-center rounded-full px-4 text-sm font-semibold text-black/70 transition-colors hover:bg-black/5 hover:text-black"
-            >
-              {label}
-            </Link>
-          ))}
+          {MAIN_LINKS.map(({ href, label }) => {
+            const current = href === "/" ? pathname === "/" : pathname.startsWith(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={current ? "page" : undefined}
+                className={`flex min-h-11 items-center rounded-full px-4 text-sm font-semibold transition-colors ${
+                  current ? "bg-black text-white" : "text-black/70 hover:bg-black/5 hover:text-black"
+                }`}
+              >
+                {label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center justify-end gap-1.5 md:flex-1">

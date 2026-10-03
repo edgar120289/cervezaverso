@@ -1,6 +1,6 @@
 import type { Product } from "@/lib/types";
 
-/** Parámetro de URL con el texto buscado desde el header (`/?q=…`). */
+/** Parámetro de URL con el texto buscado desde el header (`/tienda?q=…`). */
 export const SEARCH_PARAM = "q";
 
 /** Lo mínimo que necesitan los filtros: lo comparten la tienda (`Product`) y el inventario del admin. */

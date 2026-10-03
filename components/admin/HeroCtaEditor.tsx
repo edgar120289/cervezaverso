@@ -41,7 +41,7 @@ export default function HeroCtaEditor({ label, ctas, onChange }: HeroCtaEditorPr
             value={cta.url}
             maxLength={500}
             onChange={(e) => update(index, { url: e.target.value })}
-            placeholder={cta.is_external ? "https://…" : "/#catalogo"}
+            placeholder={cta.is_external ? "https://…" : "/tienda"}
             aria-label={`${label}: dirección del botón ${index + 1}`}
             className={fieldClass}
           />

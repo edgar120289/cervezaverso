@@ -62,6 +62,27 @@ export async function getProducts(): Promise<Product[]> {
   return data.map(toProduct);
 }
 
+/** Fachada de la landing: hasta `limit` cervezas con `is_featured` (RLS ya oculta las inactivas). */
+export async function getFeaturedProducts(limit = 8): Promise<Product[]> {
+  await connection();
+  const supabase = getClient();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("products")
+    .select(PRODUCT_COLUMNS)
+    .eq("is_featured", true)
+    .order("stock_status", { ascending: true })
+    .order("name", { ascending: true })
+    .limit(limit);
+
+  if (error) {
+    console.error("[catalog] Error al leer los destacados:", error.message);
+    return [];
+  }
+  return data.map(toProduct);
+}
+
 /** Con `cache`: generateMetadata y la página comparten una sola consulta por request. */
 export const getProductBySku = cache(async (sku: string): Promise<Product | null> => {
   await connection();

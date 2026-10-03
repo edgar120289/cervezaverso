@@ -31,7 +31,7 @@ const heroCtaSchema = z
         path: ["url"],
         message: cta.is_external
           ? "Un enlace externo debe empezar con http:// o https://."
-          : "Un enlace interno debe empezar con / (por ejemplo, /#catalogo).",
+          : "Un enlace interno debe empezar con / (por ejemplo, /tienda).",
       });
     }
   });
