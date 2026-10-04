@@ -89,7 +89,7 @@ export async function POST(req: Request) {
 
   const google = createGoogle({ apiKey });
   const result = streamText({
-    model: google("gemini-1.5-flash"),
+    model: google("gemini-flash-latest"),
     system: SYSTEM_PROMPT,
     messages: await convertToModelMessages(messages),
     tools: { buscarCervezas },
