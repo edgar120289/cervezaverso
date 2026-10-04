@@ -8,8 +8,15 @@ type CtaLinkProps = {
   children?: ReactNode;
 };
 
-/** Botón de enlace de la landing: los externos (WhatsApp, redes, blogs) abren siempre en pestaña nueva. */
+/** Botón de enlace de la landing: los externos (WhatsApp, redes, blogs) abren en pestaña nueva, salvo `tel:` y `mailto:`. */
 export default function CtaLink({ cta, className, children }: CtaLinkProps) {
+  if (/^(tel|mailto):/i.test(cta.url)) {
+    return (
+      <a href={cta.url} className={className}>
+        {children ?? cta.text}
+      </a>
+    );
+  }
   if (cta.is_external) {
     return (
       <a href={cta.url} target="_blank" rel="noopener noreferrer" className={className}>
