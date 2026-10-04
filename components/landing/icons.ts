@@ -1,0 +1,40 @@
+import {
+  Award,
+  Beer,
+  Clock,
+  Gift,
+  Heart,
+  Leaf,
+  MapPin,
+  MessageCircle,
+  Package,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  ThumbsUp,
+  Truck,
+  Wallet,
+  Wheat,
+  type LucideIcon,
+} from "lucide-react";
+import type { GridIconName } from "@/lib/landing";
+
+/** Íconos de la cuadrícula; los nombres válidos los define `GRID_ICON_NAMES` en lib/landing.ts. */
+export const GRID_ICONS: Record<GridIconName, LucideIcon> = {
+  Beer,
+  Truck,
+  ShieldCheck,
+  Gift,
+  Star,
+  Heart,
+  MapPin,
+  Clock,
+  Award,
+  Leaf,
+  Wheat,
+  Package,
+  Sparkles,
+  Wallet,
+  MessageCircle,
+  ThumbsUp,
+};

@@ -101,7 +101,7 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
               value={settings.hero_video_url ?? ""}
               maxLength={500}
               onChange={(e) => update({ hero_video_url: e.target.value })}
-              placeholder="Vacío = video por defecto de la tienda"
+              placeholder="Opcional"
               className="mt-1 min-h-11 w-full rounded-full bg-canvas px-4 text-sm font-normal normal-case tracking-normal text-black outline-none focus:ring-2 focus:ring-black/15"
             />
             <span className="mt-1 block text-[11px] font-normal normal-case tracking-normal">

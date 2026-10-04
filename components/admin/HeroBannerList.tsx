@@ -25,7 +25,7 @@ const iconButton =
 
 /**
  * Banners del carrusel: subir (directo al bucket), reordenar (arrastrar o flechas), quitar,
- * texto alternativo y botones por banner. Los cambios se guardan con el botón del formulario.
+ * descripción de la imagen y botones por banner. Los cambios se guardan con el botón del formulario.
  */
 export default function HeroBannerList({ banners, onChange }: HeroBannerListProps) {
   const [uploading, setUploading] = useState(false);
@@ -116,9 +116,7 @@ export default function HeroBannerList({ banners, onChange }: HeroBannerListProp
           aria-label="Elegir banners del carrusel"
         />
       </div>
-      <p className="text-sm text-black/60">
-        💡 Tip: Para que tus banners luzcan espectaculares, sugerimos imágenes panorámicas (1920x1080 px).
-      </p>
+      <p className="text-[11px] text-muted">Tamaño recomendado: 1920x1080px</p>
 
       {banners.length === 0 ? (
         <p className="rounded-[20px] bg-canvas px-4 py-10 text-center text-sm text-muted">
@@ -155,14 +153,13 @@ export default function HeroBannerList({ banners, onChange }: HeroBannerListProp
                 </div>
                 <div className="flex-1 space-y-2">
                   <label className="block text-xs font-semibold uppercase tracking-wide text-muted">
-                    Banner {index + 1} · texto alternativo
+                    Banner {index + 1} · Descripción de la imagen (Opcional - Mejora el SEO)
                     <input
                       type="text"
                       value={banner.alt}
                       maxLength={200}
                       onChange={(e) => patch(index, { alt: e.target.value })}
-                      placeholder="Describe la imagen (para lectores de pantalla)"
-                      className="mt-1 min-h-11 w-full rounded-full bg-canvas px-4 text-sm font-normal normal-case tracking-normal text-black outline-none focus:ring-2 focus:ring-black/15"
+                                      className="mt-1 min-h-11 w-full rounded-full bg-canvas px-4 text-sm font-normal normal-case tracking-normal text-black outline-none focus:ring-2 focus:ring-black/15"
                     />
                   </label>
                   <div className="flex items-center gap-2">

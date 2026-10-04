@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Pause, Play } from "lucide-react";
-import { useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { HeroBanner } from "@/lib/hero";
 import { useInView } from "@/lib/use-in-view";
 import HeroCtas from "./HeroCtas";
@@ -49,7 +49,7 @@ export default function HeroCarousel({ banners, intervalSeconds }: HeroCarouselP
     >
       {banners.map((banner, i) => (
         <Image
-          key={banner.image_url}
+          key={`${i}-${banner.image_url}`}
           src={banner.image_url}
           alt={banner.alt}
           fill
@@ -64,10 +64,20 @@ export default function HeroCarousel({ banners, intervalSeconds }: HeroCarouselP
       <div aria-hidden className="absolute inset-0 z-0 bg-black/45" />
       <div aria-hidden className="absolute inset-0 z-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
 
-      <div className="relative z-10 flex flex-col items-center gap-8">
-        <HeroHeading key={index} title={active.title} subtitle={active.subtitle} />
-        <HeroCtas key={index} ctas={active.ctas} />
-      </div>
+      {/* Un solo slide de texto montado a la vez: el anterior sale antes de que entre el siguiente. */}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={`${index}-${active.image_url}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 0.25 }}
+          className="relative z-10 flex flex-col items-center gap-8"
+        >
+          <HeroHeading title={active.title} subtitle={active.subtitle} />
+          <HeroCtas ctas={active.ctas} />
+        </motion.div>
+      </AnimatePresence>
 
       {hasMany && (
         <div className="absolute inset-x-0 bottom-2 z-10 flex items-center justify-center gap-1">
@@ -81,7 +91,7 @@ export default function HeroCarousel({ banners, intervalSeconds }: HeroCarouselP
           </button>
           {banners.map((banner, i) => (
             <button
-              key={banner.image_url}
+              key={`${i}-${banner.image_url}`}
               type="button"
               onClick={() => setIndex(i)}
               aria-label={`Ir al banner ${i + 1}`}

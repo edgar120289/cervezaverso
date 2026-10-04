@@ -3,7 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 
 type HeroHeadingProps = {
-  /** Sin título configurado no se pinta nada visible; el H1 queda solo para lectores de pantalla. */
+  /** Sin título ni subtítulo no se pinta nada visible; el H1 queda solo para lectores de pantalla. */
   title?: string | null;
   subtitle?: string | null;
 };
@@ -12,6 +12,9 @@ type HeroHeadingProps = {
 export default function HeroHeading({ title, subtitle }: HeroHeadingProps) {
   const reduceMotion = useReducedMotion();
   const heading = title?.trim();
+  const sub = subtitle?.trim();
+
+  if (!heading && !sub) return <h1 className="sr-only">Cervezaverso</h1>;
 
   return (
     <motion.div
@@ -25,7 +28,7 @@ export default function HeroHeading({ title, subtitle }: HeroHeadingProps) {
       ) : (
         <h1 className="sr-only">Cervezaverso</h1>
       )}
-      {subtitle?.trim() && <p className="text-pretty text-base text-white sm:text-lg">{subtitle}</p>}
+      {sub && <p className="text-pretty text-base text-white sm:text-lg">{sub}</p>}
     </motion.div>
   );
 }

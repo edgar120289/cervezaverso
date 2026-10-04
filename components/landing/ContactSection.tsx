@@ -3,7 +3,7 @@ import ContactChannels from "@/components/ContactChannels";
 /** Contacto al final de la landing: mismas tarjetas de canales que /contacto. */
 export default function ContactSection() {
   return (
-    <section aria-labelledby="contacto-inicio" className="space-y-4">
+    <section id="contacto" aria-labelledby="contacto-inicio" className="scroll-mt-24 space-y-4">
       <header className="rounded-[28px] bg-white px-6 py-10 shadow-card sm:px-12 sm:py-14">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Contacto</p>
         <h2

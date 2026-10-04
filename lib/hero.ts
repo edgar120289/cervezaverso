@@ -17,7 +17,7 @@ export const heroImageSchema = z
 const EXTERNAL_URL = /^https?:\/\/\S+$/i;
 const INTERNAL_URL = /^\/(?!\/)\S*$/;
 
-const heroCtaSchema = z
+export const heroCtaSchema = z
   .object({
     text: z.string().trim().min(1, "Cada botón necesita un texto.").max(40, "El texto del botón admite 40 caracteres."),
     url: z.string().trim().min(1, "Cada botón necesita una dirección.").max(500),
@@ -36,11 +36,13 @@ const heroCtaSchema = z
     }
   });
 
-const heroCtasSchema = z.array(heroCtaSchema).max(MAX_HERO_CTAS, `Máximo ${MAX_HERO_CTAS} botones.`);
+export const ctaListSchema = (max: number) => z.array(heroCtaSchema).max(max, `Máximo ${max} botones.`);
+
+const heroCtasSchema = ctaListSchema(MAX_HERO_CTAS);
 
 const heroBannerSchema = z.object({
   image_url: z.url({ protocol: /^https?$/ }),
-  alt: z.string().trim().max(200, "El texto alternativo admite 200 caracteres."),
+  alt: z.string().trim().max(200, "La descripción de la imagen admite 200 caracteres."),
   title: z.string().trim().max(120, "El título admite 120 caracteres.").optional(),
   subtitle: z.string().trim().max(240, "El subtítulo admite 240 caracteres.").optional(),
   ctas: heroCtasSchema,
