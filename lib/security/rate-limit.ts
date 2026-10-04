@@ -9,6 +9,7 @@ const RATE_LIMITS = {
   recover: { max: 5, windowSeconds: 60 * 60 },
   checkout: { max: 10, windowSeconds: 15 * 60 },
   promo: { max: 20, windowSeconds: 15 * 60 },
+  chat: { max: 30, windowSeconds: 15 * 60 },
 } as const;
 
 export type RateLimitAction = keyof typeof RATE_LIMITS;
