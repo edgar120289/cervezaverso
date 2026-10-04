@@ -7,18 +7,20 @@ export default function SommelierIntro() {
   return (
     <section
       aria-labelledby="sommelier-intro"
-      className="grid items-center gap-6 rounded-[28px] bg-white p-6 shadow-card sm:grid-cols-[auto_1fr] sm:gap-10 sm:p-10"
+      className="grid items-center gap-8 rounded-[28px] bg-white p-8 shadow-card sm:grid-cols-[auto_1fr] sm:gap-14 sm:p-12"
     >
-      <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-full bg-canvas ring-2 ring-accent sm:h-36 sm:w-36">
-        <Image src={SOMMELIER_MASCOT} alt="" fill sizes="144px" className="object-contain p-3" />
+      <div className="relative mx-auto h-40 w-40 sm:h-52 sm:w-52">
+        <Image src={SOMMELIER_MASCOT} alt="" fill sizes="208px" className="object-contain" />
       </div>
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Sommelier con IA · {SOMMELIER_NAME}</p>
-        <h2 id="sommelier-intro" className="mt-2 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">
-          ¡Hola! Soy {SOMMELIER_NAME}, tu Sommelier personal. Cuéntame qué vas a comer o qué sabores te gustan, y te
-          recomendaré la cerveza artesanal perfecta.
+      <div className="text-center sm:text-left">
+        <h2 id="sommelier-intro" className="text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">
+          ¡Hola! Soy {SOMMELIER_NAME}.
         </h2>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <p className="mt-3 text-lg font-semibold text-accent sm:text-xl">Tu Sommelier experta en cerveza artesanal.</p>
+        <p className="mt-3 max-w-xl text-base text-muted">
+          Encuentra el maridaje perfecto para tu comida o descubre tu próximo estilo favorito en segundos.
+        </p>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link
             href="/tienda?chat=open"
             className="inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-6 text-sm font-semibold text-white shadow-accent transition hover:brightness-110"

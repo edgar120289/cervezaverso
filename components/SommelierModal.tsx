@@ -9,6 +9,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, Loader2, RotateCcw, SendHorizontal, ShoppingBag, X } from "lucide-react";
 import { FLAVORS, INTENSITIES, OCCASIONS, QUIZ_STEPS, type QuizAnswers } from "@/lib/data/sommelier-quiz";
 import { useCart } from "@/lib/cart-context";
+import type { Product } from "@/lib/types";
+import ProductCard from "@/components/ProductCard";
 import { SOMMELIER_MASCOT, SOMMELIER_NAME } from "@/lib/site";
 
 type PartialAnswers = Partial<QuizAnswers>;
@@ -226,13 +228,28 @@ export default function SommelierModal({
                         </p>
                       );
                     }
-                    if (!text) return null;
+                    const found = message.parts.flatMap((part) =>
+                      part.type === "tool-buscarCervezas" && part.state === "output-available"
+                        ? (part.output as Omit<Product, "cost_price">[])
+                        : []
+                    );
+                    if (!text && found.length === 0) return null;
                     return (
-                      <div
-                        key={message.id}
-                        className="mr-auto max-w-[92%] rounded-[20px] rounded-bl-md bg-canvas px-4 py-3 text-sm leading-relaxed"
-                      >
-                        <ReactMarkdown components={markdownComponents}>{text}</ReactMarkdown>
+                      <div key={message.id} className="mr-auto w-full max-w-[92%] space-y-3">
+                        {text && (
+                          <div className="w-fit rounded-[20px] rounded-bl-md bg-canvas px-4 py-3 text-sm leading-relaxed">
+                            <ReactMarkdown components={markdownComponents}>{text}</ReactMarkdown>
+                          </div>
+                        )}
+                        {found.length > 0 && (
+                          <ul className="scrollbar-none -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2">
+                            {found.map((product) => (
+                              <li key={product.sku} className="w-56 shrink-0 snap-start">
+                                <ProductCard product={{ ...product, cost_price: 0 }} />
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
                     );
                   })}

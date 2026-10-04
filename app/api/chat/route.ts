@@ -15,9 +15,11 @@ import { isWithinRateLimit } from "@/lib/security/rate-limit";
 
 export const maxDuration = 30;
 
-const DEFAULT_MODEL = "gemini-3.8-flash";
-
-const SYSTEM_PROMPT = `Eres Graciela, la carismática y experta Sommelier de Cervezaverso. Hablas en español de México, eres amigable, experta cervecera y directa. Tu objetivo es recomendar cervezas reales de nuestro catálogo para guiar a la compra. NUNCA inventes productos. SIEMPRE usa la tool 'buscarCervezas' para consultar el inventario activo. Muestra los resultados de forma atractiva, usando Markdown para negritas y generando enlaces hacia la ficha del producto (/cervezas/SKU). Sé concisa, no des discursos largos.`;
+const SYSTEM_PROMPT = `Eres Graciela, la Sommelier de Cervezaverso. Tu tono es PROFESIONAL, educado, formal y amable. ESTRICTAMENTE PROHIBIDO usar jerga, lenguaje coloquial de barrio o exceso de confianza.
+Regla 1: Sé EXTREMADAMENTE concisa (1 o 2 oraciones máximo).
+Regla 2: Si te piden agua, refresco, vino o destilados, aclara educadamente que solo vendemos cerveza artesanal, pero recomienda una cerveza que se acerque a esa sensación (ej. algo muy ligero).
+Regla 3: NUNCA generes enlaces de texto ni listas Markdown para los productos. Tu único trabajo es invocar la tool 'buscarCervezas', dar tu breve respuesta en texto y detenerte.
+Nunca inventes productos: recomienda solo lo que devuelva la tool.`;
 
 /** Solo conversan usuario y asistente; el resto (system, tools, partes que no sean texto) se descarta del cliente. */
 const bodySchema = z.object({
@@ -61,13 +63,8 @@ const buscarCervezas = tool({
   }),
   execute: async ({ consulta, precioMaximo }) => {
     const products = await searchActiveProducts(consulta, { maxPrice: precioMaximo });
-    return products.map((product) => ({
-      Nombre: product.name,
-      Estilo: product.style,
-      Precio: product.sale_price,
-      SKU: product.sku,
-      Descripción: product.description_ai ?? product.notas_perfil ?? null,
-    }));
+    // Sin `cost_price`: este resultado viaja al navegador para pintar las tarjetas.
+    return products.map((product) => ({ ...product, cost_price: undefined }));
   },
 });
 
@@ -92,7 +89,7 @@ export async function POST(req: Request) {
 
   const google = createGoogle({ apiKey });
   const result = streamText({
-    model: google(process.env.GEMINI_MODEL?.trim() || DEFAULT_MODEL),
+    model: google("gemini-1.5-flash"),
     system: SYSTEM_PROMPT,
     messages: await convertToModelMessages(messages),
     tools: { buscarCervezas },
