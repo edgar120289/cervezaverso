@@ -10,7 +10,7 @@ import { ArrowLeft, Loader2, RotateCcw, SendHorizontal, ShoppingBag, X } from "l
 import { FLAVORS, INTENSITIES, OCCASIONS, QUIZ_STEPS, type QuizAnswers } from "@/lib/data/sommelier-quiz";
 import { useCart } from "@/lib/cart-context";
 import type { Product } from "@/lib/types";
-import ProductCard from "@/components/ProductCard";
+import MiniProductCard from "@/components/MiniProductCard";
 import { SOMMELIER_MASCOT, SOMMELIER_NAME } from "@/lib/site";
 
 type PartialAnswers = Partial<QuizAnswers>;
@@ -23,6 +23,17 @@ function buildQuizPrompt(answers: QuizAnswers): string {
   const occasion = OCCASIONS.find((o) => o.id === answers.occasion);
   const intensity = INTENSITIES.find((o) => o.id === answers.intensity);
   return `${QUIZ_PROMPT_PREFIX}: sabor «${flavor?.label}» (${flavor?.hint}); ocasión «${occasion?.label}»; intensidad «${intensity?.label}» (${intensity?.hint}). Recomiéndame las mejores opciones de tu catálogo.`;
+}
+
+function normalize(value: string): string {
+  return value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+}
+
+/** Las cervezas que Graciela nombra en su texto van primero en el carrusel; el resto conserva su orden. */
+function mentionedFirst<T extends { name: string }>(products: T[], text: string): T[] {
+  const haystack = normalize(text);
+  const mentioned = (p: T) => haystack.includes(normalize(p.name));
+  return [...products.filter(mentioned), ...products.filter((p) => !mentioned(p))];
 }
 
 export default function SommelierModal({
@@ -228,10 +239,13 @@ export default function SommelierModal({
                         </p>
                       );
                     }
-                    const found = message.parts.flatMap((part) =>
-                      part.type === "tool-buscarCervezas" && part.state === "output-available"
-                        ? (part.output as Omit<Product, "cost_price">[])
-                        : []
+                    const found = mentionedFirst(
+                      message.parts.flatMap((part) =>
+                        part.type === "tool-buscarCervezas" && part.state === "output-available"
+                          ? (part.output as Omit<Product, "cost_price">[])
+                          : []
+                      ),
+                      text
                     );
                     if (!text && found.length === 0) return null;
                     return (
@@ -242,10 +256,10 @@ export default function SommelierModal({
                           </div>
                         )}
                         {found.length > 0 && (
-                          <ul className="scrollbar-none -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2">
+                          <ul className="scrollbar-none -mx-1 flex max-w-full snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2">
                             {found.map((product) => (
-                              <li key={product.sku} className="w-56 shrink-0 snap-start">
-                                <ProductCard product={{ ...product, cost_price: 0 }} />
+                              <li key={product.sku} className="w-[17.5rem] max-w-[85%] shrink-0 snap-start">
+                                <MiniProductCard product={{ ...product, cost_price: 0 }} onSelect={onClose} />
                               </li>
                             ))}
                           </ul>
