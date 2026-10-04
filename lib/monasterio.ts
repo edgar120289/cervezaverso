@@ -50,6 +50,7 @@ export type MonasterioRow = {
   cost_price: number;
   sale_price: number;
   stock_status: StockStatus;
+  is_active: boolean;
 };
 
 export type ImportResult = {
@@ -79,6 +80,11 @@ function toNumber(value: unknown): number {
 /** La columna %ABV tiene formato de porcentaje en Excel: 0.055 → 5.5. */
 export function toAbvPercent(value: number): number {
   return value > 0 && value < 1 ? Math.round(value * 10000) / 100 : value;
+}
+
+/** Regla de carga masiva: si la disponibilidad dice «agotado/a» (sin importar mayúsculas), el producto queda inactivo. */
+export function isActiveFor(availabilityText: unknown): boolean {
+  return !/agotad/i.test(String(availabilityText ?? "").normalize("NFD").replace(/[̀-ͯ]/g, ""));
 }
 
 const LOW_STOCK_NOTE = /ULTIMAS? PIEZAS?|POCAS PIEZAS/;
@@ -173,6 +179,7 @@ export async function parseMonasterio(
       cost_price: costPrice,
       sale_price: calculateSalePrice(costPrice),
       stock_status: stockStatusFor(qtyCell, notes),
+      is_active: isActiveFor(qtyCell),
     });
   }
 
@@ -205,7 +212,7 @@ export async function findExistingProduct(
 
 /**
  * Inserta o actualiza cada fila en `products` (UPSERT por sku, o por nombre + volumen).
- * Al actualizar solo se escriben los campos de la lista (precio, disponibilidad,
+ * Al actualizar solo se escriben los campos de la lista (precio, disponibilidad y activo,
  * estilo, país, ABV, volumen): descripciones, fichas del Sommelier, imagen,
  * insignias y margen personalizado quedan intactos. Requiere un cliente con service_role.
  */

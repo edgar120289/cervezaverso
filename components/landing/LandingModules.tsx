@@ -73,16 +73,21 @@ const RENDERERS: Record<LandingModuleId, (props: { title: string }) => ReactNode
   grid: GridModule,
 };
 
+/** Un bloque tal como se ve en la tienda; el editor de /admin/landing lo reutiliza para su vista previa. */
+export function LandingModuleView({ module }: { module: LandingModule }) {
+  const Module = RENDERERS[module.id];
+  return <Module title={module.title.trim() || FALLBACK_TITLE[module.id]} />;
+}
+
 /** Bloques de `landing_settings.modules`: solo los activos y en el orden configurado (1, 2, 3). */
 export default function LandingModules({ modules }: { modules: LandingModule[] }) {
   const visible = modules.filter((module) => module.enabled).sort((a, b) => a.order - b.order);
 
   return (
     <>
-      {visible.map((module) => {
-        const Module = RENDERERS[module.id];
-        return <Module key={module.id} title={module.title.trim() || FALLBACK_TITLE[module.id]} />;
-      })}
+      {visible.map((module) => (
+        <LandingModuleView key={module.id} module={module} />
+      ))}
     </>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import ProductVideoLoop from "./ProductVideoLoop";
+import ProductPlaceholder from "./ProductPlaceholder";
 
 type ProductImageProps = {
   src: string | null;
@@ -11,11 +11,11 @@ type ProductImageProps = {
   priority?: boolean;
 };
 
-/** Foto del producto (Supabase Storage). Sin URL, o si la imagen falla, muestra el loop de respaldo. */
+/** Foto del producto (Supabase Storage). Sin URL, o si la imagen falla, muestra el placeholder. */
 export default function ProductImage({ src, alt, sizes, priority = false }: ProductImageProps) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
-  if (!src || failedSrc === src) return <ProductVideoLoop />;
+  if (!src || failedSrc === src) return <ProductPlaceholder />;
 
   return (
     <Image

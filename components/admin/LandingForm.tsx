@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Loader2, Save } from "lucide-react";
-import { guardarApariencia } from "@/app/actions/admin-apariencia";
+import { guardarLanding } from "@/app/actions/admin-landing";
 import { HERO_INTERVALS, type HeroSettings } from "@/lib/hero";
 import type { LandingModule, LandingSettings } from "@/lib/landing";
 import HeroBannerList from "./HeroBannerList";
@@ -20,7 +20,7 @@ function segmentClass(active: boolean) {
 }
 
 /** Centro de control de la landing: Hero (video o carrusel, textos, banners y botones) y 3 bloques modulares. */
-export default function AppearanceForm({ initial }: { initial: LandingSettings }) {
+export default function LandingForm({ initial }: { initial: LandingSettings }) {
   const [saved, setSaved] = useState(initial);
   const [landing, setLanding] = useState(initial);
   const [isPending, startTransition] = useTransition();
@@ -44,7 +44,7 @@ export default function AppearanceForm({ initial }: { initial: LandingSettings }
     setError(null);
     setNotice(null);
     startTransition(async () => {
-      const result = await guardarApariencia(landing);
+      const result = await guardarLanding(landing);
       if (!result.ok) {
         setError(result.error);
         return;

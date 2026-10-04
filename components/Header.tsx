@@ -13,7 +13,6 @@ import MobileSearchBar, { MOBILE_SEARCH_ID } from "./MobileSearchBar";
 import { useCart } from "@/lib/cart-context";
 
 const MAIN_LINKS = [
-  { href: "/", label: "Inicio" },
   { href: "/tienda", label: "Tienda" },
   { href: "/contacto", label: "Contacto" },
 ];

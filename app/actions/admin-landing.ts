@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { requireAdmin } from "@/lib/admin-auth";
 import { firstIssue } from "@/lib/validation";
-import { HERO_BUCKET, parseHeroRow } from "@/lib/hero";
+import { HERO_BUCKET } from "@/lib/hero";
 import { landingSettingsSchema, parseLandingSettings, type LandingSettings } from "@/lib/landing";
 
 export type AppearanceActionResult = { ok: true } | { ok: false; error: string };
@@ -16,8 +16,8 @@ function bucketPublicPrefix() {
  * Guarda el Hero y los bloques en `store_settings.landing_settings`. Los banners deben vivir
  * en nuestro bucket; los que salen de la lista también se borran del bucket.
  */
-export async function guardarApariencia(input: LandingSettings): Promise<AppearanceActionResult> {
-  const supabase = await requireAdmin("/admin/apariencia");
+export async function guardarLanding(input: LandingSettings): Promise<AppearanceActionResult> {
+  const supabase = await requireAdmin("/admin/landing");
   const parsed = landingSettingsSchema.safeParse({
     ...input,
     hero: {
@@ -41,7 +41,7 @@ export async function guardarApariencia(input: LandingSettings): Promise<Appeara
 
   const { data: current, error: readError } = await supabase
     .from("store_settings")
-    .select("landing_settings, hero_banners")
+    .select("landing_settings")
     .eq("id", 1)
     .maybeSingle();
   if (readError) return { ok: false, error: readError.message };
@@ -54,9 +54,9 @@ export async function guardarApariencia(input: LandingSettings): Promise<Appeara
   if (error) return { ok: false, error: error.message };
   if (!data?.length) return { ok: false, error: "No se pudo guardar: la configuración no existe o no tienes permiso." };
 
-  // Banners que ya no se usan: los de landing_settings y, en el primer guardado, los de las columnas anteriores.
+  // Banners que ya no se usan: los que estaban en landing_settings y salieron de la lista.
   const previous = current
-    ? parseLandingSettings(current.landing_settings, parseHeroRow(current)).hero.hero_banners
+    ? parseLandingSettings(current.landing_settings).hero.hero_banners
     : [];
   const kept = new Set(hero.hero_banners.map((banner) => banner.image_url));
   const removedPaths = previous

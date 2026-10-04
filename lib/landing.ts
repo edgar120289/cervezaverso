@@ -47,16 +47,15 @@ export const DEFAULT_LANDING_SETTINGS: LandingSettings = {
 
 /**
  * Lee `landing_settings`; cada parte ilegible o ausente cae a su valor por defecto.
- * `legacyHero` son las columnas hero_* de antes de la migración 010: se usan hasta el primer guardado.
  */
-export function parseLandingSettings(raw: unknown, legacyHero: z.infer<typeof heroSettingsSchema>): LandingSettings {
+export function parseLandingSettings(raw: unknown): LandingSettings {
   const source = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
 
   const hero = heroSettingsSchema.safeParse(source.hero);
   const modules = modulesSchema.safeParse(source.modules);
 
   return {
-    hero: hero.success ? hero.data : legacyHero,
+    hero: hero.success ? hero.data : DEFAULT_HERO_SETTINGS,
     modules: modules.success ? modules.data : DEFAULT_LANDING_MODULES,
   };
 }

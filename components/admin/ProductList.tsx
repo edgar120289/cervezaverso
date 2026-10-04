@@ -13,6 +13,7 @@ import {
 import { formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
 import type { StockStatus } from "@/lib/types";
 import { activeFilterChips, chipClass, FilterDrawer, FilterPanel, FilterSection } from "@/components/CatalogFilterPanel";
+import ProductPlaceholder from "@/components/ProductPlaceholder";
 import FeaturedToggle from "./FeaturedToggle";
 import ProductRowActions from "./ProductRowActions";
 
@@ -55,8 +56,11 @@ type SortId = (typeof SORT_OPTIONS)[number]["id"];
 /** El stock es un estado, no una cantidad: igual que la tienda, lo disponible va primero y lo agotado al final. */
 const STOCK_RANK: Record<StockStatus, number> = { in_stock: 0, low_stock: 1, preorder: 2, out_of_stock: 3 };
 
-/** Estados cuya foto se atenúa y lleva etiqueta; el resto de la tarjeta no cambia. */
-const DIMMED_STOCK: ReadonlySet<StockStatus> = new Set(["out_of_stock", "low_stock"]);
+/** Estados cuya foto se atenúa y lleva etiqueta: agotada en rojo oscuro y pocas piezas en ámbar de alerta. */
+const STOCK_TAG_CLASS: Partial<Record<StockStatus, string>> = {
+  out_of_stock: "bg-red-900 text-white",
+  low_stock: "bg-amber-400 text-black",
+};
 
 const byName = (a: AdminProductRow, b: AdminProductRow) => a.name.localeCompare(b.name, "es", { sensitivity: "base" });
 
@@ -224,17 +228,19 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
               <div className="flex items-center gap-3">
                 <div className={`flex min-w-0 flex-1 items-center gap-3 ${product.is_active ? "" : "opacity-60"}`}>
                   <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-white">
-                    {product.image_url && (
+                    {product.image_url ? (
                       <Image
                         src={product.image_url}
                         alt=""
                         fill
                         sizes="64px"
-                        className={`object-contain p-1 ${DIMMED_STOCK.has(product.stock_status) ? "opacity-50" : ""}`}
+                        className={`object-contain p-1 ${STOCK_TAG_CLASS[product.stock_status] ? "opacity-50" : ""}`}
                       />
+                    ) : (
+                      <ProductPlaceholder iconClassName="h-8 w-8" />
                     )}
-                    {DIMMED_STOCK.has(product.stock_status) && (
-                      <span className="absolute inset-x-0 bottom-0 bg-black/75 py-0.5 text-center text-[9px] font-semibold uppercase leading-tight text-white">
+                    {STOCK_TAG_CLASS[product.stock_status] && (
+                      <span className={`absolute inset-x-0 bottom-0 py-0.5 text-center text-[9px] font-bold uppercase leading-tight ${STOCK_TAG_CLASS[product.stock_status]}`}>
                         {STOCK_STATUS_LABEL[product.stock_status]}
                       </span>
                     )}

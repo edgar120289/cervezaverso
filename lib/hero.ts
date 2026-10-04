@@ -67,7 +67,7 @@ export type HeroCta = z.infer<typeof heroCtaSchema>;
 export type HeroBanner = z.infer<typeof heroBannerSchema>;
 export type HeroSettings = z.infer<typeof heroSettingsSchema>;
 
-/** Si la tabla aún no existe o falla la lectura, la tienda se comporta como antes: Hero de video activo. */
+/** Sin configuración guardada (o ante un error de lectura): Hero activo y vacío, sin textos ni video propios. */
 export const DEFAULT_HERO_SETTINGS: HeroSettings = {
   is_hero_active: true,
   hero_type: "video",
@@ -79,15 +79,3 @@ export const DEFAULT_HERO_SETTINGS: HeroSettings = {
   hero_banners: [],
   hero_carousel_interval_seconds: 5,
 };
-
-/** Normaliza una fila de `store_settings`; un campo ilegible cae al valor por defecto, no rompe la tienda. */
-export function parseHeroRow(row: Record<string, unknown> | null): HeroSettings {
-  if (!row) return DEFAULT_HERO_SETTINGS;
-  const parsed = heroSettingsSchema.safeParse({
-    ...row,
-    hero_banners: Array.isArray(row.hero_banners)
-      ? row.hero_banners.map((banner) => ({ alt: "", ctas: [], ...(banner as object) }))
-      : [],
-  });
-  return parsed.success ? parsed.data : DEFAULT_HERO_SETTINGS;
-}

@@ -1,16 +1,15 @@
 import { getHeroSettings } from "@/lib/hero-settings";
-import { listPublicVideos, MEDIA_DIRS, publicFileExists } from "@/lib/media";
 import HeroCarousel from "./HeroCarousel";
 import HeroVideo from "./HeroVideo";
 
-/** Portada configurable desde /admin/apariencia (`store_settings.landing_settings`). */
+const SR_TITLE = "Cervezaverso, tienda de cerveza artesanal e importada";
+
+/** Portada configurable desde /admin/landing: todo sale de `store_settings.landing_settings`, sin textos ni video propios. */
 export default async function Hero() {
   const settings = await getHeroSettings();
 
   // Apagado, la página conserva su H1 para lectores de pantalla y buscadores.
-  if (!settings.is_hero_active) {
-    return <h1 className="sr-only">Cervezaverso, tienda de cerveza artesanal e importada</h1>;
-  }
+  if (!settings.is_hero_active) return <h1 className="sr-only">{SR_TITLE}</h1>;
 
   if (settings.hero_type === "carousel" && settings.hero_banners.length > 0) {
     return (
@@ -18,14 +17,17 @@ export default async function Hero() {
     );
   }
 
-  // Prioridad: URL configurada → public/hero-beer.mp4 → primer video de public/video/hero/ → sin video (fondo oscuro).
-  const videoSrc =
-    settings.hero_video_url ??
-    (publicFileExists(MEDIA_DIRS.heroVideo) ? `/${MEDIA_DIRS.heroVideo}` : listPublicVideos(MEDIA_DIRS.heroVideos)[0]);
+  const isEmpty =
+    !settings.hero_video_url &&
+    !settings.hero_video_title?.trim() &&
+    !settings.hero_video_subtitle?.trim() &&
+    settings.hero_video_ctas.length === 0;
+  // Activo pero sin nada configurado: no se pinta una caja vacía.
+  if (isEmpty) return <h1 className="sr-only">{SR_TITLE}</h1>;
 
   return (
     <HeroVideo
-      videoSrc={videoSrc}
+      videoSrc={settings.hero_video_url ?? undefined}
       ctas={settings.hero_video_ctas}
       title={settings.hero_video_title}
       subtitle={settings.hero_video_subtitle}

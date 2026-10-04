@@ -7,6 +7,9 @@ import SommelierIntro from "@/components/landing/SommelierIntro";
 import { ProductGridSkeleton } from "@/components/Skeletons";
 import { getLandingSettings } from "@/lib/hero-settings";
 
+/** La portada siempre lee `store_settings` en cada visita: lo guardado en /admin/landing se ve de inmediato. */
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const { modules } = await getLandingSettings();
 

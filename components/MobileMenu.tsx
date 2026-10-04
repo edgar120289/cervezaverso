@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Home,
   LayoutDashboard,
   LogIn,
   LogOut,
@@ -119,10 +118,6 @@ export default function MobileMenu() {
                   />
                 </Form>
 
-                <Link href="/" className={itemClass}>
-                  <Home size={18} className="shrink-0" />
-                  Inicio
-                </Link>
                 <Link href="/tienda" className={itemClass}>
                   <Store size={18} className="shrink-0" />
                   Tienda

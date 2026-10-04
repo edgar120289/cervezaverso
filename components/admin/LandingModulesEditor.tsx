@@ -1,6 +1,7 @@
 "use client";
 
 import { LANDING_MODULES, MODULE_TITLE_MAX, type LandingModule } from "@/lib/landing";
+import { LandingModuleView } from "@/components/landing/LandingModules";
 import Switch from "./Switch";
 
 type LandingModulesEditorProps = {
@@ -39,7 +40,7 @@ export default function LandingModulesEditor({ modules, onChange }: LandingModul
         <h2 id="landing-modules" className="font-semibold tracking-tight">
           Bloques de la landing
         </h2>
-        <p className="text-xs text-muted">Se apilan debajo del Hero según su orden. Un bloque apagado no se muestra.</p>
+        <p className="text-xs text-muted">Se apilan debajo del Hero según su orden. Un bloque apagado no se muestra. Cada vista previa es el bloque real, con tu título actual.</p>
       </div>
       <ul className="space-y-3">
         {sorted.map((module) => {
@@ -77,6 +78,16 @@ export default function LandingModulesEditor({ modules, onChange }: LandingModul
                     ))}
                   </select>
                 </label>
+              </div>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  Vista previa{!module.enabled && " · apagado, no se muestra en la tienda"}
+                </p>
+                <div
+                  className={`overflow-hidden rounded-[28px] bg-canvas p-3 ring-1 ring-black/10 ${module.enabled ? "" : "opacity-50"}`}
+                >
+                  <LandingModuleView module={module} />
+                </div>
               </div>
             </li>
           );

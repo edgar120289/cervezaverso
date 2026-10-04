@@ -52,6 +52,7 @@ export async function getProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
     .select(PRODUCT_COLUMNS)
+    .eq("is_active", true)
     .order("stock_status", { ascending: true })
     .order("name", { ascending: true });
 
@@ -62,7 +63,7 @@ export async function getProducts(): Promise<Product[]> {
   return data.map(toProduct);
 }
 
-/** Fachada de la landing: hasta `limit` cervezas con `is_featured` (RLS ya oculta las inactivas). */
+/** Fachada de la landing: hasta `limit` cervezas activas con `is_featured`. */
 export async function getFeaturedProducts(limit = 8): Promise<Product[]> {
   await connection();
   const supabase = getClient();
@@ -72,6 +73,7 @@ export async function getFeaturedProducts(limit = 8): Promise<Product[]> {
     .from("products")
     .select(PRODUCT_COLUMNS)
     .eq("is_featured", true)
+    .eq("is_active", true)
     .order("stock_status", { ascending: true })
     .order("name", { ascending: true })
     .limit(limit);
@@ -93,6 +95,7 @@ export const getProductBySku = cache(async (sku: string): Promise<Product | null
     .from("products")
     .select(PRODUCT_COLUMNS)
     .eq("sku", sku)
+    .eq("is_active", true)
     .maybeSingle();
 
   if (error) {
@@ -108,7 +111,7 @@ export async function getProductSitemapEntries(): Promise<{ sku: string; updated
   const supabase = getClient();
   if (!supabase) return [];
 
-  const { data, error } = await supabase.from("products").select("sku, updated_at");
+  const { data, error } = await supabase.from("products").select("sku, updated_at").eq("is_active", true);
   if (error) {
     console.error("[catalog] Error al leer el sitemap:", error.message);
     return [];

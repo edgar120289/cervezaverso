@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import { getLandingSettings } from "@/lib/hero-settings";
-import AppearanceForm from "@/components/admin/AppearanceForm";
+import LandingForm from "@/components/admin/LandingForm";
 
-export const metadata: Metadata = { title: "Apariencia" };
+export const metadata: Metadata = { title: "Landing" };
 
-export default async function AdminAppearancePage() {
+export default async function AdminLandingPage() {
   const settings = await getLandingSettings();
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold tracking-tight">Apariencia</h2>
+        <h2 className="text-lg font-semibold tracking-tight">Landing</h2>
         <p className="text-sm text-muted">Configura el Hero y los bloques de la landing, y elige en qué orden se apilan.</p>
       </div>
-      <AppearanceForm initial={settings} />
+      <LandingForm initial={settings} />
     </div>
   );
 }

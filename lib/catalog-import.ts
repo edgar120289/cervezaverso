@@ -1,6 +1,7 @@
 import ExcelJS from "exceljs";
 import { calculateSalePrice } from "@/lib/pricing";
 import {
+  isActiveFor,
   LITERS_THRESHOLD,
   MonasterioFormatError,
   parseMonasterio,
@@ -222,6 +223,7 @@ function parseTable(table: string[][]): CatalogParseResult {
       cost_price: costPrice,
       sale_price: calculateSalePrice(costPrice),
       stock_status: stockStatus,
+      is_active: isActiveFor(cell(cells, "stock")),
     });
   }
 
