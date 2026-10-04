@@ -22,7 +22,7 @@ export const CONTACT = {
 /** Leyenda sanitaria obligatoria para bebidas alcohólicas (pendiente de revisión legal). */
 export const HEALTH_NOTICE = "El abuso en el consumo de este producto es nocivo para la salud.";
 
-/** Nombre de la Sommelier digital (quiz, chat, botón flotante y banner de la portada). */
+/** Nombre de la Sommelier digital (quiz, botón flotante y banner de la portada). */
 export const SOMMELIER_NAME = "Graciela";
 
 /** Tarrito kawaii del Sommelier (botón flotante, quiz y presentación en la landing). */

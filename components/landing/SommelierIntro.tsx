@@ -1,9 +1,12 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import { useSommelier } from "@/components/SommelierProvider";
 import { SOMMELIER_MASCOT, SOMMELIER_NAME } from "@/lib/site";
 
-/** Banner promocional del Sommelier: lleva a la tienda con el chat abierto (`?chat=open`). */
+/** Banner promocional del Sommelier: abre el quiz directamente. */
 export default function SommelierIntro() {
+  const { openQuiz } = useSommelier();
   return (
     <section
       aria-labelledby="sommelier-intro"
@@ -20,20 +23,13 @@ export default function SommelierIntro() {
         <p className="mt-3 max-w-xl text-base text-muted">
           Encuentra el maridaje perfecto para tu comida o descubre tu próximo estilo favorito en segundos.
         </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link
-            href="/tienda?chat=open"
-            className="inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-6 text-sm font-semibold text-white shadow-accent transition hover:brightness-110"
-          >
-            Ayúdame a elegir
-          </Link>
-          <Link
-            href="/tienda?chat=open&mode=text"
-            className="inline-flex min-h-11 items-center justify-center rounded-full bg-canvas px-6 text-sm font-semibold transition-colors hover:bg-black hover:text-white"
-          >
-            Pregúntame lo que quieras
-          </Link>
-        </div>
+        <button
+          type="button"
+          onClick={openQuiz}
+          className="mt-8 inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-6 text-sm font-semibold text-white shadow-accent transition hover:brightness-110"
+        >
+          Ayúdame a elegir
+        </button>
       </div>
     </section>
   );

@@ -1,55 +1,27 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import ReactMarkdown, { type Components } from "react-markdown";
-import { useChat } from "@ai-sdk/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft, Loader2, RotateCcw, SendHorizontal, ShoppingBag, X } from "lucide-react";
+import { ArrowLeft, Loader2, RotateCcw, ShoppingBag, X } from "lucide-react";
 import { QUIZ_STEPS, type QuizAnswers } from "@/lib/data/sommelier-quiz";
 import { useCart } from "@/lib/cart-context";
 import { recommendProducts } from "@/app/actions/sommelier";
 import type { Recommendation } from "@/lib/sommelier";
-import type { Product } from "@/lib/types";
 import MiniProductCard from "@/components/MiniProductCard";
 import { SOMMELIER_MASCOT, SOMMELIER_NAME } from "@/lib/site";
 
 type PartialAnswers = Partial<QuizAnswers>;
 
-function normalize(value: string): string {
-  return value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
-}
-
-/** Las cervezas que Graciela nombra en su texto van primero en el carrusel; el resto conserva su orden. */
-function mentionedFirst<T extends { name: string }>(products: T[], text: string): T[] {
-  const haystack = normalize(text);
-  const mentioned = (p: T) => haystack.includes(normalize(p.name));
-  return [...products.filter(mentioned), ...products.filter((p) => !mentioned(p))];
-}
-
-export default function SommelierModal({
-  isOpen,
-  focusInput,
-  onClose,
-}: {
-  isOpen: boolean;
-  focusInput: boolean;
-  onClose: () => void;
-}) {
+export default function SommelierModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<PartialAnswers>({});
-  const [draft, setDraft] = useState("");
   const [quizResults, setQuizResults] = useState<Recommendation[] | null>(null);
   const [quizLoading, setQuizLoading] = useState(false);
-  const { messages, sendMessage, setMessages, status, error, stop } = useChat();
   const { openDrawer, itemCount } = useCart();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const endRef = useRef<HTMLDivElement>(null);
 
   const current = QUIZ_STEPS[step];
-  const hasChat = messages.length > 0 || quizResults !== null || quizLoading;
-  const isBusy = status === "submitted" || status === "streaming";
+  const hasChat = quizResults !== null || quizLoading;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -62,16 +34,6 @@ export default function SommelierModal({
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (!isOpen || !focusInput) return;
-    const id = window.setTimeout(() => inputRef.current?.focus(), 150);
-    return () => window.clearTimeout(id);
-  }, [isOpen, focusInput]);
-
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ block: "end" });
-  }, [messages, status]);
 
   function handleAnswer(id: string) {
     const next = { ...answers, [current.key]: id } as PartialAnswers;
@@ -88,38 +50,11 @@ export default function SommelierModal({
       .finally(() => setQuizLoading(false));
   }
 
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const text = draft.trim();
-    if (!text || isBusy) return;
-    setDraft("");
-    void sendMessage({ text });
-  }
-
   function restart() {
-    void stop();
-    setMessages([]);
     setQuizResults(null);
     setStep(0);
     setAnswers({});
   }
-
-  const linkClass = "font-semibold text-accent underline underline-offset-2";
-  const markdownComponents: Components = {
-    a: ({ href, children }) =>
-      href?.startsWith("/") ? (
-        <Link href={href} onClick={onClose} className={linkClass}>
-          {children}
-        </Link>
-      ) : (
-        <a href={href} target="_blank" rel="noopener noreferrer" className={linkClass}>
-          {children}
-        </a>
-      ),
-    p: ({ children }) => <p className="[&:not(:first-child)]:mt-2">{children}</p>,
-    ul: ({ children }) => <ul className="mt-2 list-disc space-y-1 pl-5">{children}</ul>,
-    ol: ({ children }) => <ol className="mt-2 list-decimal space-y-1 pl-5">{children}</ol>,
-  };
 
   return (
     <AnimatePresence>
@@ -225,86 +160,33 @@ export default function SommelierModal({
                   </AnimatePresence>
                 </>
               ) : (
-                <div className="space-y-3" role="log" aria-live="polite" aria-label={`Conversación con ${SOMMELIER_NAME}`}>
+                <div className="space-y-3" role="log" aria-live="polite" aria-label={`Recomendaciones de ${SOMMELIER_NAME}`}>
                   {quizLoading && (
                     <p role="status" className="flex items-center gap-2 text-xs font-semibold text-muted">
                       <Loader2 size={14} className="animate-spin" /> Buscando en el catálogo…
                     </p>
                   )}
-                  {quizResults && (
-                    <div className="space-y-2">
-                      {quizResults.length === 0 ? (
-                        <p className="w-fit rounded-[20px] rounded-bl-md bg-canvas px-4 py-3 text-sm">
-                          No encontré cervezas disponibles con ese perfil. Prueba con otra combinación o escríbeme abajo.
-                        </p>
-                      ) : (
-                        <ul className="space-y-2">
-                          {quizResults.map(({ product }) => (
-                            <li key={product.sku}>
-                              <MiniProductCard product={product} onSelect={onClose} />
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  )}
-                  {messages.map((message) => {
-                    const text = message.parts.flatMap((part) => (part.type === "text" ? [part.text] : [])).join("");
-                    if (message.role === "user") {
-                      return (
-                        <p
-                          key={message.id}
-                          className="ml-auto w-fit max-w-[85%] rounded-[20px] rounded-br-md bg-black px-4 py-2.5 text-sm text-white"
-                        >
-                          {text}
-                        </p>
-                      );
-                    }
-                    const found = mentionedFirst(
-                      message.parts.flatMap((part) =>
-                        part.type === "tool-buscarCervezas" && part.state === "output-available"
-                          ? (part.output as Omit<Product, "cost_price">[])
-                          : []
-                      ),
-                      text
-                    );
-                    if (!text && found.length === 0) return null;
-                    return (
-                      <div key={message.id} className="mr-auto w-full max-w-[92%] space-y-3">
-                        {text && (
-                          <div className="w-fit rounded-[20px] rounded-bl-md bg-canvas px-4 py-3 text-sm leading-relaxed">
-                            <ReactMarkdown components={markdownComponents}>{text}</ReactMarkdown>
-                          </div>
-                        )}
-                        {found.length > 0 && (
-                          <ul className="scrollbar-none -mx-1 flex max-w-full snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-2">
-                            {found.map((product) => (
-                              <li key={product.sku} className="w-[17.5rem] max-w-[85%] shrink-0 snap-start">
-                                <MiniProductCard product={{ ...product, cost_price: 0 }} onSelect={onClose} />
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    );
-                  })}
-                  {isBusy && (
-                    <p role="status" className="flex items-center gap-2 text-xs font-semibold text-muted">
-                      <Loader2 size={14} className="animate-spin" /> {SOMMELIER_NAME} está buscando en el catálogo…
-                    </p>
-                  )}
-                  {error && (
-                    <p role="alert" className="rounded-[20px] bg-canvas px-4 py-3 text-sm text-muted">
-                      No pude responderte ahora mismo. Intenta de nuevo en unos minutos.
-                    </p>
-                  )}
+                  {quizResults &&
+                    (quizResults.length === 0 ? (
+                      <p className="w-fit rounded-[20px] rounded-bl-md bg-canvas px-4 py-3 text-sm">
+                        No encontré cervezas disponibles con ese perfil. Prueba con otra combinación.
+                      </p>
+                    ) : (
+                      <ul className="space-y-2">
+                        {quizResults.map(({ product }) => (
+                          <li key={product.sku}>
+                            <MiniProductCard product={product} onSelect={onClose} />
+                          </li>
+                        ))}
+                      </ul>
+                    ))}
                   <div className="flex flex-wrap gap-2 pt-1">
                     <button
                       type="button"
                       onClick={restart}
                       className="flex items-center gap-1.5 rounded-full bg-black/5 px-4 py-2 text-xs font-semibold hover:bg-black/10"
                     >
-                      <RotateCcw size={13} /> Nueva conversación
+                      <RotateCcw size={13} /> Repetir el quiz
                     </button>
                     {itemCount > 0 && (
                       <button
@@ -319,34 +201,9 @@ export default function SommelierModal({
                       </button>
                     )}
                   </div>
-                  <div ref={endRef} />
                 </div>
               )}
             </div>
-
-            <form onSubmit={handleSubmit} className="flex items-center gap-2 border-t border-black/5 px-4 py-3 sm:px-6">
-              <label htmlFor="sommelier-input" className="sr-only">
-                Escríbele a {SOMMELIER_NAME}
-              </label>
-              <input
-                id="sommelier-input"
-                ref={inputRef}
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                maxLength={500}
-                autoComplete="off"
-                placeholder={`Escríbele a ${SOMMELIER_NAME}: ¿qué vas a comer?`}
-                className="h-12 min-w-0 flex-1 rounded-full bg-canvas px-5 text-sm outline-none focus-visible:ring-2 focus-visible:ring-accent"
-              />
-              <button
-                type="submit"
-                disabled={!draft.trim() || isBusy}
-                aria-label="Enviar mensaje"
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent text-white transition hover:brightness-110 disabled:opacity-40"
-              >
-                <SendHorizontal size={18} />
-              </button>
-            </form>
           </motion.div>
         </motion.div>
       )}

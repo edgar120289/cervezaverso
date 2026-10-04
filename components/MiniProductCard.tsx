@@ -7,7 +7,7 @@ import { formatMXN } from "@/lib/pricing";
 import { useCart } from "@/lib/cart-context";
 import ProductImage from "./ProductImage";
 
-/** Tarjeta compacta para el chat de Graciela: miniatura, nombre, estilo y precio. */
+/** Tarjeta compacta para las recomendaciones de Graciela: miniatura, nombre, estilo y precio. */
 export default function MiniProductCard({ product, onSelect }: { product: Product; onSelect: () => void }) {
   const { addItem } = useCart();
   const isOutOfStock = product.stock_status === "out_of_stock";
