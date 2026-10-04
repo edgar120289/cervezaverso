@@ -7,23 +7,15 @@ import ReactMarkdown, { type Components } from "react-markdown";
 import { useChat } from "@ai-sdk/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, Loader2, RotateCcw, SendHorizontal, ShoppingBag, X } from "lucide-react";
-import { FLAVORS, INTENSITIES, OCCASIONS, QUIZ_STEPS, type QuizAnswers } from "@/lib/data/sommelier-quiz";
+import { QUIZ_STEPS, type QuizAnswers } from "@/lib/data/sommelier-quiz";
 import { useCart } from "@/lib/cart-context";
+import { recommendProducts } from "@/app/actions/sommelier";
+import type { Recommendation } from "@/lib/sommelier";
 import type { Product } from "@/lib/types";
 import MiniProductCard from "@/components/MiniProductCard";
 import { SOMMELIER_MASCOT, SOMMELIER_NAME } from "@/lib/site";
 
 type PartialAnswers = Partial<QuizAnswers>;
-
-/** El mensaje que arma el quiz no se muestra en el chat: solo le da contexto a Graciela. */
-const QUIZ_PROMPT_PREFIX = "Busco una cerveza con estas características";
-
-function buildQuizPrompt(answers: QuizAnswers): string {
-  const flavor = FLAVORS.find((o) => o.id === answers.flavor);
-  const occasion = OCCASIONS.find((o) => o.id === answers.occasion);
-  const intensity = INTENSITIES.find((o) => o.id === answers.intensity);
-  return `${QUIZ_PROMPT_PREFIX}: sabor «${flavor?.label}» (${flavor?.hint}); ocasión «${occasion?.label}»; intensidad «${intensity?.label}» (${intensity?.hint}). Recomiéndame las mejores opciones de tu catálogo.`;
-}
 
 function normalize(value: string): string {
   return value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -48,13 +40,15 @@ export default function SommelierModal({
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<PartialAnswers>({});
   const [draft, setDraft] = useState("");
+  const [quizResults, setQuizResults] = useState<Recommendation[] | null>(null);
+  const [quizLoading, setQuizLoading] = useState(false);
   const { messages, sendMessage, setMessages, status, error, stop } = useChat();
   const { openDrawer, itemCount } = useCart();
   const inputRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   const current = QUIZ_STEPS[step];
-  const hasChat = messages.length > 0;
+  const hasChat = messages.length > 0 || quizResults !== null || quizLoading;
   const isBusy = status === "submitted" || status === "streaming";
 
   useEffect(() => {
@@ -86,7 +80,12 @@ export default function SommelierModal({
       setStep(step + 1);
       return;
     }
-    void sendMessage({ text: buildQuizPrompt(next as QuizAnswers) });
+    // El quiz no pasa por la IA: cruce directo con el catálogo activo, sin texto.
+    setQuizLoading(true);
+    recommendProducts(next as QuizAnswers)
+      .then(setQuizResults)
+      .catch(() => setQuizResults([]))
+      .finally(() => setQuizLoading(false));
   }
 
   function handleSubmit(e: FormEvent) {
@@ -100,6 +99,7 @@ export default function SommelierModal({
   function restart() {
     void stop();
     setMessages([]);
+    setQuizResults(null);
     setStep(0);
     setAnswers({});
   }
@@ -226,10 +226,31 @@ export default function SommelierModal({
                 </>
               ) : (
                 <div className="space-y-3" role="log" aria-live="polite" aria-label={`Conversación con ${SOMMELIER_NAME}`}>
+                  {quizLoading && (
+                    <p role="status" className="flex items-center gap-2 text-xs font-semibold text-muted">
+                      <Loader2 size={14} className="animate-spin" /> Buscando en el catálogo…
+                    </p>
+                  )}
+                  {quizResults && (
+                    <div className="space-y-2">
+                      {quizResults.length === 0 ? (
+                        <p className="w-fit rounded-[20px] rounded-bl-md bg-canvas px-4 py-3 text-sm">
+                          No encontré cervezas disponibles con ese perfil. Prueba con otra combinación o escríbeme abajo.
+                        </p>
+                      ) : (
+                        <ul className="space-y-2">
+                          {quizResults.map(({ product }) => (
+                            <li key={product.sku}>
+                              <MiniProductCard product={product} onSelect={onClose} />
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
                   {messages.map((message) => {
                     const text = message.parts.flatMap((part) => (part.type === "text" ? [part.text] : [])).join("");
                     if (message.role === "user") {
-                      if (text.startsWith(QUIZ_PROMPT_PREFIX)) return null;
                       return (
                         <p
                           key={message.id}
