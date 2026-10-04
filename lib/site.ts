@@ -11,6 +11,7 @@ export const SITE = {
 export const CONTACT = {
   whatsappUrl: "https://wa.me/525643075041",
   whatsappLabel: "+52 56 4307 5041",
+  phoneUrl: "tel:+525643075041",
   instagramUrl: "https://instagram.com/Cervezaverso",
   facebookUrl: "https://facebook.com/Cervezaverso",
   handle: "@Cervezaverso",

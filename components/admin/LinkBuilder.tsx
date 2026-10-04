@@ -2,14 +2,50 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { Loader2, Search } from "lucide-react";
+import { CONTACT } from "@/lib/site";
 import { buscarProductosActivos, type ProductOption } from "@/app/actions/admin-landing";
 
-/** Páginas internas que se pueden enlazar desde un botón. */
-export const INTERNAL_PAGES = [
-  { url: "/tienda", label: "Tienda" },
-  { url: "/#contacto", label: "Contacto (en la portada)" },
-  { url: "/carrito", label: "Carrito" },
-] as const;
+/** Páginas y enlaces rápidos, agrupados, que se pueden elegir desde un botón. */
+type QuickLink = { url: string; label: string; external: boolean };
+
+export const QUICK_LINK_GROUPS: { group: string; links: QuickLink[] }[] = [
+  {
+    group: "Navegación principal",
+    links: [
+      { url: "/tienda", label: "Tienda", external: false },
+      { url: "/carrito", label: "Carrito", external: false },
+      { url: "/cuenta", label: "Mi cuenta", external: false },
+    ],
+  },
+  {
+    group: "Secciones de la portada",
+    links: [
+      { url: "/#contacto", label: "Contacto", external: false },
+      { url: "/#modulo-dividido", label: "Bloque dividido", external: false },
+      { url: "/#modulo-banner", label: "Banner de impacto", external: false },
+      { url: "/#modulo-cuadricula", label: "Cuadrícula de beneficios", external: false },
+    ],
+  },
+  {
+    group: "Legales",
+    links: [
+      { url: "/privacidad", label: "Aviso de privacidad", external: false },
+      { url: "/terminos", label: "Términos y condiciones", external: false },
+      { url: "/privacidad#cookies", label: "Configuración de cookies", external: false },
+    ],
+  },
+  {
+    group: "Contacto y redes",
+    links: [
+      { url: CONTACT.phoneUrl, label: `Teléfono (${CONTACT.whatsappLabel})`, external: true },
+      { url: CONTACT.whatsappUrl, label: "WhatsApp", external: true },
+      { url: CONTACT.instagramUrl, label: "Instagram", external: true },
+      { url: CONTACT.facebookUrl, label: "Facebook", external: true },
+    ],
+  },
+];
+
+const QUICK_LINKS = QUICK_LINK_GROUPS.flatMap((group) => group.links);
 
 const PRODUCT_PREFIX = "/cervezas/";
 
@@ -27,12 +63,13 @@ type LinkBuilderProps = {
 const fieldClass = "min-h-11 w-full rounded-full bg-canvas px-4 text-sm outline-none focus:ring-2 focus:ring-black/15";
 
 function modeOf(value: LinkValue): Mode {
+  if (QUICK_LINKS.some((link) => link.url === value.url)) return "internal";
   if (value.is_external) return "external";
   return value.url.startsWith(PRODUCT_PREFIX) ? "product" : "internal";
 }
 
 /**
- * Selector de destino de un botón con 3 modos: página interna (lista fija), cerveza específica
+ * Selector de destino de un botón con 3 modos: páginas y enlaces rápidos (lista fija), cerveza específica
  * (búsqueda en el servidor, solo productos activos) y enlace externo (se abre en pestaña nueva).
  */
 export default function LinkBuilder({ label, value, onChange }: LinkBuilderProps) {
@@ -40,19 +77,19 @@ export default function LinkBuilder({ label, value, onChange }: LinkBuilderProps
 
   function changeMode(next: Mode) {
     setMode(next);
-    if (next === "internal") onChange({ url: INTERNAL_PAGES[0].url, is_external: false });
+    if (next === "internal") onChange({ url: QUICK_LINKS[0].url, is_external: false });
     else onChange({ url: "", is_external: next === "external" });
   }
 
   return (
-    <div className="grid gap-2 sm:grid-cols-[9.5rem_1fr]">
+    <div className="grid gap-2 sm:grid-cols-[13rem_1fr]">
       <select
         value={mode}
         onChange={(e) => changeMode(e.target.value as Mode)}
         aria-label={`${label}: tipo de destino`}
         className={fieldClass}
       >
-        <option value="internal">Página interna</option>
+        <option value="internal">Páginas y Enlaces Rápidos</option>
         <option value="product">Cerveza específica</option>
         <option value="external">Enlace externo</option>
       </select>
@@ -60,17 +97,23 @@ export default function LinkBuilder({ label, value, onChange }: LinkBuilderProps
       {mode === "internal" && (
         <select
           value={value.url}
-          onChange={(e) => onChange({ url: e.target.value, is_external: false })}
+          onChange={(e) =>
+            onChange({ url: e.target.value, is_external: QUICK_LINKS.some((l) => l.url === e.target.value && l.external) })
+          }
           aria-label={`${label}: página`}
           className={fieldClass}
         >
-          {!INTERNAL_PAGES.some((page) => page.url === value.url) && (
+          {!QUICK_LINKS.some((link) => link.url === value.url) && (
             <option value={value.url}>{value.url || "Elige una página"}</option>
           )}
-          {INTERNAL_PAGES.map((page) => (
-            <option key={page.url} value={page.url}>
-              {page.label} ({page.url})
-            </option>
+          {QUICK_LINK_GROUPS.map((group) => (
+            <optgroup key={group.group} label={group.group}>
+              {group.links.map((link) => (
+                <option key={link.url} value={link.url}>
+                  {link.label} ({link.url})
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
       )}

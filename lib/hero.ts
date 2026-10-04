@@ -14,7 +14,7 @@ export const heroImageSchema = z
   .refine((file) => file.size > 0, "La imagen está vacía.")
   .refine((file) => file.size <= MAX_HERO_IMAGE_BYTES, "La imagen supera los 8 MB.");
 
-const EXTERNAL_URL = /^https?:\/\/\S+$/i;
+const EXTERNAL_URL = /^(https?:\/\/|tel:\+?)\S+$/i;
 const INTERNAL_URL = /^\/(?!\/)\S*$/;
 
 export const heroCtaSchema = z
@@ -30,7 +30,7 @@ export const heroCtaSchema = z
         code: "custom",
         path: ["url"],
         message: cta.is_external
-          ? "Un enlace externo debe empezar con http:// o https://."
+          ? "Un enlace externo debe empezar con http://, https:// o tel:."
           : "Un enlace interno debe empezar con / (por ejemplo, /tienda).",
       });
     }

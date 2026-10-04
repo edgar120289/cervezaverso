@@ -29,8 +29,9 @@ function SplitView({ module, preview }: { module: SplitModule; preview: boolean 
 
   return (
     <section
+      id="modulo-dividido"
       aria-labelledby={module.title ? "module-split" : undefined}
-      className={`grid gap-4 ${module.image_url && hasText ? "md:grid-cols-2" : ""}`}
+      className={`scroll-mt-24 grid gap-4 ${module.image_url && hasText ? "md:grid-cols-2" : ""}`}
     >
       {hasText && (
         <div
@@ -74,8 +75,9 @@ function ImpactView({ module, preview }: { module: ImpactModule; preview: boolea
 
   return (
     <section
+      id="modulo-banner"
       aria-labelledby={module.title ? "module-impact" : undefined}
-      className="relative isolate overflow-hidden rounded-[28px] bg-accent px-6 py-14 text-center text-white shadow-accent sm:px-12 sm:py-20"
+      className="scroll-mt-24 relative isolate overflow-hidden rounded-[28px] bg-accent px-6 py-14 text-center text-white shadow-accent sm:px-12 sm:py-20"
     >
       {module.image_url && (
         <>
@@ -116,7 +118,7 @@ function GridView({ module, preview }: { module: GridModule; preview: boolean })
   if (!module.title && module.items.length === 0) return preview ? <EmptyView /> : null;
 
   return (
-    <section aria-labelledby={module.title ? "module-grid" : undefined}>
+    <section id="modulo-cuadricula" aria-labelledby={module.title ? "module-grid" : undefined} className="scroll-mt-24">
       <Heading id="module-grid" title={module.title} className="mb-4 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl" />
       {module.items.length > 0 && (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
