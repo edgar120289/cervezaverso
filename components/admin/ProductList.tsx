@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { ArrowUpDown, ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { ArrowUpDown, ChevronDown, Eye, Search, SlidersHorizontal, Star, X } from "lucide-react";
 import {
   activeFilterCount,
   EMPTY_FILTERS,
@@ -10,6 +11,7 @@ import {
   normalize,
   type CatalogFilters,
 } from "@/lib/catalog-filters";
+import { parseListState, serializeListState, type AdminSortId, type StatusFilter } from "@/lib/admin-list-url";
 import { formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
 import type { StockStatus } from "@/lib/types";
 import { activeFilterChips, chipClass, FilterDrawer, FilterPanel, FilterSection } from "@/components/CatalogFilterPanel";
@@ -34,11 +36,17 @@ export type AdminProductRow = {
   created_at: string;
 };
 
-const STATUS_OPTIONS = [
+const STATUS_OPTIONS: { id: StatusFilter; label: string }[] = [
   { id: "all", label: "Todas" },
   { id: "active", label: "Solo activas" },
   { id: "inactive", label: "Solo inactivas" },
-] as const;
+];
+
+/** El interruptor rápido recorre los tres estados: todas → solo activas → solo inactivas → todas. */
+const NEXT_STATUS: Record<StatusFilter, StatusFilter> = { all: "active", active: "inactive", inactive: "all" };
+
+const TOGGLE_CLASS =
+  "flex h-12 min-w-0 flex-1 basis-[calc(50%-0.5rem)] items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold shadow-card transition-colors lg:w-40 lg:flex-none lg:basis-auto";
 
 const SORT_OPTIONS = [
   { id: "name-asc", label: "Nombre A-Z" },
@@ -50,8 +58,7 @@ const SORT_OPTIONS = [
   { id: "newest", label: "Más recientes" },
 ] as const;
 
-type StatusFilter = (typeof STATUS_OPTIONS)[number]["id"];
-type SortId = (typeof SORT_OPTIONS)[number]["id"];
+type SortId = AdminSortId;
 
 /** El stock es un estado, no una cantidad: igual que la tienda, lo disponible va primero y lo agotado al final. */
 const STOCK_RANK: Record<StockStatus, number> = { in_stock: 0, low_stock: 1, preorder: 2, out_of_stock: 3 };
@@ -84,11 +91,25 @@ function InactiveBadge() {
 
 /** Inventario: búsqueda en tiempo real (nombre o SKU), orden y «Filtros avanzados» (estado, precio, ABV, país y cervecería). */
 export default function ProductList({ products }: { products: AdminProductRow[] }) {
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("all");
-  const [sort, setSort] = useState<SortId>("name-asc");
-  const [filters, setFilters] = useState<CatalogFilters>(EMPTY_FILTERS);
+  // La URL es la memoria del listado: se lee una vez al montar y cada cambio se refleja con replaceState.
+  const searchParams = useSearchParams();
+  const [initial] = useState(() => parseListState(searchParams));
+  const [search, setSearch] = useState(initial.search);
+  const [status, setStatus] = useState<StatusFilter>(initial.status);
+  const [sort, setSort] = useState<SortId>(initial.sort);
+  const [featuredOnly, setFeaturedOnly] = useState(initial.featuredOnly);
+  const [filters, setFilters] = useState<CatalogFilters>(initial.filters);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // replaceState (no push) deja una sola entrada de historial; con espera para no saturarlo al teclear.
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const query = serializeListState({ search, status, sort, featuredOnly, filters });
+      if (query === window.location.search.replace(/^\?/, "")) return;
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [search, status, sort, featuredOnly, filters]);
 
   const visible = useMemo(() => {
     const words = normalize(search).split(/\s+/).filter(Boolean);
@@ -96,25 +117,27 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
       .filter((product) => {
         if (status === "active" && !product.is_active) return false;
         if (status === "inactive" && product.is_active) return false;
+        if (featuredOnly && !product.is_featured) return false;
         if (!matchesFilters(product, filters)) return false;
         const haystack = normalize(`${product.name} ${product.sku}`);
         return words.every((word) => haystack.includes(word));
       })
       .sort(COMPARATORS[sort]);
-  }, [products, search, status, filters, sort]);
+  }, [products, search, status, featuredOnly, filters, sort]);
 
-  const activeCount = activeFilterCount(filters) + (status !== "all" ? 1 : 0);
+  const activeCount = activeFilterCount(filters) + (status !== "all" ? 1 : 0) + (featuredOnly ? 1 : 0);
   const chips = [
     ...(status !== "all"
       ? [{ key: "status", label: STATUS_OPTIONS.find((o) => o.id === status)!.label, clear: () => setStatus("all") }]
       : []),
+    ...(featuredOnly ? [{ key: "featured", label: "Destacadas", clear: () => setFeaturedOnly(false) }] : []),
     ...activeFilterChips(filters, setFilters),
   ];
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-4">
-        <div className="relative min-w-full flex-1 md:min-w-0">
+        <div className="relative min-w-full flex-1 lg:min-w-0">
           <Search size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
           <input
             type="search"
@@ -125,7 +148,7 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
             className="h-12 w-full rounded-full bg-white pl-11 pr-5 text-sm shadow-card outline-none focus:ring-2 focus:ring-black/15"
           />
         </div>
-        <div className="relative min-w-0 flex-1 md:w-48 md:flex-none">
+        <div className="relative min-w-0 flex-1 basis-[calc(50%-0.5rem)] lg:w-44 lg:flex-none lg:basis-auto">
           <ArrowUpDown size={16} aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2" />
           <select
             value={sort}
@@ -146,7 +169,7 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
           onClick={() => setDrawerOpen(true)}
           aria-haspopup="dialog"
           aria-expanded={drawerOpen}
-          className="flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold shadow-card md:w-52 md:flex-none"
+          className="flex h-12 min-w-0 flex-1 basis-[calc(50%-0.5rem)] items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold shadow-card lg:w-48 lg:flex-none lg:basis-auto"
         >
           <SlidersHorizontal size={16} />
           Filtros avanzados
@@ -155,6 +178,24 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
               {activeCount}
             </span>
           )}
+        </button>
+        <button
+          type="button"
+          onClick={() => setStatus(NEXT_STATUS[status])}
+          aria-label={`Estado: ${STATUS_OPTIONS.find((o) => o.id === status)!.label}. Cambiar`}
+          className={`${TOGGLE_CLASS} ${status === "all" ? "bg-white" : "bg-black text-white"}`}
+        >
+          <Eye size={16} aria-hidden className="shrink-0" />
+          <span className="truncate">{STATUS_OPTIONS.find((o) => o.id === status)!.label}</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setFeaturedOnly((on) => !on)}
+          aria-pressed={featuredOnly}
+          className={`${TOGGLE_CLASS} ${featuredOnly ? "bg-black text-white" : "bg-white"}`}
+        >
+          <Star size={16} aria-hidden className={`shrink-0 ${featuredOnly ? "fill-current" : ""}`} />
+          <span className="truncate">Destacadas</span>
         </button>
       </div>
 
@@ -205,6 +246,7 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
             type="button"
             onClick={() => {
               setStatus("all");
+              setFeaturedOnly(false);
               setFilters(EMPTY_FILTERS);
             }}
             className="text-xs font-semibold text-accent hover:underline"
