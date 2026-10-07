@@ -1,69 +1,92 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import { TRIBUS } from "@/lib/tribus";
+import { ESTADOS_PEDIDO, type EstadoPedido } from "@/lib/types";
 
-/** Inicio del mes actual en hora de Ciudad de México (UTC-6 fijo desde 2022), en ISO. */
-function inicioDeMes(): string {
-  const local = new Date(Date.now() - 6 * 60 * 60 * 1000);
-  return new Date(Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), 1, 6)).toISOString();
+const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+const MESES_ATRAS = 12;
+/** Ciudad de México: UTC-6 fijo desde 2022. */
+const CDMX_OFFSET_H = 6;
+/** En el modelo el stock es un estado, no una cantidad: «poco stock» = «Pocas piezas» (1 a 5 piezas). */
+const LOW_STOCK = "low_stock";
+
+export type MesOpcion = { value: string; label: string };
+
+/** Mes actual en CDMX como [año, mes 1-12]. */
+function mesActual(): [number, number] {
+  const local = new Date(Date.now() - CDMX_OFFSET_H * 60 * 60 * 1000);
+  return [local.getUTCFullYear(), local.getUTCMonth() + 1];
 }
 
-export type TopCerveza = { sku: string; nombre: string; botellas: number };
-export type TribuConteo = { id: string; label: string; total: number };
+const pad = (n: number) => String(n).padStart(2, "0");
 
-export type DashboardData = {
-  pendientes: number;
+/** Últimos 12 meses (el actual primero) para el selector. */
+export function opcionesDeMes(): MesOpcion[] {
+  const [year, month] = mesActual();
+  return Array.from({ length: MESES_ATRAS }, (_, i) => {
+    const d = new Date(Date.UTC(year, month - 1 - i, 1));
+    const y = d.getUTCFullYear();
+    const m = d.getUTCMonth();
+    return { value: `${y}-${pad(m + 1)}`, label: `${MESES[m][0].toUpperCase()}${MESES[m].slice(1)} ${y}` };
+  });
+}
+
+/** Valida `?mes=YYYY-MM` contra las opciones; si no es válido, usa el mes actual. */
+export function resolverMes(raw: string | undefined): string {
+  const opciones = opcionesDeMes();
+  return opciones.find((o) => o.value === raw)?.value ?? opciones[0].value;
+}
+
+/** Límites [desde, hasta) del mes en ISO, a medianoche de CDMX. */
+function limitesDeMes(mes: string): { desde: string; hasta: string } {
+  const [y, m] = mes.split("-").map(Number);
+  return {
+    desde: new Date(Date.UTC(y, m - 1, 1, CDMX_OFFSET_H)).toISOString(),
+    hasta: new Date(Date.UTC(y, m, 1, CDMX_OFFSET_H)).toISOString(),
+  };
+}
+
+export type ResumenData = {
   ventasMes: number;
   pedidosMes: number;
   ticketPromedio: number;
   clientes: number;
-  top: TopCerveza[];
-  tribus: TribuConteo[];
-  sinTribu: number;
+  inventario: { total: number; activos: number; inactivos: number; pocoStock: number };
+  pedidosPorEstado: Record<EstadoPedido, number>;
   error: string | null;
 };
 
 /** Todas las consultas corren en paralelo; los conteos usan `head` para no traer filas. */
-export async function getDashboardData(): Promise<DashboardData> {
+export async function getResumenData(mes: string): Promise<ResumenData> {
   const supabase = await createClient();
-  const desde = inicioDeMes();
+  const { desde, hasta } = limitesDeMes(mes);
+  const count = (table: string) => supabase.from(table).select("*", { count: "exact", head: true });
 
-  const [pendientesRes, ventasRes, clientesRes, topRes, ...tribusRes] = await Promise.all([
-    supabase.from("pedidos").select("*", { count: "exact", head: true }).eq("estado", "Pendiente"),
-    supabase.rpc("ventas_desde", { p_desde: desde }).single<{ ventas: number; pedidos: number }>(),
-    supabase.from("users").select("*", { count: "exact", head: true }).eq("role", "client"),
-    supabase.rpc("top_cervezas_vendidas", { p_limit: 3 }),
-    ...TRIBUS.map((t) =>
-      supabase.from("users").select("*", { count: "exact", head: true }).eq("role", "client").eq("avatar_team", t.id)
-    ),
+  const [ventasRes, clientesRes, totalRes, activosRes, pocoRes, ...estadosRes] = await Promise.all([
+    supabase.rpc("ventas_periodo", { p_desde: desde, p_hasta: hasta }).single<{ ventas: number; pedidos: number }>(),
+    count("users").eq("role", "client"),
+    count("products"),
+    count("products").eq("is_active", true),
+    count("products").eq("is_active", true).eq("stock_status", LOW_STOCK),
+    ...ESTADOS_PEDIDO.map((estado) => count("pedidos").eq("estado", estado)),
   ]);
 
   const ventasMes = Number(ventasRes.data?.ventas ?? 0);
   const pedidosMes = Number(ventasRes.data?.pedidos ?? 0);
+  const total = totalRes.count ?? 0;
+  const activos = activosRes.count ?? 0;
 
-  const top: TopCerveza[] = (topRes.data ?? []).map((row: { sku: string; nombre: string; botellas: number }) => ({
-    sku: row.sku,
-    nombre: row.nombre,
-    botellas: Number(row.botellas),
-  }));
-
-  const tribus = TRIBUS.map((t, i) => ({ id: t.id, label: t.label, total: tribusRes[i].count ?? 0 })).sort(
-    (a, b) => b.total - a.total
-  );
-  const clientes = clientesRes.count ?? 0;
-  const conTribu = tribus.reduce((sum, t) => sum + t.total, 0);
-
-  const failed = [pendientesRes, ventasRes, clientesRes, topRes, ...tribusRes].find((r) => r.error);
+  const failed = [ventasRes, clientesRes, totalRes, activosRes, pocoRes, ...estadosRes].find((r) => r.error);
 
   return {
-    pendientes: pendientesRes.count ?? 0,
     ventasMes,
     pedidosMes,
     ticketPromedio: pedidosMes > 0 ? ventasMes / pedidosMes : 0,
-    clientes,
-    top,
-    tribus,
-    sinTribu: Math.max(clientes - conTribu, 0),
+    clientes: clientesRes.count ?? 0,
+    inventario: { total, activos, inactivos: Math.max(total - activos, 0), pocoStock: pocoRes.count ?? 0 },
+    pedidosPorEstado: Object.fromEntries(ESTADOS_PEDIDO.map((e, i) => [e, estadosRes[i].count ?? 0])) as Record<
+      EstadoPedido,
+      number
+    >,
     error: failed?.error?.message ?? null,
   };
 }

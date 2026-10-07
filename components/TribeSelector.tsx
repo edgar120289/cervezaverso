@@ -26,7 +26,7 @@ export default function TribeSelector({ current }: { current: TribuId | null }) 
 
   return (
     <div className="space-y-3">
-      <div role="radiogroup" aria-label="Mi tribu cervecera" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div role="radiogroup" aria-label="¿De qué Team eres?" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {TRIBUS.map((tribu) => {
           const active = tribu.id === selected;
           return (
@@ -52,7 +52,7 @@ export default function TribeSelector({ current }: { current: TribuId | null }) 
       </div>
       {failed && (
         <p role="alert" className="text-sm text-danger">
-          No pudimos guardar tu tribu. Inténtalo de nuevo.
+          No pudimos guardar tu team. Inténtalo de nuevo.
         </p>
       )}
     </div>

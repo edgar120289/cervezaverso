@@ -49,7 +49,7 @@ export default async function AdminClientesPage() {
         <thead className="text-xs font-semibold uppercase tracking-wide text-muted">
           <tr>
             <th scope="col" className="px-6 py-4">Correo</th>
-            <th scope="col" className="px-6 py-4">Tribu</th>
+            <th scope="col" className="px-6 py-4">Team</th>
             <th scope="col" className="px-6 py-4 text-right">Botellas compradas</th>
             <th scope="col" className="px-6 py-4 text-right">LTV</th>
           </tr>

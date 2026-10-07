@@ -5,6 +5,7 @@ import { refresh } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { TRIBU_IDS } from "@/lib/tribus";
+import { avatarUrlPrefix } from "@/lib/avatar";
 
 /** Cada acción usa el cliente con la sesión del visitante: RLS limita todo a sus propias filas. */
 async function requireUser() {
@@ -32,7 +33,22 @@ export async function elegirTribu(tribu: string): Promise<{ ok: boolean }> {
   const { supabase, user } = await requireUser();
   const { error } = await supabase.from("users").update({ avatar_team: parsed.data }).eq("id", user.id);
   if (error) {
-    console.error("[cuenta] No se pudo guardar la tribu", error.code);
+    console.error("[cuenta] No se pudo guardar el team", error.code);
+    return { ok: false };
+  }
+  refresh();
+  return { ok: true };
+}
+
+/** Guarda la URL de la foto ya subida; solo acepta archivos del bucket público dentro de la carpeta del propio usuario. */
+export async function guardarAvatar(url: string): Promise<{ ok: boolean }> {
+  const { supabase, user } = await requireUser();
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const parsed = z.string().max(500).safeParse(url);
+  if (!base || !parsed.success || !parsed.data.startsWith(avatarUrlPrefix(base, user.id))) return { ok: false };
+  const { error } = await supabase.from("users").update({ avatar_url: parsed.data }).eq("id", user.id);
+  if (error) {
+    console.error("[cuenta] No se pudo guardar la foto", error.code);
     return { ok: false };
   }
   refresh();

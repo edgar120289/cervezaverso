@@ -10,6 +10,7 @@ import { eliminarDireccion, hacerPredeterminada } from "@/app/actions/cuenta";
 import ProductGrid from "@/components/ProductGrid";
 import SignOutButton from "@/components/SignOutButton";
 import LoyaltyProgress, { type Recompensa } from "@/components/LoyaltyProgress";
+import AvatarUpload from "@/components/AvatarUpload";
 import TribeSelector from "@/components/TribeSelector";
 import { toTribuId } from "@/lib/tribus";
 import type { Direccion, EstadoPedido } from "@/lib/types";
@@ -35,7 +36,7 @@ export default async function CuentaPage() {
 
   // RLS limita cada consulta a las filas del propio cliente.
   const [perfilRes, recompensasRes, pedidosRes, favoritosRes, direccionesRes] = await Promise.all([
-    supabase.from("users").select("avatar_team, bottle_count, niveles_secretos").eq("id", user.id).maybeSingle(),
+    supabase.from("users").select("avatar_team, avatar_url, bottle_count, niveles_secretos").eq("id", user.id).maybeSingle(),
     supabase
       .from("promo_codes")
       .select("code, reward_level, reward_label, times_used")
@@ -94,7 +95,8 @@ export default async function CuentaPage() {
       </section>
 
       <section aria-labelledby="mi-tribu" className="space-y-4">
-        <SectionHeading id="mi-tribu" icon={<Users size={20} />} title="Mi Tribu Cervecera" count={0} />
+        <SectionHeading id="mi-tribu" icon={<Users size={20} />} title="¿De qué Team eres?" count={0} />
+        <AvatarUpload userId={user.id} current={perfilRes.data?.avatar_url ?? null} />
         <TribeSelector current={tribuActual} />
       </section>
 

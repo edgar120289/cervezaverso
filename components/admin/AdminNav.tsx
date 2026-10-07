@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const LINKS = [
-  { href: "/admin", label: "Resumen" },
-  { href: "/admin/pedidos", label: "Pedidos" },
+  { href: "/admin", label: "Inventario" },
+  { href: "/admin/resumen", label: "Resumen" },
   { href: "/admin/clientes", label: "Clientes" },
   { href: "/admin/cupones", label: "Cupones" },
   { href: "/admin/landing", label: "Landing" },
@@ -19,7 +19,8 @@ export default function AdminNav() {
   return (
     <nav aria-label="Secciones del panel" className="flex flex-wrap items-center gap-1.5">
       {LINKS.map(({ href, label }) => {
-        const current = (href === "/admin" ? pathname === href : pathname.startsWith(href));
+        const current =
+          href === "/admin" ? pathname === href || pathname.startsWith("/admin/productos") : pathname.startsWith(href);
         return (
           <Link
             key={href}
