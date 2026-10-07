@@ -76,10 +76,15 @@ export default async function AdminPedidosPage({
           {pedidos.map((pedido) => (
             <li
               key={pedido.id}
-              className="grid grid-cols-2 items-center gap-x-4 gap-y-2 rounded-[28px] bg-white px-6 py-5 shadow-card sm:grid-cols-[2fr_1.5fr_1fr_1fr]"
+              className="relative grid grid-cols-2 items-center gap-x-4 gap-y-2 rounded-[28px] bg-white px-6 py-5 shadow-card sm:grid-cols-[2fr_1.5fr_1fr_1fr]"
             >
               <div className="col-span-2 min-w-0 sm:col-span-1">
-                <p className="truncate font-semibold">{pedido.cliente_nombre}</p>
+                <Link
+                  href={`/admin/pedidos/${pedido.id}`}
+                  className="block truncate font-semibold after:absolute after:inset-0 after:rounded-[28px] after:content-[''] hover:underline"
+                >
+                  {pedido.cliente_nombre}
+                </Link>
                 <p className="truncate text-sm text-muted">{pedido.cliente_email}</p>
               </div>
               <p className="col-span-2 text-sm text-black/60 sm:col-span-1">

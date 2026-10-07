@@ -92,6 +92,7 @@ type PedidoItem = {
 };
 
 export type PedidoDetalle = Pedido & {
+  user_id: string | null;
   cliente_telefono: string | null;
   metodo_envio: MetodoEnvio;
   subtotal: number;
