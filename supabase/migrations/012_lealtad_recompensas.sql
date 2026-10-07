@@ -1,11 +1,40 @@
 -- Cervezaverso — Motor de lealtad: acreditación de botellas y cupones de recompensa.
 -- Ejecutar completo en el SQL Editor de Supabase (es idempotente: se puede correr más de una vez).
--- Requiere 004_promo_codes.sql y 011_users_tribu_botellas.sql.
+-- Autosuficiente: crea `promo_codes` si no existe (misma definición que 004_promo_codes.sql, que sigue
+-- siendo necesaria para el checkout: canje atómico y columnas promo_code/descuento de pedidos).
+-- Requiere 002_checkout_cuentas.sql (public.is_admin(), pedidos, pedido_items).
 --
--- Reutiliza `promo_codes` (ya existe) y la extiende: un cupón con `reward_level` es una
+-- Extiende `promo_codes`: un cupón con `reward_level` es una
 -- recompensa personal (de un solo uso, ligada a `user_id`) que se canjea de forma manual;
 -- el checkout web NO la aplica (el 100% de descuento de la Cerveza Sorpresa vaciaría el pedido).
 
+create table if not exists public.promo_codes (
+  id uuid primary key default gen_random_uuid(),
+  code text not null unique check (code = upper(code) and code ~ '^[A-Z0-9_-]{3,30}$'),
+  discount_type text not null check (discount_type in ('percent', 'fixed')),
+  value numeric(10, 2) not null check (value > 0),
+  min_purchase numeric(10, 2) not null default 0 check (min_purchase >= 0),
+  active boolean not null default true,
+  max_uses integer check (max_uses is null or max_uses > 0),
+  times_used integer not null default 0 check (times_used >= 0),
+  created_at timestamptz not null default now(),
+  constraint promo_codes_percent_max check (discount_type <> 'percent' or value <= 100)
+);
+
+create index if not exists promo_codes_created_idx on public.promo_codes (created_at desc);
+
+alter table public.promo_codes enable row level security;
+
+drop policy if exists "Los admins gestionan los cupones" on public.promo_codes;
+create policy "Los admins gestionan los cupones"
+  on public.promo_codes for all
+  using (public.is_admin())
+  with check (public.is_admin());
+
+grant select, insert, update on public.promo_codes to authenticated;
+grant all on public.promo_codes to service_role;
+
+-- Columnas de recompensas de lealtad.
 alter table public.promo_codes
   add column if not exists user_id uuid references public.users (id) on delete cascade,
   add column if not exists reward_level integer check (reward_level is null or reward_level > 0),
@@ -22,6 +51,7 @@ create policy "Los clientes ven sus recompensas"
   using (user_id = auth.uid() and reward_level is not null);
 
 alter table public.users
+  add column if not exists bottle_count integer not null default 0 check (bottle_count >= 0),
   add column if not exists niveles_secretos boolean not null default false;
 
 -- Marca el pedido ya contado para que reintentos del webhook no sumen dos veces.
