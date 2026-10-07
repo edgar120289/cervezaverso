@@ -31,14 +31,11 @@ export async function getDashboardData(): Promise<DashboardData> {
   const supabase = await createClient();
   const desde = inicioDeMes();
 
-  const [pendientesRes, ventasRes, clientesRes, itemsRes, ...tribusRes] = await Promise.all([
+  const [pendientesRes, ventasRes, clientesRes, topRes, ...tribusRes] = await Promise.all([
     supabase.from("pedidos").select("*", { count: "exact", head: true }).eq("estado", "Pendiente"),
     supabase.from("pedidos").select("total").in("estado", ESTADOS_COBRADOS).gte("fecha", desde),
     supabase.from("users").select("*", { count: "exact", head: true }).eq("role", "client"),
-    supabase
-      .from("pedido_items")
-      .select("sku, nombre, cantidad, pedidos!inner(estado)")
-      .in("pedidos.estado", ESTADOS_COBRADOS),
+    supabase.rpc("top_cervezas_vendidas", { p_limit: 3 }),
     ...TRIBUS.map((t) =>
       supabase.from("users").select("*", { count: "exact", head: true }).eq("role", "client").eq("avatar_team", t.id)
     ),
@@ -48,13 +45,11 @@ export async function getDashboardData(): Promise<DashboardData> {
   const ventasMes = ventas.reduce((sum, total) => sum + total, 0);
   const pedidosMes = ventas.length;
 
-  const porSku = new Map<string, TopCerveza>();
-  for (const item of itemsRes.data ?? []) {
-    const actual = porSku.get(item.sku) ?? { sku: item.sku, nombre: item.nombre, botellas: 0 };
-    actual.botellas += item.cantidad;
-    porSku.set(item.sku, actual);
-  }
-  const top = [...porSku.values()].sort((a, b) => b.botellas - a.botellas).slice(0, 3);
+  const top: TopCerveza[] = (topRes.data ?? []).map((row: { sku: string; nombre: string; botellas: number }) => ({
+    sku: row.sku,
+    nombre: row.nombre,
+    botellas: Number(row.botellas),
+  }));
 
   const tribus = TRIBUS.map((t, i) => ({ id: t.id, label: t.label, total: tribusRes[i].count ?? 0 })).sort(
     (a, b) => b.total - a.total
@@ -62,7 +57,7 @@ export async function getDashboardData(): Promise<DashboardData> {
   const clientes = clientesRes.count ?? 0;
   const conTribu = tribus.reduce((sum, t) => sum + t.total, 0);
 
-  const failed = [pendientesRes, ventasRes, clientesRes, itemsRes, ...tribusRes].find((r) => r.error);
+  const failed = [pendientesRes, ventasRes, clientesRes, topRes, ...tribusRes].find((r) => r.error);
 
   return {
     pendientes: pendientesRes.count ?? 0,
