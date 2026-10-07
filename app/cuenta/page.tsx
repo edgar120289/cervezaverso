@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronRight, Heart, MapPin, Package, Users } from "lucide-react";
+import { ChevronRight, Heart, MapPin, Package, Trophy, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PRODUCT_COLUMNS, toProduct } from "@/lib/catalog";
 import { formatMXN } from "@/lib/pricing";
@@ -9,6 +9,7 @@ import { ESTADO_BADGE, folio, formatFecha } from "@/lib/pedidos";
 import { eliminarDireccion, hacerPredeterminada } from "@/app/actions/cuenta";
 import ProductGrid from "@/components/ProductGrid";
 import SignOutButton from "@/components/SignOutButton";
+import LoyaltyProgress, { type Recompensa } from "@/components/LoyaltyProgress";
 import TribeSelector from "@/components/TribeSelector";
 import { toTribuId } from "@/lib/tribus";
 import type { Direccion, EstadoPedido } from "@/lib/types";
@@ -33,8 +34,14 @@ export default async function CuentaPage() {
   if (!user) redirect("/login?next=/cuenta");
 
   // RLS limita cada consulta a las filas del propio cliente.
-  const [perfilRes, pedidosRes, favoritosRes, direccionesRes] = await Promise.all([
-    supabase.from("users").select("avatar_team").eq("id", user.id).maybeSingle(),
+  const [perfilRes, recompensasRes, pedidosRes, favoritosRes, direccionesRes] = await Promise.all([
+    supabase.from("users").select("avatar_team, bottle_count, niveles_secretos").eq("id", user.id).maybeSingle(),
+    supabase
+      .from("promo_codes")
+      .select("code, reward_level, reward_label, times_used")
+      .eq("user_id", user.id)
+      .not("reward_level", "is", null)
+      .order("reward_level", { ascending: true }),
     supabase
       .from("pedidos")
       .select("id, fecha, estado, total, metodo_envio, pedido_items (cantidad)")
@@ -57,8 +64,9 @@ export default async function CuentaPage() {
     .filter((product): product is Record<string, unknown> => product !== null)
     .map(toProduct);
   const direcciones = (direccionesRes.data ?? []) as Direccion[];
+  const recompensas = (recompensasRes.data ?? []) as Recompensa[];
   const tribuActual = toTribuId(perfilRes.data?.avatar_team);
-  const loadError = perfilRes.error ?? pedidosRes.error ?? favoritosRes.error ?? direccionesRes.error;
+  const loadError = perfilRes.error ?? recompensasRes.error ?? pedidosRes.error ?? favoritosRes.error ?? direccionesRes.error;
 
   return (
     <div className="mx-auto max-w-6xl space-y-10 px-4 py-10">
@@ -76,7 +84,14 @@ export default async function CuentaPage() {
         </p>
       )}
 
-      {/* Mi Progreso (contador de botellas): se programa en la Fase 3. */}
+      <section aria-labelledby="mi-progreso" className="space-y-4">
+        <SectionHeading id="mi-progreso" icon={<Trophy size={20} />} title="Mi Progreso" count={0} />
+        <LoyaltyProgress
+          botellas={perfilRes.data?.bottle_count ?? 0}
+          recompensas={recompensas}
+          nivelesSecretos={perfilRes.data?.niveles_secretos ?? false}
+        />
+      </section>
 
       <section aria-labelledby="mi-tribu" className="space-y-4">
         <SectionHeading id="mi-tribu" icon={<Users size={20} />} title="Mi Tribu Cervecera" count={0} />

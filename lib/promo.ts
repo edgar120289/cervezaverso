@@ -11,7 +11,7 @@ export type PromoLookup = { ok: true; promo: AppliedPromo & { id: string } } | {
 export async function findActivePromo(code: string): Promise<PromoLookup> {
   const { data, error } = await createAdminClient()
     .from("promo_codes")
-    .select("id, code, discount_type, value, min_purchase, active, max_uses, times_used")
+    .select("id, code, discount_type, value, min_purchase, active, max_uses, times_used, reward_level")
     .eq("code", code)
     .maybeSingle();
 
@@ -20,7 +20,11 @@ export async function findActivePromo(code: string): Promise<PromoLookup> {
     return { ok: false, error: "No pudimos validar el código. Intenta de nuevo." };
   }
   if (!data || !data.active) return { ok: false, error: "Este código no existe o ya no está activo." };
-  if (data.max_uses !== null && data.times_used >= data.max_uses) {
+  // Las recompensas de lealtad se canjean de forma manual: aplicarlas aquí daría 100% sobre todo el pedido.
+  if (data.reward_level !== null) {
+    return { ok: false, error: "Este código de recompensa se canjea escribiéndonos con tu pedido." };
+  }
+  if (data.max_uses !== null &&data.times_used >= data.max_uses) {
     return { ok: false, error: "Este código ya fue utilizado." };
   }
 

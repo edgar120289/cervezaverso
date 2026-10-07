@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { formatMXN } from "@/lib/pricing";
 import { ESTADO_BADGE, formatFecha } from "@/lib/pedidos";
+import PedidoEstadoSelect from "@/components/admin/PedidoEstadoSelect";
 import { ESTADOS_PEDIDO, type EstadoPedido, type Pedido } from "@/lib/types";
 
 function isEstado(value: unknown): value is EstadoPedido {
@@ -84,11 +85,14 @@ export default async function AdminPedidosPage({
               <p className="col-span-2 text-sm text-black/60 sm:col-span-1">
                 {formatFecha(pedido.fecha)}
               </p>
-              <span
-                className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${ESTADO_BADGE[pedido.estado]}`}
-              >
-                {pedido.estado}
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${ESTADO_BADGE[pedido.estado]}`}
+                >
+                  {pedido.estado}
+                </span>
+                <PedidoEstadoSelect id={pedido.id} estado={pedido.estado} />
+              </div>
               <p className="text-right font-semibold tabular-nums">
                 {formatMXN(Number(pedido.total))}
               </p>
