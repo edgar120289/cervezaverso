@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { TRIBU_IDS } from "@/lib/tribus";
 
 /** Cada acción usa el cliente con la sesión del visitante: RLS limita todo a sus propias filas. */
 async function requireUser() {
@@ -23,6 +24,19 @@ export async function eliminarDireccion(formData: FormData) {
   const { supabase, user } = await requireUser();
   await supabase.from("direcciones").delete().eq("id", id.data).eq("user_id", user.id);
   refresh();
+}
+
+export async function elegirTribu(tribu: string): Promise<{ ok: boolean }> {
+  const parsed = z.enum(TRIBU_IDS).safeParse(tribu);
+  if (!parsed.success) return { ok: false };
+  const { supabase, user } = await requireUser();
+  const { error } = await supabase.from("users").update({ avatar_team: parsed.data }).eq("id", user.id);
+  if (error) {
+    console.error("[cuenta] No se pudo guardar la tribu", error.code);
+    return { ok: false };
+  }
+  refresh();
+  return { ok: true };
 }
 
 export async function hacerPredeterminada(formData: FormData) {

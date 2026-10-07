@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronRight, Heart, MapPin, Package } from "lucide-react";
+import { ChevronRight, Heart, MapPin, Package, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { PRODUCT_COLUMNS, toProduct } from "@/lib/catalog";
 import { formatMXN } from "@/lib/pricing";
@@ -9,6 +9,8 @@ import { ESTADO_BADGE, folio, formatFecha } from "@/lib/pedidos";
 import { eliminarDireccion, hacerPredeterminada } from "@/app/actions/cuenta";
 import ProductGrid from "@/components/ProductGrid";
 import SignOutButton from "@/components/SignOutButton";
+import TribeSelector from "@/components/TribeSelector";
+import { toTribuId } from "@/lib/tribus";
 import type { Direccion, EstadoPedido } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Mi cuenta", robots: { index: false } };
@@ -31,7 +33,8 @@ export default async function CuentaPage() {
   if (!user) redirect("/login?next=/cuenta");
 
   // RLS limita cada consulta a las filas del propio cliente.
-  const [pedidosRes, favoritosRes, direccionesRes] = await Promise.all([
+  const [perfilRes, pedidosRes, favoritosRes, direccionesRes] = await Promise.all([
+    supabase.from("users").select("avatar_team").eq("id", user.id).maybeSingle(),
     supabase
       .from("pedidos")
       .select("id, fecha, estado, total, metodo_envio, pedido_items (cantidad)")
@@ -54,7 +57,8 @@ export default async function CuentaPage() {
     .filter((product): product is Record<string, unknown> => product !== null)
     .map(toProduct);
   const direcciones = (direccionesRes.data ?? []) as Direccion[];
-  const loadError = pedidosRes.error ?? favoritosRes.error ?? direccionesRes.error;
+  const tribuActual = toTribuId(perfilRes.data?.avatar_team);
+  const loadError = perfilRes.error ?? pedidosRes.error ?? favoritosRes.error ?? direccionesRes.error;
 
   return (
     <div className="mx-auto max-w-6xl space-y-10 px-4 py-10">
@@ -71,6 +75,13 @@ export default async function CuentaPage() {
           No pudimos cargar toda tu información: {loadError.message}
         </p>
       )}
+
+      {/* Mi Progreso (contador de botellas): se programa en la Fase 3. */}
+
+      <section aria-labelledby="mi-tribu" className="space-y-4">
+        <SectionHeading id="mi-tribu" icon={<Users size={20} />} title="Mi Tribu Cervecera" count={0} />
+        <TribeSelector current={tribuActual} />
+      </section>
 
       {/* Historial de pedidos */}
       <section aria-labelledby="mis-pedidos" className="space-y-4">
