@@ -49,3 +49,46 @@ export function premioDesbloqueadoEmail({ nombre, nivel, premio, code }: PremioE
   const text = `Hola ${nombre}, llegaste a ${nivel} botellas en Cervezaverso. Tu premio: ${premio}.\nCódigo: ${code}\nEs personal, de un solo uso y se canjea escribiéndonos con tu siguiente pedido. Míralo en ${cuentaUrl}\n\n${HEALTH_NOTICE}`;
   return { subject, html, text };
 }
+
+export type EstadoEmailInput = { nombre: string; folio: string; total: string; pedidoUrl: string };
+
+const ESTADO_EMAIL = {
+  Pagado: {
+    subject: "Recibimos tu pago",
+    title: "¡Pago confirmado!",
+    message: "Recibimos tu pago y ya estamos preparando tu pedido.",
+  },
+  Enviado: {
+    subject: "Tu pedido va en camino",
+    title: "¡Tu pedido va en camino!",
+    message: "Tu pedido ya salió de nuestras manos. Recuerda tener una identificación oficial a la mano: la pedimos al entregar.",
+  },
+  Cancelado: {
+    subject: "Tu pedido fue cancelado",
+    title: "Pedido cancelado",
+    message: "Tu pedido fue cancelado. Si no lo esperabas o tienes dudas, escríbenos por WhatsApp y lo revisamos contigo.",
+  },
+} as const;
+
+export type EstadoConCorreo = keyof typeof ESTADO_EMAIL;
+
+export function esEstadoConCorreo(estado: string): estado is EstadoConCorreo {
+  return estado in ESTADO_EMAIL;
+}
+
+/** Correo de cambio de estado del pedido: pago confirmado, enviado o cancelado. */
+export function estadoPedidoEmail(estado: EstadoConCorreo, { nombre, folio, total, pedidoUrl }: EstadoEmailInput) {
+  const copy = ESTADO_EMAIL[estado];
+  const subject = `${copy.subject} · pedido #${folio} · ${SITE.name}`;
+  const html = emailLayout({
+    title: copy.title,
+    bodyHtml: `
+      <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Hola ${esc(nombre)}, ${esc(copy.message)}</p>
+      <p style="margin:0 0 24px;padding:16px;border-radius:20px;background:${CANVAS};font-size:14px;line-height:1.8;">
+        Pedido <strong>#${esc(folio)}</strong><br>Total: <strong>${esc(total)}</strong>
+      </p>
+      <a href="${esc(pedidoUrl)}" style="display:inline-block;padding:14px 28px;border-radius:9999px;background:${ACCENT};color:#fff;font-weight:600;text-decoration:none;">Ver mi pedido</a>`,
+  });
+  const text = `Hola ${nombre}, ${copy.message}\nPedido #${folio} · Total: ${total}\nVer pedido: ${pedidoUrl}\n\n${HEALTH_NOTICE}`;
+  return { subject, html, text };
+}
