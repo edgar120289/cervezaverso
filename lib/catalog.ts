@@ -105,6 +105,45 @@ export const getProductBySku = cache(async (sku: string): Promise<Product | null
   return data ? toProduct(data) : null;
 });
 
+/**
+ * Venta cruzada: hasta `limit` cervezas activas con el mismo estilo o la misma
+ * cervecería que `product` (primero las del mismo estilo), sin incluirla a ella.
+ * Dos consultas con `eq` en lugar de `.or()` para no armar filtros con texto libre.
+ */
+export async function getSimilarProducts(product: Product, limit = 4): Promise<Product[]> {
+  await connection();
+  const supabase = getClient();
+  if (!supabase) return [];
+
+  const byColumn = async (column: "style" | "brewery", value: string | null) => {
+    if (!value) return [];
+    const { data, error } = await supabase
+      .from("products")
+      .select(PRODUCT_COLUMNS)
+      .eq(column, value)
+      .eq("is_active", true)
+      .neq("id", product.id)
+      .order("stock_status", { ascending: true })
+      .order("name", { ascending: true })
+      .limit(limit);
+    if (error) {
+      console.error(`[catalog] Error al leer similares por ${column}:`, error.message);
+      return [];
+    }
+    return data.map(toProduct);
+  };
+
+  const [sameStyle, sameBrewery] = await Promise.all([
+    byColumn("style", product.style),
+    byColumn("brewery", product.brewery),
+  ]);
+
+  const seen = new Set<string>();
+  return [...sameStyle, ...sameBrewery]
+    .filter((p) => !seen.has(p.id) && seen.add(p.id))
+    .slice(0, limit);
+}
+
 /** Para el sitemap: sólo lo necesario. */
 export async function getProductSitemapEntries(): Promise<{ sku: string; updated_at: string | null }[]> {
   await connection();

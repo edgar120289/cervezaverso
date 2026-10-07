@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { toProduct } from "@/lib/catalog";
 import { DEFAULT_MARGIN_PCT } from "@/lib/pricing";
 import ProductRowActions from "@/components/admin/ProductRowActions";
+import BackButton from "@/components/admin/BackButton";
 import ProductEditForm from "@/components/admin/ProductEditForm";
 
 export const metadata: Metadata = { title: "Editar producto" };
@@ -29,13 +28,7 @@ export default async function EditProductPage({ params }: PageProps<"/admin/prod
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <Link
-          href="/admin"
-          className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-muted hover:text-black"
-        >
-          <ArrowLeft size={16} />
-          Volver a productos
-        </Link>
+        <BackButton fallbackHref="/admin">Volver a productos</BackButton>
         <ProductRowActions id={product.id} name={product.name} isActive={data.is_active !== false} layout="header" />
       </div>
       <ProductEditForm

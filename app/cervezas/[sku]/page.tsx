@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Globe2, UtensilsCrossed, Wine } from "lucide-react";
-import { getProductBySku } from "@/lib/catalog";
+import { getProductBySku, getSimilarProducts } from "@/lib/catalog";
+import ProductGrid from "@/components/ProductGrid";
 import { formatMXN } from "@/lib/pricing";
 import AddToCartButton from "@/components/AddToCartButton";
 import HealthNotice from "@/components/HealthNotice";
@@ -27,6 +28,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
   const { sku } = await params;
   const product = await getProductBySku(decodeURIComponent(sku));
   if (!product) notFound();
+  const similar = await getSimilarProducts(product);
 
   // Ficha del Sommelier Digital: las notas propias mandan; si aún no existen,
   // se usan las descripciones generadas por IA.
@@ -113,6 +115,17 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
           ))}
         </div>
       </section>
+
+      {similar.length > 0 && (
+        <section aria-labelledby="similares" className="mt-10 pb-6">
+          <h2 id="similares" className="text-2xl font-semibold tracking-[-0.04em]">
+            También te podría gustar
+          </h2>
+          <div className="mt-4">
+            <ProductGrid products={similar} />
+          </div>
+        </section>
+      )}
     </div>
   );
 }
