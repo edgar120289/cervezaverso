@@ -11,6 +11,9 @@ export const SITE = {
 export const LEGAL = {
   razonSocial: "Cervezaverso S.A.S. de C.V.",
   rfc: "CER231101TZ7",
+  domicilio: "República del Salvador #2, Col. Centro (Área 1), C.P. 06000, Alcaldía Cuauhtémoc, Ciudad de México.",
+  horario: "Lunes a Domingo de 09:00 a 21:00 hrs.",
+  emailFacturas: "facturas@cervezaverso.com",
 } as const;
 
 /** Canales de contacto y redes (Footer, botón de WhatsApp y /contacto). */
@@ -21,8 +24,7 @@ export const CONTACT = {
   instagramUrl: "https://instagram.com/Cervezaverso",
   facebookUrl: "https://facebook.com/Cervezaverso",
   handle: "@Cervezaverso",
-  /** Correo de atención: déjalo en null hasta tener uno oficial (la tarjeta se oculta). */
-  email: null as string | null,
+  email: "contacto@cervezaverso.com",
 } as const;
 
 /** Leyenda sanitaria obligatoria para bebidas alcohólicas (pendiente de revisión legal). */

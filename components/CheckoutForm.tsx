@@ -2,6 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
+import { LEGAL } from "@/lib/site";
 import { useRouter } from "next/navigation";
 import { Check, MapPin, Truck, Zap } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
@@ -469,6 +470,17 @@ export default function CheckoutForm({
         </button>
         <p className="text-center text-xs text-muted">
           Te contactaremos para coordinar el pago. Muy pronto podrás pagar en línea con Mercado Pago.
+        </p>
+        <p className="text-center text-xs leading-relaxed text-muted">
+          Al proceder con el pago, aceptas nuestros{" "}
+          <Link href="/terminos" className="underline underline-offset-2 hover:text-ink">
+            Términos y Condiciones
+          </Link>{" "}
+          y nuestro{" "}
+          <Link href="/privacidad" className="underline underline-offset-2 hover:text-ink">
+            Aviso de Privacidad
+          </Link>
+          . Venta operada por {LEGAL.razonSocial}
         </p>
         <HealthNotice className="text-center" />
         <PrivacyNotice className="text-center">

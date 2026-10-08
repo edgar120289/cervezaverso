@@ -46,7 +46,7 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - Fase 2 · Base y correcciones: terminada en código (2026-09-29), **pendiente de OK**. Bloques 1–8 con commit propio; build, lint y typecheck limpios.
 - Para que funcione completo falta: correr `supabase/migrations/005_edad_rate_limit.sql` en Supabase y dar de alta las claves de Turnstile (ver `.env.example`).
 - Pendiente de revisar en navegador (360, 768, 1024 y 1440 px): no hubo navegador disponible en la sesión.
-- Pendientes de datos del negocio: marcados `[[PENDIENTE]]` en `/terminos` y `/privacidad`.
+- Datos legales del negocio completos en `/terminos` y `/privacidad` (2026-10-07); los textos siguen como borrador pendiente de revisión legal. Falta configurar `NEXT_PUBLIC_SITE_URL` (dominio) en Vercel.
 - Fase 2.5 · Refactor UI/UX (header con logotipo horizontal, menú de sesión, Hero, Sommelier con tarrito kawaii, filtros sin Estilo, tarjetas simétricas): hecho en código (2026-09-29), pendiente de revisión en navegador y de OK.
 - Fase 2.7 · Refactor UI/UX (Hero con video, Sommelier flotante, menú hamburguesa móvil, filtros en panel lateral con chips): hecho en código (2026-09-29), pendiente de revisión en navegador y de OK.
 - Fase 3 · Construcción, avance 1 · Catálogo en `/admin`: carga masiva (.xlsx/.csv) con plantilla descargable y alta manual de cervezas (2026-09-30). Aprobado por el cliente; pendiente de revisión en navegador (360, 768, 1024 y 1440 px).

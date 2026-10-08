@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
-import Pending from "@/components/Pending";
 import CookieSettingsButton from "@/components/CookieSettingsButton";
 import { CONTACT, LEGAL } from "@/lib/site";
 
@@ -26,8 +25,7 @@ export default function PrivacidadPage() {
           title: "Responsable del tratamiento",
           body: (
             <p>
-              {LEGAL.razonSocial} (nombre comercial Cervezaverso), con RFC {LEGAL.rfc} y domicilio en{" "}
-              <Pending>domicilio completo</Pending>, es responsable del tratamiento de tus datos personales conforme a
+              {LEGAL.razonSocial} (nombre comercial Cervezaverso), con RFC {LEGAL.rfc} y domicilio en {LEGAL.domicilio} Es responsable del tratamiento de tus datos personales conforme a
               la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.
             </p>
           ),
@@ -110,7 +108,9 @@ export default function PrivacidadPage() {
             <>
               <p>
                 Tienes derecho a acceder a tus datos, rectificarlos, cancelarlos u oponerte a su uso (derechos ARCO),
-                así como a revocar tu consentimiento. Envía tu solicitud a <Pending>correo para derechos ARCO</Pending>{" "}
+                así como a revocar tu consentimiento. Envía tu solicitud a <a href={`mailto:${CONTACT.email}`} className="font-semibold text-accent hover:underline">
+                  {CONTACT.email}
+                </a>{" "}
                 o por WhatsApp al {CONTACT.whatsappLabel}, con:
               </p>
               <ul className="list-disc space-y-2 pl-5">

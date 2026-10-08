@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
-import Pending from "@/components/Pending";
 import { FLAT_SHIPPING_COST, formatMXN, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
 import { CONTACT, HEALTH_NOTICE, LEGAL } from "@/lib/site";
 
@@ -27,12 +26,14 @@ export default function TerminosPage() {
           body: (
             <>
               <p>
-                Cervezaverso es una marca operada por {LEGAL.razonSocial}, con RFC {LEGAL.rfc} y domicilio en{" "}
-                <Pending>domicilio fiscal completo</Pending>.
+                Cervezaverso es una marca operada por {LEGAL.razonSocial}, con RFC {LEGAL.rfc} y domicilio en {LEGAL.domicilio}
               </p>
               <p>
                 Atención a clientes por WhatsApp al {CONTACT.whatsappLabel} y en{" "}
-                <Pending>correo de atención a clientes</Pending>, en horario de <Pending>días y horario de atención</Pending>.
+                <a href={`mailto:${CONTACT.email}`} className={linkClass}>
+                  {CONTACT.email}
+                </a>
+                , en horario de {LEGAL.horario}
               </p>
               <p>
                 Al hacer un pedido aceptas estos términos. Te recomendamos leerlos junto con nuestro{" "}
@@ -56,8 +57,8 @@ export default function TerminosPage() {
               <p>
                 Quien reciba el pedido debe ser mayor de edad y mostrar una identificación oficial vigente con
                 fotografía (INE, pasaporte o cédula profesional) al repartidor. Si no se presenta la identificación o
-                quien recibe es menor de edad, el pedido no se entrega y regresa a nuestro almacén;{" "}
-                <Pending>política de reembolso y costo de envío cuando la entrega no procede</Pending>.
+                quien recibe es menor de edad, el pedido no se entrega y regresa a nuestro almacén. En ese caso, nos pondremos en contacto contigo para reprogramar la entrega o
+                gestionar la cancelación y el reembolso conforme a la sección de cambios y devoluciones.
               </p>
             </>
           ),
@@ -94,7 +95,12 @@ export default function TerminosPage() {
                 los datos de tu tarjeta. Preparamos tu pedido cuando el pago queda confirmado.
               </p>
               <p>
-                Facturación: <Pending>si se emiten facturas (CFDI), cómo solicitarlas y en qué plazo</Pending>.
+                Facturación: la emisión de facturas (CFDI) deberá solicitarse estrictamente dentro del mismo mes fiscal en
+                que se realizó la compra, enviando la solicitud con los datos fiscales al correo{" "}
+                <a href={`mailto:${LEGAL.emailFacturas}`} className={linkClass}>
+                  {LEGAL.emailFacturas}
+                </a>
+                .
               </p>
             </>
           ),
@@ -117,16 +123,17 @@ export default function TerminosPage() {
             <>
               <p>
                 Envío nacional por paquetería a toda la República: {formatMXN(FLAT_SHIPPING_COST)} en pedidos menores a{" "}
-                {formatMXN(FREE_SHIPPING_THRESHOLD)} y gratis a partir de ese monto. Plazo estimado:{" "}
-                <Pending>días hábiles de entrega y paquetería</Pending>.
+                {formatMXN(FREE_SHIPPING_THRESHOLD)} y gratis a partir de ese monto. Los pedidos se procesan en un máximo de
+                24 horas y se envían a través de FedEx o DHL, con un tiempo estimado de entrega de 3 a 5 días hábiles.
               </p>
               <p>
                 Envío local sin costo en Ciudad de México y Estado de México (Área Metropolitana), con entrega en 2 a
                 3 días hábiles.
               </p>
               <p>
-                Revisa tu dirección antes de confirmar. Si la paquetería no puede entregar por un dato incorrecto o
-                porque nadie mayor de edad recibe, te contactaremos para reprogramar.
+                Revisa tu dirección antes de confirmar. En caso de no encontrar a nadie en el domicilio, la paquetería
+                realizará un intento al día siguiente o pondrá el paquete a disposición del cliente en un punto de
+                recolección cercano.
               </p>
             </>
           ),
@@ -148,8 +155,10 @@ export default function TerminosPage() {
               <p>
                 También puedes devolver productos sellados y en su empaque original dentro de los 5 días hábiles
                 siguientes a la entrega. Por seguridad alimentaria no aceptamos devoluciones de productos abiertos.
-                Costo del envío de devolución: <Pending>quién lo paga y cómo se recoge</Pending>. Los reembolsos se
-                hacen en un plazo de <Pending>días hábiles para reembolsar</Pending>.
+                En caso de producto dañado o error de envío, Cervezaverso resolverá el incidente en un plazo máximo de 8
+                días (mediante el envío de un reemplazo o reembolso del dinero), asumiendo la responsabilidad directa
+                con el cliente. Una vez aprobado, el reembolso se procesará en un plazo de 5 a 15 días hábiles,
+                dependiendo de la institución bancaria.
               </p>
             </>
           ),
@@ -195,7 +204,7 @@ export default function TerminosPage() {
               </p>
               <p>
                 Estos términos se rigen por las leyes federales de los Estados Unidos Mexicanos, en particular la Ley
-                Federal de Protección al Consumidor. Jurisdicción: <Pending>tribunales competentes</Pending>.
+                Federal de Protección al Consumidor. Jurisdicción: leyes y tribunales competentes de la Ciudad de México.
               </p>
               <p>
                 ¿Dudas? Escríbenos desde la página de{" "}
