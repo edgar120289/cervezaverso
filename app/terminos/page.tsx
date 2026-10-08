@@ -3,7 +3,7 @@ import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
 import Pending from "@/components/Pending";
 import { FLAT_SHIPPING_COST, formatMXN, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
-import { CONTACT, HEALTH_NOTICE } from "@/lib/site";
+import { CONTACT, HEALTH_NOTICE, LEGAL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Términos y condiciones",
@@ -27,8 +27,8 @@ export default function TerminosPage() {
           body: (
             <>
               <p>
-                Cervezaverso es operado por <Pending>nombre o razón social del proveedor</Pending>, con RFC{" "}
-                <Pending>RFC</Pending> y domicilio en <Pending>domicilio fiscal completo</Pending>.
+                Cervezaverso es una marca operada por {LEGAL.razonSocial}, con RFC {LEGAL.rfc} y domicilio en{" "}
+                <Pending>domicilio fiscal completo</Pending>.
               </p>
               <p>
                 Atención a clientes por WhatsApp al {CONTACT.whatsappLabel} y en{" "}
@@ -179,7 +179,7 @@ export default function TerminosPage() {
           body: (
             <p>
               La marca Cervezaverso, su logotipo, los tarros ilustrados y los textos del sitio son propiedad de
-              Cervezaverso. Las marcas, etiquetas e imágenes de cada cerveza pertenecen a sus respectivas cervecerías.
+              {" "}{LEGAL.razonSocial}. Las marcas, etiquetas e imágenes de cada cerveza pertenecen a sus respectivas cervecerías.
             </p>
           ),
         },

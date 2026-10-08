@@ -3,7 +3,7 @@ import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
 import Pending from "@/components/Pending";
 import CookieSettingsButton from "@/components/CookieSettingsButton";
-import { CONTACT } from "@/lib/site";
+import { CONTACT, LEGAL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Aviso de privacidad",
@@ -26,7 +26,7 @@ export default function PrivacidadPage() {
           title: "Responsable del tratamiento",
           body: (
             <p>
-              <Pending>nombre o razón social del responsable</Pending>, con domicilio en{" "}
+              {LEGAL.razonSocial} (nombre comercial Cervezaverso), con RFC {LEGAL.rfc} y domicilio en{" "}
               <Pending>domicilio completo</Pending>, es responsable del tratamiento de tus datos personales conforme a
               la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.
             </p>

@@ -1,4 +1,4 @@
-import { HEALTH_NOTICE, SITE } from "@/lib/site";
+import { HEALTH_NOTICE, LEGAL, SITE } from "@/lib/site";
 
 const ACCENT = "#5433eb";
 const CANVAS = "#f2f4f5";
@@ -22,6 +22,7 @@ export function emailLayout({ title, bodyHtml }: { title: string; bodyHtml: stri
       </td></tr>
       <tr><td style="padding:20px 32px;background:${CANVAS};font-size:12px;color:${MUTED};line-height:1.5;">
         ${esc(HEALTH_NOTICE)} Venta exclusiva a mayores de 18 años. Disfruta con responsabilidad.<br>
+        ${esc(LEGAL.razonSocial)} · RFC ${esc(LEGAL.rfc)}<br>
         <a href="${SITE.url}" style="color:${ACCENT};">${esc(SITE.url.replace(/^https?:\/\//, ""))}</a>
       </td></tr>
     </table>

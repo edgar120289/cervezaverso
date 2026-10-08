@@ -7,6 +7,12 @@ export const SITE = {
   locale: "es_MX",
 } as const;
 
+/** Datos fiscales oficiales: avisos legales, Footer y correos. "Cervezaverso" queda como nombre comercial. */
+export const LEGAL = {
+  razonSocial: "Cervezaverso S.A.S. de C.V.",
+  rfc: "CER231101TZ7",
+} as const;
+
 /** Canales de contacto y redes (Footer, botón de WhatsApp y /contacto). */
 export const CONTACT = {
   whatsappUrl: "https://wa.me/525643075041",
