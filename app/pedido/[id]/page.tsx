@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { CircleCheck, CircleX, MapPin, MessageSquareText, Truck } from "lucide-react";
 import { z } from "zod";
 import ClearCart from "@/components/ClearCart";
+import RetryPaymentButton from "@/components/RetryPaymentButton";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatMXN, SHIPPING_METHODS } from "@/lib/pricing";
@@ -75,14 +76,8 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
           </span>
           <h1 className="text-3xl font-semibold tracking-[-0.04em]">El pago no se completó</h1>
           <p className="max-w-md text-muted">
-            No se hizo ningún cargo. Tu carrito sigue guardado: vuelve al checkout para intentarlo de nuevo.
+            No se hizo ningún cargo. Tu pedido sigue guardado: puedes intentar pagar de nuevo.
           </p>
-          <Link
-            href="/checkout"
-            className="mt-2 rounded-full bg-accent px-7 py-3.5 text-center font-semibold text-white shadow-accent transition-transform active:scale-[0.98]"
-          >
-            Volver al checkout
-          </Link>
         </section>
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -91,6 +86,13 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
             ← Mis pedidos
           </Link>
         </div>
+      )}
+
+      {pedido.estado === "Pendiente" && !esNuevo && (
+        <section className="flex flex-col items-center gap-3 rounded-[28px] bg-white p-6 text-center shadow-card">
+          <p className="text-sm text-muted">Este pedido está pendiente de pago.</p>
+          <RetryPaymentButton pedidoId={pedido.id} />
+        </section>
       )}
 
       <section className="rounded-[28px] bg-white p-6 shadow-card">

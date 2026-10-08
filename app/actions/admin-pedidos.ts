@@ -21,6 +21,14 @@ export async function cambiarEstadoPedido(id: string, estado: string): Promise<P
   await requireAdmin("/admin/pedidos");
   const admin = createAdminClient();
   const { data: previo } = await admin.from("pedidos").select("estado").eq("id", parsed.data.id).maybeSingle();
+  // Cancelar un Pendiente pasa por la función SQL que también devuelve el uso del cupón.
+  if (parsed.data.estado === "Cancelado" && previo?.estado === "Pendiente") {
+    const cancelado = await cancelarPendiente(parsed.data.id);
+    if (!cancelado.ok) return cancelado;
+    await notificarEstadoPedido(parsed.data.id, "Cancelado");
+    refresh();
+    return { ok: true };
+  }
   const { data, error } = await admin
     .from("pedidos")
     .update({ estado: parsed.data.estado })
@@ -37,6 +45,35 @@ export async function cambiarEstadoPedido(id: string, estado: string): Promise<P
   // Correo solo si el estado realmente cambió (evita duplicados al reseleccionar el mismo).
   if (previo?.estado !== parsed.data.estado) await notificarEstadoPedido(parsed.data.id, parsed.data.estado);
 
+  refresh();
+  return { ok: true };
+}
+
+async function cancelarPendiente(id: string): Promise<PedidoEstadoResult> {
+  const { data, error } = await createAdminClient().rpc("cancelar_pedido_pendiente", { p_pedido_id: id });
+  if (error) {
+    console.error("[admin-pedidos] Error al cancelar el pedido pendiente:", error.message);
+    return { ok: false, error: "No se pudo cancelar el pedido." };
+  }
+  const status = (data as { status?: string } | null)?.status;
+  if (status !== "cancelado") return { ok: false, error: "El pedido ya no está pendiente." };
+  return { ok: true };
+}
+
+/**
+ * Cancela un pedido Pendiente abandonado: pasa a Cancelado y el cupón usado vuelve a quedar disponible
+ * (migración 018, una sola transacción). El stock no se repone porque nunca se descuenta al crear el pedido.
+ * Solo administradores; los clientes no tienen forma de cancelar.
+ */
+export async function cancelarPedidoPendiente(id: string): Promise<PedidoEstadoResult> {
+  const parsed = z.uuid().safeParse(id);
+  if (!parsed.success) return { ok: false, error: "Datos inválidos." };
+
+  await requireAdmin("/admin/pedidos");
+  const result = await cancelarPendiente(parsed.data);
+  if (!result.ok) return result;
+
+  await notificarEstadoPedido(parsed.data, "Cancelado");
   refresh();
   return { ok: true };
 }
