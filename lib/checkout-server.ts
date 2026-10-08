@@ -1,4 +1,4 @@
-"use server";
+import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -9,17 +9,35 @@ import { guardPublicForm } from "@/lib/security/form-guard";
 import { getProfileBirthDate } from "@/lib/profile";
 import type { AppliedPromo, DireccionEnvio } from "@/lib/types";
 
-export type CheckoutResult =
-  | { ok: true; pedidoId: string }
+export type PedidoRegistrado = {
+  pedidoId: string;
+  email: string;
+  nombre: string;
+  telefono: string;
+  lineas: { sku: string; nombre: string; precio_unitario: number; cantidad: number }[];
+  subtotal: number;
+  descuento: number;
+  costoEnvio: number;
+  total: number;
+  promoId: string | null;
+};
+
+export type RegistroResult =
+  | ({ ok: true } & PedidoRegistrado)
   | { ok: false; error: string; /** El código ya no sirve: el cliente debe quitarlo. */ promoInvalid?: boolean };
 
+/** Libera un cupón canjeado cuando el pedido no llegó a la pasarela. */
+export async function liberarPromo(promoId: string | null): Promise<void> {
+  if (promoId) await createAdminClient().rpc("release_promo_code", { p_id: promoId });
+}
+
 /**
- * Crea el pedido. Los precios y el stock se leen de Supabase: los del carrito
+ * Crea el pedido en estado Pendiente. Los precios y el stock se leen de Supabase: los del carrito
  * (localStorage) sólo sirven para mostrar, nunca para cobrar. Si hay sesión,
  * el pedido queda en el historial del cliente y la dirección se guarda en su
  * libreta como predeterminada para la próxima compra en 1 clic.
  */
-export async function crearPedido(input: unknown): Promise<CheckoutResult> {
+export async function registrarPedido(input: unknown): Promise<RegistroResult> {
   const parsed = checkoutSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
   const { email, metodo_envio, direccion, notas, items, promo_code, fecha_nacimiento, website, turnstileToken } =
@@ -133,7 +151,19 @@ export async function crearPedido(input: unknown): Promise<CheckoutResult> {
 
   if (user) await guardarDireccion(user.id, direccionEnvio);
 
-  return { ok: true, pedidoId: pedido.id };
+  return {
+    ok: true,
+    pedidoId: pedido.id,
+    email,
+    nombre: direccion.nombre_completo,
+    telefono: direccion.telefono,
+    lineas: lineas.map(({ sku, nombre, precio_unitario, cantidad }) => ({ sku, nombre, precio_unitario, cantidad })),
+    subtotal,
+    descuento: promo ? discount : 0,
+    costoEnvio,
+    total,
+    promoId: promo?.id ?? null,
+  };
 }
 
 /** Guarda la dirección (sin duplicarla) y la deja como predeterminada. */

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CircleCheck, MapPin, MessageSquareText, Truck } from "lucide-react";
+import { CircleCheck, CircleX, MapPin, MessageSquareText, Truck } from "lucide-react";
 import { z } from "zod";
+import ClearCart from "@/components/ClearCart";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatMXN, SHIPPING_METHODS } from "@/lib/pricing";
@@ -39,11 +40,14 @@ async function getPedido(id: string): Promise<PedidoDetalle | null> {
 }
 
 export default async function PedidoPage({ params, searchParams }: PageProps<"/pedido/[id]">) {
-  const [{ id }, { confirmado }] = await Promise.all([params, searchParams]);
+  const [{ id }, { pago }] = await Promise.all([params, searchParams]);
   const pedido = await getPedido(id);
   if (!pedido) notFound();
 
-  const esNuevo = confirmado === "1";
+  // `pago` solo decide el mensaje al volver de Mercado Pago; el estado real viene de la base (webhook).
+  const esNuevo = pago === "exitoso" || pago === "pendiente";
+  const fallido = pago === "fallido";
+  const confirmado = pedido.estado !== "Pendiente";
   const envio = SHIPPING_METHODS[pedido.metodo_envio];
   const d = pedido.direccion;
 
@@ -51,15 +55,34 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
     <div className="mx-auto max-w-3xl space-y-4 px-4 py-10">
       {esNuevo ? (
         <section className="flex flex-col items-center gap-3 rounded-[28px] bg-white px-6 py-10 text-center shadow-card">
+          <ClearCart />
           <span className="flex h-14 w-14 items-center justify-center rounded-pill bg-accent text-white shadow-accent">
             <CircleCheck size={28} />
           </span>
           <h1 className="text-3xl font-semibold tracking-[-0.04em]">¡Gracias por tu pedido!</h1>
           <p className="max-w-md text-muted">
-            Recibimos tu pedido <span className="font-semibold text-black">#{folio(pedido.id)}</span>. Te
-            escribiremos a <span className="font-semibold text-black">{pedido.cliente_email}</span> para
-            coordinar el pago y el envío.
+            {confirmado
+              ? "Recibimos tu pago del pedido "
+              : "Estamos confirmando el pago del pedido "}
+            <span className="font-semibold text-black">#{folio(pedido.id)}</span>. Te avisaremos en{" "}
+            <span className="font-semibold text-black">{pedido.cliente_email}</span> en cuanto quede confirmado.
           </p>
+        </section>
+      ) : fallido ? (
+        <section className="flex flex-col items-center gap-3 rounded-[28px] bg-white px-6 py-10 text-center shadow-card">
+          <span className="flex h-14 w-14 items-center justify-center rounded-pill bg-black/5 text-black/60">
+            <CircleX size={28} />
+          </span>
+          <h1 className="text-3xl font-semibold tracking-[-0.04em]">El pago no se completó</h1>
+          <p className="max-w-md text-muted">
+            No se hizo ningún cargo. Tu carrito sigue guardado: vuelve al checkout para intentarlo de nuevo.
+          </p>
+          <Link
+            href="/checkout"
+            className="mt-2 rounded-full bg-accent px-7 py-3.5 text-center font-semibold text-white shadow-accent transition-transform active:scale-[0.98]"
+          >
+            Volver al checkout
+          </Link>
         </section>
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-3">

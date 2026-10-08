@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useTransition, type FormEvent } from "react";
+import { useEffect, useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
 import { LEGAL } from "@/lib/site";
-import { useRouter } from "next/navigation";
 import { Check, MapPin, Truck, Zap } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import {
@@ -17,7 +16,6 @@ import {
 } from "@/lib/pricing";
 import { ESTADOS_MX } from "@/lib/estados-mx";
 import { checkoutSchema, firstIssue, isHoneypotFilled, MAX_NOTAS } from "@/lib/validation";
-import { crearPedido } from "@/app/actions/checkout";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
 import Honeypot from "@/components/Honeypot";
 import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
@@ -58,10 +56,18 @@ export default function CheckoutForm({
   /** Invitados y cuentas sin fecha registrada deben confirmar su mayoría de edad aquí. */
   requiresBirthDate: boolean;
 }) {
-  const router = useRouter();
-  const { items, subtotal, isHydrated, clear, promo, removePromo } = useCart();
+  const { items, subtotal, isHydrated, promo, removePromo } = useCart();
   const [isPending, startTransition] = useTransition();
   const [isRedirecting, setIsRedirecting] = useState(false);
+
+  // Al volver con "atrás" desde Mercado Pago el navegador restaura esta página tal cual.
+  useEffect(() => {
+    const reset = (event: PageTransitionEvent) => {
+      if (event.persisted) setIsRedirecting(false);
+    };
+    window.addEventListener("pageshow", reset);
+    return () => window.removeEventListener("pageshow", reset);
+  }, []);
   const [error, setError] = useState<string | null>(null);
 
   const predeterminada = direcciones.find((d) => d.predeterminada) ?? direcciones[0];
@@ -145,18 +151,29 @@ export default function CheckoutForm({
     }
 
     startTransition(async () => {
-      const result = await crearPedido(input);
+      let result: { initPoint?: string; error?: string; promoInvalid?: boolean } = {};
+      try {
+        const response = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(input),
+        });
+        result = await response.json();
+      } catch {
+        result = { error: "No pudimos conectar con el servidor. Revisa tu conexión e intenta de nuevo." };
+      }
       // Cada token de Turnstile sirve una sola vez.
       setTurnstileReset((n) => n + 1);
-      if (!result.ok) {
+      if (!result.initPoint) {
         // El código dejó de servir (se agotó o lo desactivaron): se quita y los totales se recalculan.
         if (result.promoInvalid) removePromo();
-        setError(result.promoInvalid ? `${result.error} Lo quitamos de tu pedido; revisa el total.` : result.error);
+        const mensaje = result.error ?? "No pudimos iniciar el pago. Intenta de nuevo.";
+        setError(result.promoInvalid ? `${mensaje} Lo quitamos de tu pedido; revisa el total.` : mensaje);
         return;
       }
+      // El carrito se vacía al volver del pago (página del pedido); si el cliente cancela, lo conserva.
       setIsRedirecting(true);
-      clear();
-      router.push(`/pedido/${result.pedidoId}?confirmado=1`);
+      window.location.assign(result.initPoint);
     });
   }
 
@@ -466,10 +483,10 @@ export default function CheckoutForm({
           className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3.5 font-semibold text-white shadow-accent transition-transform active:scale-[0.98] disabled:opacity-60"
         >
           {guardada && !isPending && <Zap size={16} fill="currentColor" />}
-          {isPending ? "Confirmando…" : guardada ? "Comprar en 1 clic" : "Confirmar pedido"}
+          {isPending ? "Preparando tu pago…" : guardada ? "Pagar en 1 clic" : "Pagar con Mercado Pago"}
         </button>
         <p className="text-center text-xs text-muted">
-          Te contactaremos para coordinar el pago. Muy pronto podrás pagar en línea con Mercado Pago.
+          Pagas en la página segura de Mercado Pago con tarjeta, SPEI u OXXO Pay. Nosotros nunca vemos tus datos de pago.
         </p>
         <p className="text-center text-xs leading-relaxed text-muted">
           Al proceder con el pago, aceptas nuestros{" "}
