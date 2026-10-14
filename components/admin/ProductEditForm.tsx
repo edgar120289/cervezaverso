@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import { actualizarProducto } from "@/app/actions/admin-productos";
 import { calculateSalePrice, DEFAULT_MARGIN_PCT, formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
@@ -53,6 +53,7 @@ export default function ProductEditForm({
   initialMargin: number;
   initialImages: string[];
 }) {
+  const router = useRouter();
   const [form, setForm] = useState<FormState>({
     name: product.name,
     brewery: product.brewery ?? "",
@@ -70,6 +71,7 @@ export default function ProductEditForm({
     notas_perfil: product.notas_perfil ?? "",
     notas_maridaje: product.notas_maridaje ?? "",
   });
+  const [savedForm, setSavedForm] = useState<FormState>(form);
   const [isSaving, setIsSaving] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +83,14 @@ export default function ProductEditForm({
     Number.isFinite(cost) && Number.isFinite(margin) && cost >= 0 && margin >= 0
       ? calculateSalePrice(cost, margin)
       : null;
+
+  const isDirty = (Object.keys(form) as (keyof FormState)[]).some((key) => form[key] !== savedForm[key]);
+
+  function handleBack() {
+    if (isDirty && !window.confirm("Tienes cambios sin guardar. ¿Seguro que quieres salir y perder los cambios?")) return;
+    if (window.history.length > 1) router.back();
+    else router.push("/admin");
+  }
 
   function update<K extends keyof FormState>(key: K) {
     return (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -127,6 +137,7 @@ export default function ProductEditForm({
     setError(null);
     setNotice(null);
     setIsSaving(true);
+    const submitted = form;
     try {
       const result = await actualizarProducto({
         id: product.id,
@@ -150,6 +161,7 @@ export default function ProductEditForm({
         setError(result.error);
         return;
       }
+      setSavedForm(submitted);
       setNotice(`Cambios guardados. Precio de venta: ${formatMXN(result.sale_price ?? 0)}.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudieron guardar los cambios.");
@@ -309,13 +321,14 @@ export default function ProductEditForm({
           >
             {isSaving ? "Guardando…" : "Guardar cambios"}
           </button>
-          <Link
-            href="/admin"
+          <button
+            type="button"
+            onClick={handleBack}
             className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-black/15 py-3.5 font-semibold text-black/70 transition-colors hover:bg-black/5 hover:text-black sm:w-auto sm:px-8"
           >
             <ArrowLeft size={16} />
             Regresar al inventario
-          </Link>
+          </button>
         </div>
       </div>
     </form>
