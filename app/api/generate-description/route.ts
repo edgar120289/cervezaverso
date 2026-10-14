@@ -17,7 +17,12 @@ si no conoces la cervecería, habla de la tradición del estilo y del país.
 Devuelve tres secciones:
 - "origen" — El Origen: historia breve del estilo y de la tradición cervecera del país, y qué hace especial a esta cerveza. 2 a 3 frases.
 - "perfil" — Perfil Sensorial: notas de cata en orden visual (color, espuma), olfativa (aromas) y gustativa (sabor, cuerpo, final). 3 a 4 frases evocadoras.
-- "maridaje" — El Maridaje Perfecto: 2 o 3 platillos concretos (de preferencia uno de cocina mexicana) y por qué combinan. 2 a 3 frases.`;
+- "maridaje" — El Maridaje Perfecto: exactamente 3 sugerencias, una de cada tipo, y por qué combinan (3 a 4 frases):
+  1) un plato de alta cocina,
+  2) una comida urbana o street food,
+  3) una botana local o un postre inesperado.
+  Varía: evita los platillos de siempre (tacos al pastor, hamburguesa, alitas, queso o chocolate) salvo que sean realmente lo ideal,
+  y elige opciones distintas en cada ficha, de preferencia con ingredientes o platillos mexicanos.`;
 
 const RESPONSE_SCHEMA: ObjectSchema = {
   type: SchemaType.OBJECT,
@@ -81,7 +86,7 @@ export async function POST(req: NextRequest) {
       {
         systemInstruction: SYSTEM_PROMPT,
         generationConfig: {
-          temperature: 0.8,
+          temperature: 1.1,
           responseMimeType: "application/json",
           responseSchema: RESPONSE_SCHEMA,
         },

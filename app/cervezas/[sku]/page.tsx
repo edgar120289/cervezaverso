@@ -9,6 +9,7 @@ import AddToCartButton from "@/components/AddToCartButton";
 import HealthNotice from "@/components/HealthNotice";
 import FavoriteButton from "@/components/FavoriteButton";
 import ProductGallery from "@/components/ProductGallery";
+import SommelierAudio from "@/components/SommelierAudio";
 
 export async function generateMetadata({ params }: PageProps<"/cervezas/[sku]">): Promise<Metadata> {
   const { sku } = await params;
@@ -98,9 +99,17 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
       </div>
 
       <section aria-labelledby="sommelier-digital" className="mt-10">
-        <h2 id="sommelier-digital" className="text-2xl font-semibold tracking-[-0.04em]">
-          Sommelier digital
-        </h2>
+        <div className="flex items-center gap-2">
+          <h2 id="sommelier-digital" className="text-2xl font-semibold tracking-[-0.04em]">
+            Sommelier digital
+          </h2>
+          <SommelierAudio
+            text={fichas
+              .filter((f) => f.body)
+              .map((f) => `${f.title}. ${f.body}`)
+              .join(" ")}
+          />
+        </div>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           {fichas.map(({ icon: Icon, title, body }) => (
             <article key={title} className="rounded-[28px] bg-white p-6 shadow-card">

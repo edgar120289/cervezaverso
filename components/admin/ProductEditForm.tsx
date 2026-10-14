@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
-import { Loader2, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import { actualizarProducto } from "@/app/actions/admin-productos";
 import { calculateSalePrice, DEFAULT_MARGIN_PCT, formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
 import ProductGallery from "./ProductGallery";
@@ -159,7 +160,16 @@ export default function ProductEditForm({
 
   return (
     <form onSubmit={handleSubmit} noValidate className="grid gap-6 lg:grid-cols-[320px_1fr]">
-      <div className="lg:col-span-2">
+      <div className="space-y-3 lg:col-span-2">
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={isSaving || isGenerating}
+            className="w-full rounded-full border border-accent px-6 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/5 active:scale-[0.98] disabled:opacity-60 sm:w-auto"
+          >
+            {isSaving ? "Guardando…" : "Guardar cambios"}
+          </button>
+        </div>
         <ProductGallery
           productId={product.id}
           productName={product.name}
@@ -291,13 +301,22 @@ export default function ProductEditForm({
           <p className="rounded-[20px] border border-accent/20 bg-accent/5 px-4 py-3 text-sm text-black/70">{notice}</p>
         )}
 
-        <button
-          type="submit"
-          disabled={isSaving || isGenerating}
-          className="w-full rounded-full bg-accent py-3.5 font-semibold text-white shadow-accent transition-transform active:scale-[0.98] disabled:opacity-60 sm:w-auto sm:px-10"
-        >
-          {isSaving ? "Guardando…" : "Guardar cambios"}
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button
+            type="submit"
+            disabled={isSaving || isGenerating}
+            className="w-full rounded-full bg-accent py-3.5 font-semibold text-white shadow-accent transition-transform active:scale-[0.98] disabled:opacity-60 sm:w-auto sm:px-10"
+          >
+            {isSaving ? "Guardando…" : "Guardar cambios"}
+          </button>
+          <Link
+            href="/admin"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-black/15 py-3.5 font-semibold text-black/70 transition-colors hover:bg-black/5 hover:text-black sm:w-auto sm:px-8"
+          >
+            <ArrowLeft size={16} />
+            Regresar al inventario
+          </Link>
+        </div>
       </div>
     </form>
   );

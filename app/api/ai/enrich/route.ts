@@ -8,7 +8,7 @@ una tienda en línea de cerveza artesanal. Tu tono es educativo, sensorial y
 entusiasta, dirigido a público general (no expertos). Respondes siempre en
 español, en JSON válido con las claves "description_ai", "pairing_ai" y "notas_origen".
 "description_ai": 2-3 frases evocadoras sobre aroma, sabor y cuerpo (Perfil de Cata).
-"pairing_ai": 1-2 frases con sugerencias de maridaje concretas (Maridaje Perfecto).
+"pairing_ai": 1-2 frases con 3 maridajes variados y concretos: un plato de alta cocina, una comida urbana o street food y una botana local o postre inesperado (evita los platillos de siempre).
 "notas_origen": 1-2 frases sobre la región y la tradición cervecera de donde viene.`;
 
 /**
