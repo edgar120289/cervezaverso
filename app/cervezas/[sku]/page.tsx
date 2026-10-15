@@ -10,6 +10,7 @@ import HealthNotice from "@/components/HealthNotice";
 import FavoriteButton from "@/components/FavoriteButton";
 import ProductGallery from "@/components/ProductGallery";
 import SommelierAudio from "@/components/SommelierAudio";
+import ShareButton from "@/components/ShareButton";
 
 export async function generateMetadata({ params }: PageProps<"/cervezas/[sku]">): Promise<Metadata> {
   const { sku } = await params;
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }: PageProps<"/cervezas/[sku]">)
   return {
     title: product.name,
     description,
-    openGraph: { title: product.name, description, images: product.image_url ? [product.image_url] : undefined },
+    openGraph: { title: product.name, description: product.description_ai ?? description, images: product.image_url ? [product.image_url] : undefined },
     alternates: { canonical: `/cervezas/${encodeURIComponent(product.sku)}` },
   };
 }
@@ -91,6 +92,10 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
             <div className="flex w-full items-center gap-3 sm:w-auto">
               <AddToCartButton product={product} />
               <FavoriteButton productId={product.id} productName={product.name} size="lg" />
+              <ShareButton
+                title={product.name}
+                text={product.description_ai ?? `${product.style} de ${product.country} en Cervezaverso`}
+              />
             </div>
           </div>
           <p className="text-xs text-muted">Precio final en MXN con IVA e IEPS incluidos.</p>

@@ -16,8 +16,8 @@ si no conoces la cervecería, habla de la tradición del estilo y del país.
 
 Además de las tres secciones, devuelve tres campos cortos para el catálogo:
 - "cerveceria": nombre de la marca o cervecería fabricante, deducido del nombre de la cerveza (solo el nombre, sin "Cervecería" ni explicaciones). Si no puedes deducirla con certeza, devuelve una cadena vacía; nunca inventes una.
-- "descripcion": resumen comercial muy corto, máximo 2 líneas (unos 160 caracteres), apto para el catálogo y la meta descripción.
-- "maridaje_resumen": maridaje en una sola línea, por ejemplo "Ideal con cortes de carne y quesos fuertes".
+- "descripcion": gancho comercial punchy para og:description al compartir en WhatsApp y redes. MÁXIMO ESTRICTO de 100 caracteres (10 a 15 palabras), una sola frase, sin comillas ni punto y coma. Cuenta los caracteres antes de responder.
+- "maridaje_resumen": maridaje en una sola línea. MÁXIMO ESTRICTO de 60 caracteres, por ejemplo "Ideal para carnes rojas y postres oscuros". Cuenta los caracteres antes de responder.
 
 Devuelve tres secciones:
 - "origen" — El Origen: historia breve del estilo y de la tradición cervecera del país, y qué hace especial a esta cerveza. 2 a 3 frases.
@@ -36,8 +36,8 @@ const RESPONSE_SCHEMA: ObjectSchema = {
     perfil: { type: SchemaType.STRING, description: "Perfil Sensorial: notas visuales, olfativas y gustativas." },
     maridaje: { type: SchemaType.STRING, description: "El Maridaje Perfecto." },
     cerveceria: { type: SchemaType.STRING, description: "Marca o cervecería fabricante; vacío si no se puede deducir." },
-    descripcion: { type: SchemaType.STRING, description: "Resumen comercial de máximo 2 líneas." },
-    maridaje_resumen: { type: SchemaType.STRING, description: "Maridaje en una línea." },
+    descripcion: { type: SchemaType.STRING, description: "Gancho comercial de MÁXIMO 100 caracteres (10 a 15 palabras)." },
+    maridaje_resumen: { type: SchemaType.STRING, description: "Maridaje en una línea de MÁXIMO 60 caracteres." },
   },
   required: ["origen", "perfil", "maridaje", "cerveceria", "descripcion", "maridaje_resumen"],
 };
@@ -53,9 +53,17 @@ const responseSchema = z.object({
   perfil: z.string().trim().min(1),
   maridaje: z.string().trim().min(1),
   cerveceria: z.string().trim().max(120),
-  descripcion: z.string().trim().min(1).max(300),
-  maridaje_resumen: z.string().trim().min(1).max(200),
+  descripcion: z.string().trim().min(1).transform((s) => clip(s, 100)),
+  maridaje_resumen: z.string().trim().min(1).transform((s) => clip(s, 60)),
 });
+
+/** Red de seguridad: si la IA se pasa del límite, corta en la última palabra completa. */
+function clip(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:.]+$/, "");
+}
 
 type GeneratedDescription = z.infer<typeof responseSchema>;
 
