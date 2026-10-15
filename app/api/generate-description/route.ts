@@ -14,6 +14,11 @@ Escribe siempre en español de México, en segunda persona cuando invites a prob
 Nunca inventes datos concretos que no puedas saber (premios, fechas exactas, nombres de maestros cerveceros);
 si no conoces la cervecería, habla de la tradición del estilo y del país.
 
+Además de las tres secciones, devuelve tres campos cortos para el catálogo:
+- "cerveceria": nombre de la marca o cervecería fabricante, deducido del nombre de la cerveza (solo el nombre, sin "Cervecería" ni explicaciones). Si no puedes deducirla con certeza, devuelve una cadena vacía; nunca inventes una.
+- "descripcion": resumen comercial muy corto, máximo 2 líneas (unos 160 caracteres), apto para el catálogo y la meta descripción.
+- "maridaje_resumen": maridaje en una sola línea, por ejemplo "Ideal con cortes de carne y quesos fuertes".
+
 Devuelve tres secciones:
 - "origen" — El Origen: historia breve del estilo y de la tradición cervecera del país, y qué hace especial a esta cerveza. 2 a 3 frases.
 - "perfil" — Perfil Sensorial: notas de cata en orden visual (color, espuma), olfativa (aromas) y gustativa (sabor, cuerpo, final). 3 a 4 frases evocadoras.
@@ -30,8 +35,11 @@ const RESPONSE_SCHEMA: ObjectSchema = {
     origen: { type: SchemaType.STRING, description: "El Origen: historia breve." },
     perfil: { type: SchemaType.STRING, description: "Perfil Sensorial: notas visuales, olfativas y gustativas." },
     maridaje: { type: SchemaType.STRING, description: "El Maridaje Perfecto." },
+    cerveceria: { type: SchemaType.STRING, description: "Marca o cervecería fabricante; vacío si no se puede deducir." },
+    descripcion: { type: SchemaType.STRING, description: "Resumen comercial de máximo 2 líneas." },
+    maridaje_resumen: { type: SchemaType.STRING, description: "Maridaje en una línea." },
   },
-  required: ["origen", "perfil", "maridaje"],
+  required: ["origen", "perfil", "maridaje", "cerveceria", "descripcion", "maridaje_resumen"],
 };
 
 const requestSchema = z.object({
@@ -44,13 +52,16 @@ const responseSchema = z.object({
   origen: z.string().trim().min(1),
   perfil: z.string().trim().min(1),
   maridaje: z.string().trim().min(1),
+  cerveceria: z.string().trim().max(120),
+  descripcion: z.string().trim().min(1).max(300),
+  maridaje_resumen: z.string().trim().min(1).max(200),
 });
 
 type GeneratedDescription = z.infer<typeof responseSchema>;
 
 /**
- * Sommelier Digital: genera El Origen, Perfil Sensorial y El Maridaje Perfecto
- * a partir del nombre, estilo y país. No guarda nada: el admin revisa el texto
+ * Sommelier Digital: genera El Origen, Perfil Sensorial, El Maridaje Perfecto y
+ * los campos de catálogo (cervecería, descripción y maridaje corto) a partir del nombre, estilo y país. No guarda nada: el admin revisa el texto
  * en el panel y lo guarda con "Guardar cambios".
  */
 export async function POST(req: NextRequest) {

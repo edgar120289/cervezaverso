@@ -42,7 +42,14 @@ type FormState = {
   notas_maridaje: string;
 };
 
-type SommelierNotes = { origen: string; perfil: string; maridaje: string };
+type SommelierNotes = {
+  origen: string;
+  perfil: string;
+  maridaje: string;
+  cerveceria: string;
+  descripcion: string;
+  maridaje_resumen: string;
+};
 
 export default function ProductEditForm({
   product,
@@ -123,6 +130,9 @@ export default function ProductEditForm({
         notas_origen: notes.origen,
         notas_perfil: notes.perfil,
         notas_maridaje: notes.maridaje,
+        brewery: current.brewery.trim() || notes.cerveceria,
+        description_ai: notes.descripcion,
+        pairing_ai: notes.maridaje_resumen,
       }));
       setNotice("Ficha generada. Revísala, edítala si quieres y pulsa “Guardar cambios”.");
     } catch (err) {
@@ -173,15 +183,6 @@ export default function ProductEditForm({
   return (
     <form onSubmit={handleSubmit} noValidate className="grid gap-6 lg:grid-cols-[320px_1fr]">
       <div className="space-y-3 lg:col-span-2">
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={isSaving || isGenerating}
-            className="w-full rounded-full border border-accent px-6 py-3 text-sm font-semibold text-accent transition-colors hover:bg-accent/5 active:scale-[0.98] disabled:opacity-60 sm:w-auto"
-          >
-            {isSaving ? "Guardando…" : "Guardar cambios"}
-          </button>
-        </div>
         <ProductGallery
           productId={product.id}
           productName={product.name}
