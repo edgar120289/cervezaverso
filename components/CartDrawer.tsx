@@ -61,12 +61,13 @@ export default function CartDrawer() {
                 <p className="text-sm text-muted">
                   Elige tu primera cerveza del catálogo para empezar.
                 </p>
-                <button
+                <Link
+                  href="/tienda"
                   onClick={closeDrawer}
                   className="mt-2 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-white shadow-accent"
                 >
                   Explorar cervezas
-                </button>
+                </Link>
               </div>
             ) : (
               <>
