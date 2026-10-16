@@ -2,7 +2,7 @@
 
 Nombre del Proyecto: Cervezaverso
 Tipo: Tienda en línea (E-commerce)
-Fase Actual: 3 - Construcción, ~90 %. EN PAUSA (standby) desde 2026-10-07 a la espera de credenciales de Mercado Pago y datos logísticos (ver sección Estado).
+Fase Actual: 3 - Construcción, ~90 %. ACTIVO desde 2026-10-16 (reactivado tras adquirir el dominio oficial); a la espera de las llaves de producción de Mercado Pago y datos logísticos (ver sección Estado).
 
 Stack Tecnológico:
 
@@ -73,10 +73,12 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 - Fase 3 · Reestructuración del admin y perfil «Team» (2026-10-07): `/admin` pasa a ser solo el Inventario y la analítica vive en `/admin/resumen` (inventario, pedidos por estado, ventas con selector de mes `?mes=YYYY-MM`); menú Inventario, Pedidos, Resumen, Clientes, Cupones, Landing, Carga masiva; en `/cuenta` «¿De qué Team eres?» con 12 teams y foto de perfil (bucket `avatars`). Migración `016_avatars_y_perfil.sql` (**pendiente de ejecutar en Supabase**; las 011 a 015 ya están ejecutadas). tsc, lint y build limpios; pendiente de revisión en navegador y de OK.
 - Fase 3 · Pago con Mercado Pago (2026-10-07): `POST /api/checkout` (pedido Pendiente + preferencia de Checkout Pro), webhook firmado en `/api/webhooks/mercadopago` (Pagado + lealtad + correo) y botón «Pagar con Mercado Pago» en el checkout. Migraciones `017_mercadopago.sql` y `018_cancelar_pedido_pendiente.sql` (**pendientes de ejecutar en Supabase**). Falta `MP_ACCESS_TOKEN` y `MP_WEBHOOK_SECRET` del cliente, dominio HTTPS y probar con credenciales de prueba. tsc, lint y build limpios; pendiente de OK.
 - Siguiente en Fase 3: Sommelier con Gemini y Tarjetas de Regalo, página por página.
-- **ESTADO: PROYECTO AL 90 % Y EN PAUSA en la integración de Mercado Pago** (2026-10-07). El código de pagos, reintento de pago y cancelación de pendientes está completo y commiteado; no se puede probar ni cobrar hasta recibir `MP_ACCESS_TOKEN` y `MP_WEBHOOK_SECRET`, un dominio HTTPS (`NEXT_PUBLIC_SITE_URL`) y los datos de paquetería. Al reanudar: (1) ejecutar en Supabase las migraciones `016`, `017` y `018`; (2) cargar las variables en Vercel y registrar el webhook `/api/webhooks/mercadopago`; (3) probar con credenciales de prueba; (4) tarea programada que cancele Pendientes antiguos con `cancelar_pedido_pendiente`; (5) revisión en navegador (360, 768, 1024 y 1440 px) y auditoría (`/auditoria`).
-- Última actualización: 2026-10-07.
+- **ESTADO: ACTIVO (reactivado el 2026-10-16). Proyecto al 90 %; dominio oficial `https://cervezaverso.com` configurado y listo para inyectar las llaves de producción de la pasarela de pagos.** Antes en pausa desde 2026-10-07. El código de pagos, reintento de pago y cancelación de pendientes está completo y commiteado; no se puede probar ni cobrar hasta recibir `MP_ACCESS_TOKEN` y `MP_WEBHOOK_SECRET`, un dominio HTTPS (`NEXT_PUBLIC_SITE_URL`) y los datos de paquetería. Al reanudar: (1) ejecutar en Supabase las migraciones `016`, `017` y `018`; (2) cargar las variables en Vercel y registrar el webhook `/api/webhooks/mercadopago`; (3) probar con credenciales de prueba; (4) tarea programada que cancele Pendientes antiguos con `cancelar_pedido_pendiente`; (5) revisión en navegador (360, 768, 1024 y 1440 px) y auditoría (`/auditoria`).
+- Última actualización: 2026-10-16.
 
 ## Decisiones
+
+- 2026-10-16 · Proyecto reactivado. Dominio oficial `https://cervezaverso.com`: es el fallback de `SITE.url` en `lib/site.ts` cuando falta `NEXT_PUBLIC_SITE_URL`; `metadataBase`, sitemap, robots, correos, redirecciones de auth y retorno/webhook de Mercado Pago salen de ese valor (no hay `next-sitemap.config.js`). Sustituye el fallback `http://localhost:3000`: en local conviene definir `NEXT_PUBLIC_SITE_URL=http://localhost:3000` en `.env.local`. Siguen pendientes: cargar `NEXT_PUBLIC_SITE_URL` y las llaves `MP_ACCESS_TOKEN`/`MP_WEBHOOK_SECRET` en Vercel y las migraciones 016–018.
 
 - 2026-09-29 · Este CLAUDE.md describe la visión final del proyecto, no solo lo ya construido.
 - 2026-09-29 · El Sommelier actual (cuestionario con reglas en `lib/sommelier.ts`) se migrará a la API de Gemini en una fase posterior; es una funcionalidad nueva.

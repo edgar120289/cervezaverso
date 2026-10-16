@@ -1,7 +1,7 @@
 /** Datos globales del sitio para SEO (metadata, sitemap, robots). */
 export const SITE = {
   name: "Cervezaverso",
-  url: (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
+  url: (process.env.NEXT_PUBLIC_SITE_URL || "https://cervezaverso.com").replace(/\/$/, ""),
   description:
     "Tienda en línea de cerveza artesanal nacional e importada. Estilos, orígenes y maridajes seleccionados, con envío a todo México.",
   locale: "es_MX",
