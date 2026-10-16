@@ -87,7 +87,9 @@ export default function TerminosPage() {
             <>
               <p>
                 Al confirmar tu pedido te mostramos un número de pedido y te llevamos a pagar en línea con Mercado
-                Pago (tarjeta de crédito o débito, SPEI y pago en efectivo en OXXO Pay).
+                Pago (tarjeta de crédito o débito, SPEI y pago en efectivo en OXXO Pay) o, si lo prefieres, por transferencia
+                interbancaria a la cuenta de {LEGAL.razonSocial}. En ese caso, tu pedido queda pendiente hasta que recibamos
+                tu comprobante de pago y confirmemos el depósito.
               </p>
               <p>
                 Los pagos en línea se procesan en la página segura de Mercado Pago: Cervezaverso nunca ve ni guarda

@@ -1,7 +1,8 @@
 import type { AppliedPromo, StockStatus } from "@/lib/types";
 
-const FREE_SHIPPING_THRESHOLD = 2000;
-const FLAT_SHIPPING_COST = 490;
+const FREE_SHIPPING_THRESHOLD = 3000;
+/** Tarifa base temporal: se sustituirá por la cotización de la paquetería. */
+const FLAT_SHIPPING_COST = 150;
 
 export const DEFAULT_MARGIN_PCT = 50;
 
@@ -24,6 +25,24 @@ export const STOCK_STATUS_LABEL: Record<StockStatus, string> = {
 
 export type ShippingMethod = "nacional" | "local";
 
+export type PaymentMethod = "mercadopago" | "transferencia";
+
+export const PAYMENT_METHODS: Record<
+  PaymentMethod,
+  { label: string; description: string; delivery: string }
+> = {
+  mercadopago: {
+    label: "Mercado Pago",
+    description: "Tarjetas, SPEI y efectivo.",
+    delivery: "Tiempo estimado de entrega: 3 a 6 días hábiles",
+  },
+  transferencia: {
+    label: "Transferencia Interbancaria (Sin comisiones)",
+    description: "Pagas desde tu banca en línea y nos envías el comprobante.",
+    delivery: "Entrega rápida: 24 a 48 horas hábiles",
+  },
+};
+
 /** Estados cubiertos por el envío local (CDMX y Área Metropolitana). */
 const LOCAL_SHIPPING_STATES = ["Ciudad de México", "Estado de México"] as const;
 
@@ -42,7 +61,7 @@ export const SHIPPING_METHODS: Record<
 };
 
 /**
- * Nacional: tarifa fija de $490, gratis desde $2,000 de subtotal.
+ * Nacional: tarifa base de $150, gratis desde $3,000 de subtotal.
  * Local (CDMX y Área Metropolitana): siempre $0.
  */
 export function calculateShippingCost(subtotal: number, method: ShippingMethod = "nacional"): number {

@@ -25,6 +25,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: pedido.error, promoInvalid: pedido.promoInvalid ?? false }, { status: 422 });
   }
 
+  // Transferencia: no hay pasarela; el pedido queda Pendiente hasta que el administrador confirme el depósito.
+  if (pedido.metodoPago === "transferencia") {
+    return NextResponse.json({ pedidoId: pedido.pedidoId, redirectUrl: `/pedido/${pedido.pedidoId}?pago=transferencia` });
+  }
+
   const admin = createAdminClient();
   try {
     const preference = await crearPreferenciaPedido(pedido, pedido.pedidoId);

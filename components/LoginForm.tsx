@@ -9,6 +9,7 @@ import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import FormField, { INPUT_CLASS } from "@/components/FormField";
 import FormMessage from "@/components/FormMessage";
 import PrivacyNotice from "@/components/PrivacyNotice";
+import SocialLoginButtons from "@/components/SocialLoginButtons";
 
 type Mode = "signin" | "signup";
 
@@ -80,6 +81,8 @@ export default function LoginForm({ next, notice: initialNotice }: { next: strin
           {mode === "signin" ? "Inicia sesión" : "Crea tu cuenta"}
         </h1>
         <p className="mt-1 text-sm text-muted">Guarda tus favoritas, consulta tus pedidos y compra en 1 clic.</p>
+
+        <SocialLoginButtons next={next} />
 
         <form onSubmit={handleSubmit} noValidate className="relative mt-6 space-y-3">
           <Honeypot value={honeypot} onChange={setHoneypot} />

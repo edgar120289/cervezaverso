@@ -98,6 +98,7 @@ export const checkoutSchema = z
   .object({
     email: z.email("Escribe un correo electrónico válido.").trim().toLowerCase(),
     metodo_envio: z.enum(["nacional", "local"], "Elige un método de envío."),
+    metodo_pago: z.enum(["mercadopago", "transferencia"], "Elige un método de pago."),
     direccion: direccionSchema,
     notas: z
       .string()

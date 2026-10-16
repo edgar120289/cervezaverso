@@ -30,7 +30,7 @@ export async function reintentarPago(pedidoId: string): Promise<ReintentoResult>
   const { data: pedido } = await admin
     .from("pedidos")
     .select(
-      "id, user_id, estado, cliente_nombre, cliente_email, cliente_telefono, costo_envio, descuento, total, pedido_items (product_id, sku, nombre, precio_unitario, cantidad)"
+      "id, user_id, estado, metodo_pago, cliente_nombre, cliente_email, cliente_telefono, costo_envio, descuento, total, pedido_items (product_id, sku, nombre, precio_unitario, cantidad)"
     )
     .eq("id", id.data)
     .maybeSingle();
@@ -43,6 +43,7 @@ export async function reintentarPago(pedidoId: string): Promise<ReintentoResult>
     } = await supabase.auth.getUser();
     if (user?.id !== pedido.user_id) return { ok: false, error: "Pedido no encontrado." };
   }
+  if (pedido.metodo_pago === "transferencia") return { ok: false, error: "Este pedido se paga por transferencia." };
   if (pedido.estado !== "Pendiente") return { ok: false, error: "Este pedido ya no está pendiente de pago." };
 
   // Los productos pudieron agotarse o desactivarse desde la compra original.

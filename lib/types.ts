@@ -65,6 +65,8 @@ export type Pedido = {
 
 type MetodoEnvio = "nacional" | "local";
 
+export type MetodoPago = "mercadopago" | "transferencia";
+
 export type Direccion = {
   id: string;
   nombre_completo: string;
@@ -95,6 +97,8 @@ export type PedidoDetalle = Pedido & {
   user_id: string | null;
   cliente_telefono: string | null;
   metodo_envio: MetodoEnvio;
+  /** Columna de la migración 019; los pedidos anteriores son de Mercado Pago. */
+  metodo_pago?: MetodoPago;
   subtotal: number;
   costo_envio: number;
   /** Columnas de la migración 004; ausentes en pedidos anteriores. */

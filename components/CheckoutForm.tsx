@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
 import { LEGAL } from "@/lib/site";
-import { Check, MapPin, Truck, Zap } from "lucide-react";
+import { Check, CreditCard, Landmark, MapPin, Truck, Zap } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import {
   calculateOrderTotals,
@@ -11,7 +11,9 @@ import {
   formatMXN,
   FREE_SHIPPING_THRESHOLD,
   isLocalShippingState,
+  PAYMENT_METHODS,
   SHIPPING_METHODS,
+  type PaymentMethod,
   type ShippingMethod,
 } from "@/lib/pricing";
 import { ESTADOS_MX } from "@/lib/estados-mx";
@@ -20,6 +22,7 @@ import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
 import Honeypot from "@/components/Honeypot";
 import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import FormField from "@/components/FormField";
+import BankTransferCard from "@/components/BankTransferCard";
 import HealthNotice from "@/components/HealthNotice";
 import PrivacyNotice from "@/components/PrivacyNotice";
 import type { Direccion, DireccionEnvio } from "@/lib/types";
@@ -69,6 +72,7 @@ export default function CheckoutForm({
     return () => window.removeEventListener("pageshow", reset);
   }, []);
   const [error, setError] = useState<string | null>(null);
+  const [metodoPago, setMetodoPago] = useState<PaymentMethod>("mercadopago");
 
   const predeterminada = direcciones.find((d) => d.predeterminada) ?? direcciones[0];
   const [email, setEmail] = useState(initialEmail);
@@ -120,6 +124,7 @@ export default function CheckoutForm({
     const input = {
       email,
       metodo_envio: metodo,
+      metodo_pago: metodoPago,
       direccion: {
         nombre_completo: direccion.nombre_completo,
         telefono: direccion.telefono,
@@ -151,7 +156,7 @@ export default function CheckoutForm({
     }
 
     startTransition(async () => {
-      let result: { initPoint?: string; error?: string; promoInvalid?: boolean } = {};
+      let result: { initPoint?: string; redirectUrl?: string; error?: string; promoInvalid?: boolean } = {};
       try {
         const response = await fetch("/api/checkout", {
           method: "POST",
@@ -164,7 +169,8 @@ export default function CheckoutForm({
       }
       // Cada token de Turnstile sirve una sola vez.
       setTurnstileReset((n) => n + 1);
-      if (!result.initPoint) {
+      const destino = result.initPoint ?? result.redirectUrl;
+      if (!destino) {
         // El código dejó de servir (se agotó o lo desactivaron): se quita y los totales se recalculan.
         if (result.promoInvalid) removePromo();
         const mensaje = result.error ?? "No pudimos iniciar el pago. Intenta de nuevo.";
@@ -173,7 +179,7 @@ export default function CheckoutForm({
       }
       // El carrito se vacía al volver del pago (página del pedido); si el cliente cancela, lo conserva.
       setIsRedirecting(true);
-      window.location.assign(result.initPoint);
+      window.location.assign(destino);
     });
   }
 
@@ -304,7 +310,7 @@ export default function CheckoutForm({
                   <input
                     className={inputClass}
                     id="checkout-calle"
-                    autoComplete="street-address"
+                    autoComplete="address-line1"
                     value={nueva.calle}
                     onChange={(e) => updateNueva("calle", e.target.value)}
                   />
@@ -315,6 +321,7 @@ export default function CheckoutForm({
                   <input
                     className={inputClass}
                     id="checkout-colonia"
+                    autoComplete="address-line2"
                     value={nueva.colonia}
                     onChange={(e) => updateNueva("colonia", e.target.value)}
                   />
@@ -415,9 +422,39 @@ export default function CheckoutForm({
           )}
         </section>
 
+        {/* Pago */}
+        <section className="rounded-[28px] bg-white p-6 shadow-card">
+          <SectionTitle step={4} title="Método de pago" />
+          <div className="space-y-2" role="radiogroup" aria-label="Método de pago">
+            <OptionCard checked={metodoPago === "mercadopago"} onSelect={() => setMetodoPago("mercadopago")} name="metodo_pago">
+              <div className="flex gap-3">
+                <CreditCard size={20} className="mt-0.5 shrink-0 text-muted" />
+                <div>
+                  <p className="font-semibold">{PAYMENT_METHODS.mercadopago.label}</p>
+                  <p className="text-sm text-muted">{PAYMENT_METHODS.mercadopago.description}</p>
+                  <p className="mt-1 text-sm text-muted">{PAYMENT_METHODS.mercadopago.delivery}</p>
+                </div>
+              </div>
+            </OptionCard>
+            <OptionCard checked={metodoPago === "transferencia"} onSelect={() => setMetodoPago("transferencia")} name="metodo_pago">
+              <div className="flex gap-3">
+                <Landmark size={20} className="mt-0.5 shrink-0 text-muted" />
+                <div>
+                  <p className="font-semibold">{PAYMENT_METHODS.transferencia.label}</p>
+                  <p className="text-sm text-muted">{PAYMENT_METHODS.transferencia.description}</p>
+                  <p className="mt-1 inline-block rounded-pill bg-accent/10 px-3 py-1 text-sm font-semibold text-accent">
+                    {PAYMENT_METHODS.transferencia.delivery}
+                  </p>
+                </div>
+              </div>
+            </OptionCard>
+          </div>
+          {metodoPago === "transferencia" && <BankTransferCard />}
+        </section>
+
         {/* Notas */}
         <section className="rounded-[28px] bg-white p-6 shadow-card">
-          <SectionTitle step={4} title="Notas o instrucciones especiales para su pedido" />
+          <SectionTitle step={5} title="Notas o instrucciones especiales para su pedido" />
           <label htmlFor="checkout-notas" className="sr-only">
             Notas o instrucciones especiales
           </label>
@@ -482,11 +519,19 @@ export default function CheckoutForm({
           disabled={isPending}
           className="flex w-full items-center justify-center gap-2 rounded-full bg-accent py-3.5 font-semibold text-white shadow-accent transition-transform active:scale-[0.98] disabled:opacity-60"
         >
-          {guardada && !isPending && <Zap size={16} fill="currentColor" />}
-          {isPending ? "Preparando tu pago…" : guardada ? "Pagar en 1 clic" : "Pagar con Mercado Pago"}
+          {guardada && !isPending && metodoPago === "mercadopago" && <Zap size={16} fill="currentColor" />}
+          {isPending
+            ? "Preparando tu pedido…"
+            : metodoPago === "transferencia"
+              ? "Confirmar pedido"
+              : guardada
+                ? "Pagar en 1 clic"
+                : "Pagar con Mercado Pago"}
         </button>
         <p className="text-center text-xs text-muted">
-          Pagas en la página segura de Mercado Pago con tarjeta, SPEI u OXXO Pay. Nosotros nunca vemos tus datos de pago.
+          {metodoPago === "transferencia"
+            ? "Al confirmar, verás tu número de pedido y podrás enviarnos el comprobante por WhatsApp. Preparamos tu envío al confirmar el depósito."
+            : "Pagas en la página segura de Mercado Pago con tarjeta, SPEI u OXXO Pay. Nosotros nunca vemos tus datos de pago."}
         </p>
         <p className="text-center text-xs leading-relaxed text-muted">
           Al proceder con el pago, aceptas nuestros{" "}

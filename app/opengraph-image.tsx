@@ -1,15 +1,18 @@
 import { ImageResponse } from "next/og";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-export const alt = "Cervezaverso — Cerveza artesanal nacional e importada";
+// Un logotipo distinto en cada generación: la imagen no se pre-renderiza en el build.
+export const dynamic = "force-dynamic";
+
+export const alt = "Cervezaverso — Tienda de cerveza artesanal e importada";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OpengraphImage() {
-  const tarro = await readFile(
-    join(process.cwd(), "public/img/cervezaverso-tarros-sin-fondo/tarros-sin-fondo/03-azteca.png")
-  );
+  const logosDir = join(process.cwd(), "public/img/cervezaverso-logos-v2/logos/circular");
+  const logos = (await readdir(logosDir)).filter((name) => name.toLowerCase().endsWith(".png"));
+  const logo = await readFile(join(logosDir, logos[Math.floor(Math.random() * logos.length)]));
 
   return new ImageResponse(
     (
@@ -45,10 +48,10 @@ export default async function OpengraphImage() {
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`data:image/png;base64,${tarro.toString("base64")}`}
+            src={`data:image/png;base64,${logo.toString("base64")}`}
             alt=""
-            width={380}
-            height={471}
+            width={440}
+            height={440}
             style={{ objectFit: "contain" }}
           />
         </div>

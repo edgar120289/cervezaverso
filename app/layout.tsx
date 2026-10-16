@@ -23,7 +23,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: "Cervezaverso — Cerveza artesanal nacional e importada",
+    default: SITE.title,
     template: "%s · Cervezaverso",
   },
   description: SITE.description,
@@ -40,12 +40,12 @@ export const metadata: Metadata = {
     locale: SITE.locale,
     url: "/",
     siteName: SITE.name,
-    title: "Cervezaverso — Cerveza artesanal nacional e importada",
+    title: SITE.title,
     description: SITE.description,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cervezaverso — Cerveza artesanal nacional e importada",
+    title: SITE.title,
     description: SITE.description,
   },
 };

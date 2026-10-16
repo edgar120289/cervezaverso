@@ -2,8 +2,10 @@
 export const SITE = {
   name: "Cervezaverso",
   url: (process.env.NEXT_PUBLIC_SITE_URL || "https://cervezaverso.com").replace(/\/$/, ""),
+  /** Título por defecto: no repite la descripción. */
+  title: "Cervezaverso — Tienda de cerveza artesanal e importada",
   description:
-    "Tienda en línea de cerveza artesanal nacional e importada. Estilos, orígenes y maridajes seleccionados, con envío a todo México.",
+    "Explora nuestro catálogo de cervezas del mundo. Encuentra estilos únicos, orígenes exóticos y los mejores maridajes. Compra segura en línea.",
   locale: "es_MX",
 } as const;
 
@@ -25,6 +27,13 @@ export const CONTACT = {
   facebookUrl: "https://facebook.com/Cervezaverso",
   handle: "@Cervezaverso",
   email: "contacto@cervezaverso.com",
+} as const;
+
+/** Datos bancarios para pagos por transferencia interbancaria (públicos, se muestran al cliente). */
+export const BANK_TRANSFER = {
+  beneficiario: "Cervezaverso S.A.S de C.V.",
+  banco: "STP / Fondeadora",
+  clabe: "699180600006072378",
 } as const;
 
 /** Leyenda sanitaria obligatoria para bebidas alcohólicas (pendiente de revisión legal). */

@@ -2,7 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { calculateOrderTotals, formatMXN } from "@/lib/pricing";
+import { calculateOrderTotals, formatMXN, type PaymentMethod } from "@/lib/pricing";
 import { findActivePromo } from "@/lib/promo";
 import { checkoutSchema, firstIssue } from "@/lib/validation";
 import { guardPublicForm } from "@/lib/security/form-guard";
@@ -20,6 +20,7 @@ export type PedidoRegistrado = {
   costoEnvio: number;
   total: number;
   promoId: string | null;
+  metodoPago: PaymentMethod;
 };
 
 export type RegistroResult =
@@ -40,7 +41,7 @@ export async function liberarPromo(promoId: string | null): Promise<void> {
 export async function registrarPedido(input: unknown): Promise<RegistroResult> {
   const parsed = checkoutSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
-  const { email, metodo_envio, direccion, notas, items, promo_code, fecha_nacimiento, website, turnstileToken } =
+  const { email, metodo_envio, metodo_pago, direccion, notas, items, promo_code, fecha_nacimiento, website, turnstileToken } =
     parsed.data;
 
   const guard = await guardPublicForm("checkout", { honeypot: website, turnstileToken });
@@ -122,6 +123,8 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
       cliente_email: email,
       cliente_telefono: direccion.telefono,
       metodo_envio,
+      // Sólo se envía con transferencia: con Mercado Pago aplica el valor por defecto de la columna.
+      ...(metodo_pago === "transferencia" ? { metodo_pago } : {}),
       subtotal,
       costo_envio: costoEnvio,
       total,
@@ -163,6 +166,7 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
     costoEnvio,
     total,
     promoId: promo?.id ?? null,
+    metodoPago: metodo_pago,
   };
 }
 

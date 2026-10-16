@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CircleCheck, CircleX, MapPin, MessageSquareText, Truck } from "lucide-react";
+import BankTransferCard from "@/components/BankTransferCard";
+import { WhatsAppIcon } from "@/components/SocialIcons";
+import { CONTACT } from "@/lib/site";
 import { z } from "zod";
 import ClearCart from "@/components/ClearCart";
 import RetryPaymentButton from "@/components/RetryPaymentButton";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { formatMXN, SHIPPING_METHODS } from "@/lib/pricing";
+import { formatMXN, PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/pricing";
 import { ESTADO_BADGE, folio, formatFecha, PEDIDO_DETALLE_COLUMNS } from "@/lib/pedidos";
 import type { PedidoDetalle } from "@/lib/types";
 
@@ -46,7 +49,8 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
   if (!pedido) notFound();
 
   // `pago` solo decide el mensaje al volver de Mercado Pago; el estado real viene de la base (webhook).
-  const esNuevo = pago === "exitoso" || pago === "pendiente";
+  const esTransferencia = pedido.metodo_pago === "transferencia";
+  const esNuevo = pago === "exitoso" || pago === "pendiente" || (esTransferencia && pago === "transferencia");
   const fallido = pago === "fallido";
   const confirmado = pedido.estado !== "Pendiente";
   const envio = SHIPPING_METHODS[pedido.metodo_envio];
@@ -64,8 +68,13 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
           <p className="max-w-md text-muted">
             {confirmado
               ? "Recibimos tu pago del pedido "
-              : "Estamos confirmando el pago del pedido "}
-            <span className="font-semibold text-black">#{folio(pedido.id)}</span>. Te avisaremos en{" "}
+              : esTransferencia
+                ? "Registramos tu pedido "
+                : "Estamos confirmando el pago del pedido "}
+            <span className="font-semibold text-black">#{folio(pedido.id)}</span>.{" "}
+            {esTransferencia && !confirmado
+              ? "Realiza la transferencia y envíanos tu comprobante para confirmar tu pago. Te avisaremos en "
+              : "Te avisaremos en "}
             <span className="font-semibold text-black">{pedido.cliente_email}</span> en cuanto quede confirmado.
           </p>
         </section>
@@ -88,7 +97,26 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
         </div>
       )}
 
-      {pedido.estado === "Pendiente" && !esNuevo && (
+      {pedido.estado === "Pendiente" && esTransferencia && (
+        <section className="rounded-[28px] bg-white p-6 shadow-card">
+          <p className="text-center text-sm font-semibold text-accent">{PAYMENT_METHODS.transferencia.delivery}</p>
+          <p className="mt-1 text-center text-sm text-muted">
+            Transfiere {formatMXN(Number(pedido.total))} indicando el folio #{folio(pedido.id)} como referencia.
+          </p>
+          <BankTransferCard />
+          <a
+            href={`${CONTACT.whatsappUrl}?text=${encodeURIComponent(`Hola, envío mi comprobante de pago para el pedido #${folio(pedido.id)}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#0e7c3f] px-6 py-4 text-base font-semibold text-white shadow-card transition-transform active:scale-[0.98]"
+          >
+            <WhatsAppIcon />
+            Enviar comprobante de pago
+          </a>
+        </section>
+      )}
+
+      {pedido.estado === "Pendiente" && !esNuevo && !esTransferencia && (
         <section className="flex flex-col items-center gap-3 rounded-[28px] bg-white p-6 text-center shadow-card">
           <p className="text-sm text-muted">Este pedido está pendiente de pago.</p>
           <RetryPaymentButton pedidoId={pedido.id} />
