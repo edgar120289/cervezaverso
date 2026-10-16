@@ -79,6 +79,7 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 ## Decisiones
 
 - 2026-10-16 · Migraciones: `004_promo_codes.sql`, `016_avatars_y_perfil.sql`, `017_mercadopago.sql` y `018_cancelar_pedido_pendiente.sql` se ejecutaron a mano en el SQL Editor de Supabase (producción), sin errores. Con ellas, todas las migraciones (002 a 018) están aplicadas. El CLI de Supabase no está ligado al proyecto ni se usa `db push`; el flujo sigue siendo manual.
+- 2026-10-16 · Cloudflare Turnstile sigue activo (login, registro, recuperación y checkout): el cliente decidió mantener el nivel de seguridad alto; se revirtió el intento de retirarlo. Requiere `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY` en Vercel, con el dominio `cervezaverso.com` dado de alta en el widget de Cloudflare, y el Captcha de Supabase apagado (la verificación se hace en el servidor, no en Supabase).
 - 2026-10-16 · Proyecto reactivado. Dominio oficial `https://cervezaverso.com`: es el fallback de `SITE.url` en `lib/site.ts` cuando falta `NEXT_PUBLIC_SITE_URL`; `metadataBase`, sitemap, robots, correos, redirecciones de auth y retorno/webhook de Mercado Pago salen de ese valor (no hay `next-sitemap.config.js`). Sustituye el fallback `http://localhost:3000`: en local conviene definir `NEXT_PUBLIC_SITE_URL=http://localhost:3000` en `.env.local`. Siguen pendientes: cargar `NEXT_PUBLIC_SITE_URL` y las llaves `MP_ACCESS_TOKEN`/`MP_WEBHOOK_SECRET` en Vercel.
 
 - 2026-09-29 · Este CLAUDE.md describe la visión final del proyecto, no solo lo ya construido.
