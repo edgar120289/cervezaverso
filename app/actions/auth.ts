@@ -11,15 +11,15 @@ export type AuthResult<T = object> = ({ ok: true } & T) | { ok: false; error: st
 
 /**
  * Acceso, registro y recuperación pasan por el servidor para aplicar el mismo
- * filtro que el resto de formularios públicos (honeypot, límite de intentos y
- * Turnstile) y para validar la fecha de nacimiento antes de crear la cuenta.
+ * filtro que el resto de formularios públicos (honeypot y límite de intentos)
+ * y para validar la fecha de nacimiento antes de crear la cuenta.
  */
 export async function iniciarSesion(input: unknown): Promise<AuthResult<{ role: UserRole }>> {
   const parsed = loginSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
-  const { email, password, website, turnstileToken } = parsed.data;
+  const { email, password, website } = parsed.data;
 
-  const guard = await guardPublicForm("login", { honeypot: website, turnstileToken });
+  const guard = await guardPublicForm("login", { honeypot: website });
   if (!guard.ok) return guard;
 
   const supabase = await createClient();
@@ -38,9 +38,9 @@ export async function iniciarSesion(input: unknown): Promise<AuthResult<{ role: 
 export async function registrarCuenta(input: unknown): Promise<AuthResult<{ needsConfirmation: boolean }>> {
   const parsed = signupSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
-  const { email, password, fecha_nacimiento, next, website, turnstileToken } = parsed.data;
+  const { email, password, fecha_nacimiento, next, website } = parsed.data;
 
-  const guard = await guardPublicForm("signup", { honeypot: website, turnstileToken });
+  const guard = await guardPublicForm("signup", { honeypot: website });
   if (!guard.ok) return guard;
 
   const supabase = await createClient();
@@ -63,9 +63,9 @@ export async function registrarCuenta(input: unknown): Promise<AuthResult<{ need
 export async function solicitarRecuperacion(input: unknown): Promise<AuthResult> {
   const parsed = recoverSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
-  const { email, website, turnstileToken } = parsed.data;
+  const { email, website } = parsed.data;
 
-  const guard = await guardPublicForm("recover", { honeypot: website, turnstileToken });
+  const guard = await guardPublicForm("recover", { honeypot: website });
   if (!guard.ok) return guard;
 
   const supabase = await createClient();

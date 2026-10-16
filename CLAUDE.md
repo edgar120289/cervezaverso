@@ -44,7 +44,7 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 
 - Fase 1 · Plan: aprobada (2026-09-29).
 - Fase 2 · Base y correcciones: terminada en código (2026-09-29), **pendiente de OK**. Bloques 1–8 con commit propio; build, lint y typecheck limpios.
-- Para que funcione completo falta: correr `supabase/migrations/005_edad_rate_limit.sql` en Supabase y dar de alta las claves de Turnstile (ver `.env.example`).
+- Para que funcione completo falta: correr `supabase/migrations/005_edad_rate_limit.sql` en Supabase.
 - Pendiente de revisar en navegador (360, 768, 1024 y 1440 px): no hubo navegador disponible en la sesión.
 - Datos legales del negocio completos en `/terminos` y `/privacidad` (2026-10-07); los textos siguen como borrador pendiente de revisión legal. Falta configurar `NEXT_PUBLIC_SITE_URL` (dominio) en Vercel.
 - Fase 2.5 · Refactor UI/UX (header con logotipo horizontal, menú de sesión, Hero, Sommelier con tarrito kawaii, filtros sin Estilo, tarjetas simétricas): hecho en código (2026-09-29), pendiente de revisión en navegador y de OK.
@@ -79,6 +79,7 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 ## Decisiones
 
 - 2026-10-16 · Migraciones: `004_promo_codes.sql`, `016_avatars_y_perfil.sql`, `017_mercadopago.sql` y `018_cancelar_pedido_pendiente.sql` se ejecutaron a mano en el SQL Editor de Supabase (producción), sin errores. Con ellas, todas las migraciones (002 a 018) están aplicadas. El CLI de Supabase no está ligado al proyecto ni se usa `db push`; el flujo sigue siendo manual.
+- 2026-10-16 · Se retira Cloudflare Turnstile de login, registro, recuperación y checkout (bloqueaba el login en el dominio de producción; el Captcha de Supabase ya está apagado). La protección pública queda en honeypot + límite de intentos por IP (`guardPublicForm`). Se eliminan `components/Turnstile.tsx`, `lib/security/turnstile.ts`, las variables `*TURNSTILE*` y el origen de Cloudflare en la CSP (`frame-src 'none'`). Riesgo: sin captcha, el rate limiting es la única defensa contra bots; reevaluar si hay abuso.
 - 2026-10-16 · Proyecto reactivado. Dominio oficial `https://cervezaverso.com`: es el fallback de `SITE.url` en `lib/site.ts` cuando falta `NEXT_PUBLIC_SITE_URL`; `metadataBase`, sitemap, robots, correos, redirecciones de auth y retorno/webhook de Mercado Pago salen de ese valor (no hay `next-sitemap.config.js`). Sustituye el fallback `http://localhost:3000`: en local conviene definir `NEXT_PUBLIC_SITE_URL=http://localhost:3000` en `.env.local`. Siguen pendientes: cargar `NEXT_PUBLIC_SITE_URL` y las llaves `MP_ACCESS_TOKEN`/`MP_WEBHOOK_SECRET` en Vercel.
 
 - 2026-09-29 · Este CLAUDE.md describe la visión final del proyecto, no solo lo ya construido.

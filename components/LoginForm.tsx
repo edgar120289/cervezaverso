@@ -5,7 +5,6 @@ import Link from "next/link";
 import { iniciarSesion, registrarCuenta } from "@/app/actions/auth";
 import { credentialsSchema, birthDateSchema, firstIssue, isHoneypotFilled } from "@/lib/validation";
 import Honeypot from "@/components/Honeypot";
-import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import FormField, { INPUT_CLASS } from "@/components/FormField";
 import FormMessage from "@/components/FormMessage";
 import PrivacyNotice from "@/components/PrivacyNotice";
@@ -19,8 +18,6 @@ export default function LoginForm({ next, notice: initialNotice }: { next: strin
   const [birthDate, setBirthDate] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [honeypot, setHoneypot] = useState("");
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [turnstileReset, setTurnstileReset] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(initialNotice ?? null);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,12 +37,9 @@ export default function LoginForm({ next, notice: initialNotice }: { next: strin
       const birth = birthDateSchema.safeParse(birthDate);
       if (!birth.success) return setError(firstIssue(birth.error));
     }
-    if (TURNSTILE_ENABLED && !turnstileToken) {
-      return setError("Espera un momento a que terminemos de verificar tu navegador.");
-    }
 
     setIsLoading(true);
-    const common = { ...parsed.data, website: honeypot, turnstileToken };
+    const common = { ...parsed.data, website: honeypot };
     try {
       if (mode === "signup") {
         const result = await registrarCuenta({ ...common, fecha_nacimiento: birthDate, next });
@@ -63,8 +57,6 @@ export default function LoginForm({ next, notice: initialNotice }: { next: strin
       setError("No pudimos conectar con el servidor. Intenta de nuevo.");
     } finally {
       setIsLoading(false);
-      // Cada token de Turnstile sirve una sola vez.
-      setTurnstileReset((n) => n + 1);
     }
   }
 
@@ -146,8 +138,6 @@ export default function LoginForm({ next, notice: initialNotice }: { next: strin
               </Link>
             )}
           </div>
-
-          <Turnstile onToken={setTurnstileToken} resetKey={turnstileReset} />
 
           {error && <FormMessage tone="error">{error}</FormMessage>}
           {notice && <FormMessage tone="info">{notice}</FormMessage>}

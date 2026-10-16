@@ -17,7 +17,7 @@ export type RateLimitAction = keyof typeof RATE_LIMITS;
  * Cuenta un intento en Supabase (`check_rate_limit`, migración 005) y dice si
  * sigue dentro del límite. La IP se guarda como hash, no en claro. Si la base
  * no responde se deja pasar: un fallo del contador no debe tumbar la tienda
- * (Turnstile y el firewall de la plataforma siguen activos).
+ * (el firewall de la plataforma sigue activo).
  */
 export async function isWithinRateLimit(action: RateLimitAction, ip: string | null): Promise<boolean> {
   const { max, windowSeconds } = RATE_LIMITS[action];
