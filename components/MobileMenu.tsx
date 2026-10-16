@@ -14,6 +14,7 @@ import {
   Menu,
   Search,
   Store,
+  UserPlus,
   UserRound,
   X,
 } from "lucide-react";
@@ -158,10 +159,16 @@ export default function MobileMenu() {
                     </button>
                   </>
                 ) : (
-                  <Link href="/login" className={itemClass}>
-                    <LogIn size={18} className="shrink-0" />
-                    Iniciar sesión
-                  </Link>
+                  <>
+                    <Link href="/login" className={itemClass}>
+                      <LogIn size={18} className="shrink-0" />
+                      Iniciar sesión
+                    </Link>
+                    <Link href="/registro" className={itemClass}>
+                      <UserPlus size={18} className="shrink-0" />
+                      Crear cuenta
+                    </Link>
+                  </>
                 )}
               </motion.nav>
             </div>

@@ -13,8 +13,16 @@ import SocialLoginButtons from "@/components/SocialLoginButtons";
 
 type Mode = "signin" | "signup";
 
-export default function LoginForm({ next, notice: initialNotice }: { next: string; notice?: string }) {
-  const [mode, setMode] = useState<Mode>("signin");
+export default function LoginForm({
+  next,
+  notice: initialNotice,
+  initialMode = "signin",
+}: {
+  next: string;
+  notice?: string;
+  initialMode?: Mode;
+}) {
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -69,15 +77,32 @@ export default function LoginForm({ next, notice: initialNotice }: { next: strin
     }
   }
 
-  function switchMode() {
-    setMode(mode === "signin" ? "signup" : "signin");
+  function selectMode(value: Mode) {
+    setMode(value);
     setError(null);
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-16">
-      <div className="rounded-[28px] bg-white p-8 shadow-card">
-        <h1 className="text-2xl font-semibold tracking-tight">
+    <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-10 sm:py-16">
+      <div className="rounded-[28px] bg-white p-6 shadow-card sm:p-8">
+        <div role="tablist" aria-label="Acceso" className="grid grid-cols-2 gap-1 rounded-full bg-canvas p-1 text-sm font-semibold">
+          {(["signin", "signup"] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              role="tab"
+              aria-selected={mode === value}
+              onClick={() => selectMode(value)}
+              className={`min-h-11 rounded-full transition-colors ${
+                mode === value ? "bg-white shadow-card" : "text-muted hover:text-black"
+              }`}
+            >
+              {value === "signin" ? "Entrar" : "Crear cuenta"}
+            </button>
+          ))}
+        </div>
+
+        <h1 className="mt-6 text-2xl font-semibold tracking-tight">
           {mode === "signin" ? "Inicia sesión" : "Crea tu cuenta"}
         </h1>
         <p className="mt-1 text-sm text-muted">Guarda tus favoritas, consulta tus pedidos y compra en 1 clic.</p>
@@ -170,15 +195,7 @@ export default function LoginForm({ next, notice: initialNotice }: { next: strin
           </PrivacyNotice>
         </form>
 
-        <button
-          type="button"
-          onClick={switchMode}
-          className="mt-4 min-h-11 w-full text-center text-sm text-muted hover:text-black"
-        >
-          {mode === "signin" ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
-        </button>
-
-        <Link href="/" className="mx-auto flex min-h-11 w-fit items-center text-xs text-muted hover:text-black">
+        <Link href="/" className="mx-auto mt-2 flex min-h-11 w-fit items-center text-xs text-muted hover:text-black">
           Volver a la tienda
         </Link>
       </div>

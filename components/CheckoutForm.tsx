@@ -230,7 +230,11 @@ export default function CheckoutForm({
               <Link href="/login?next=/checkout" className="font-semibold text-accent hover:underline">
                 Inicia sesión
               </Link>{" "}
-              para usar tus direcciones guardadas y ver este pedido en tu historial.
+              para usar tus direcciones guardadas y ver este pedido en tu historial. ¿Prefieres crear una?{" "}
+              <Link href="/registro?next=/checkout" className="font-semibold text-accent hover:underline">
+                Crear cuenta
+              </Link>
+              .
             </p>
           )}
         </section>

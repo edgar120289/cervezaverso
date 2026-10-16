@@ -28,7 +28,7 @@ export default function SocialLoginButtons({ next }: { next: string }) {
   }
 
   return (
-    <div className="mt-6 space-y-2">
+    <div className="mt-6 space-y-3">
       <button type="button" onClick={() => signIn("google")} disabled={loading !== null} className={BUTTON_CLASS}>
         <GoogleIcon />
         {loading === "google" ? "Conectando…" : "Continuar con Google"}
@@ -38,8 +38,8 @@ export default function SocialLoginButtons({ next }: { next: string }) {
         {loading === "apple" ? "Conectando…" : "Continuar con Apple"}
       </button>
       {error && <FormMessage tone="error">{error}</FormMessage>}
-      <div className="flex items-center gap-3 pt-2 text-xs text-muted" aria-hidden>
-        <span className="h-px flex-1 bg-black/10" />o con tu correo
+      <div className="flex items-center gap-3 pt-1 text-sm text-muted" aria-hidden>
+        <span className="h-px flex-1 bg-black/10" />o
         <span className="h-px flex-1 bg-black/10" />
       </div>
     </div>
