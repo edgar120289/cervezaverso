@@ -40,10 +40,10 @@ export async function liberarPromo(promoId: string | null): Promise<void> {
 export async function registrarPedido(input: unknown): Promise<RegistroResult> {
   const parsed = checkoutSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
-  const { email, metodo_envio, direccion, notas, items, promo_code, fecha_nacimiento, website } =
+  const { email, metodo_envio, direccion, notas, items, promo_code, fecha_nacimiento, website, turnstileToken } =
     parsed.data;
 
-  const guard = await guardPublicForm("checkout", { honeypot: website });
+  const guard = await guardPublicForm("checkout", { honeypot: website, turnstileToken });
   if (!guard.ok) return guard;
 
   const supabase = await createClient();

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { solicitarRecuperacion } from "@/app/actions/auth";
 import { firstIssue, isHoneypotFilled, recoverSchema } from "@/lib/validation";
 import Honeypot from "@/components/Honeypot";
+import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import FormField, { INPUT_CLASS } from "@/components/FormField";
 import FormMessage from "@/components/FormMessage";
 import PrivacyNotice from "@/components/PrivacyNotice";
@@ -12,6 +13,8 @@ import PrivacyNotice from "@/components/PrivacyNotice";
 export default function RecoverPasswordForm() {
   const [email, setEmail] = useState("");
   const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,8 +25,11 @@ export default function RecoverPasswordForm() {
     setError(null);
     if (isHoneypotFilled(honeypot)) return;
 
-    const parsed = recoverSchema.safeParse({ email, website: honeypot });
+    const parsed = recoverSchema.safeParse({ email, website: honeypot, turnstileToken });
     if (!parsed.success) return setError(firstIssue(parsed.error));
+    if (TURNSTILE_ENABLED && !turnstileToken) {
+      return setError("Espera un momento a que terminemos de verificar tu navegador.");
+    }
 
     setIsLoading(true);
     try {
@@ -34,6 +40,7 @@ export default function RecoverPasswordForm() {
       setError("No pudimos conectar con el servidor. Intenta de nuevo.");
     } finally {
       setIsLoading(false);
+      setTurnstileReset((n) => n + 1);
     }
   }
 
@@ -64,6 +71,7 @@ export default function RecoverPasswordForm() {
                 className={INPUT_CLASS}
               />
             </FormField>
+            <Turnstile onToken={setTurnstileToken} resetKey={turnstileReset} />
             {error && <FormMessage tone="error">{error}</FormMessage>}
             <button
               type="submit"

@@ -7,6 +7,7 @@ const supabaseHostname = supabaseOrigin ? new URL(supabaseOrigin).hostname : und
 
 const isDev = process.env.NODE_ENV === "development";
 
+const TURNSTILE = "https://challenges.cloudflare.com";
 const GA_SCRIPT = "https://www.googletagmanager.com";
 const GA_COLLECT = "https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com";
 
@@ -14,18 +15,18 @@ const GA_COLLECT = "https://*.google-analytics.com https://*.analytics.google.co
  * CSP sin nonce: un nonce obligaría a renderizar cada página en cada visita
  * (sin HTML estático ni caché de CDN). Por eso `script-src` conserva
  * 'unsafe-inline' (scripts de hidratación de Next y el arranque de GA), pero
- * limita los orígenes a los propios y Google Analytics, y bloquea
+ * limita los orígenes a los propios, Turnstile y Google Analytics, y bloquea
  * `object`, `base`, iframes ajenos y que otro sitio nos incruste.
  */
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} ${GA_SCRIPT}`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} ${TURNSTILE} ${GA_SCRIPT}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${GA_SCRIPT} https://*.google-analytics.com https://flagcdn.com`,
   "font-src 'self'",
   `media-src 'self' ${supabaseOrigin ?? ""}`,
   `connect-src 'self' ${supabaseOrigin ?? ""} ${GA_COLLECT}`,
-  "frame-src 'none'",
+  `frame-src ${TURNSTILE}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

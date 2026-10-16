@@ -18,6 +18,7 @@ import { ESTADOS_MX } from "@/lib/estados-mx";
 import { checkoutSchema, firstIssue, isHoneypotFilled, MAX_NOTAS } from "@/lib/validation";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
 import Honeypot from "@/components/Honeypot";
+import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import FormField from "@/components/FormField";
 import HealthNotice from "@/components/HealthNotice";
 import PrivacyNotice from "@/components/PrivacyNotice";
@@ -76,6 +77,8 @@ export default function CheckoutForm({
   const [notas, setNotas] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
 
   const guardada = direcciones.find((d) => d.id === seleccion);
   const direccion: DireccionEnvio = guardada ?? nueva;
@@ -133,12 +136,17 @@ export default function CheckoutForm({
       promo_code: promo && discount > 0 ? promo.code : null,
       fecha_nacimiento: requiresBirthDate ? birthDate : null,
       website: honeypot,
+      turnstileToken,
     };
 
     // Misma validación que el servidor, para avisar sin esperar la red.
     const parsed = checkoutSchema.safeParse(input);
     if (!parsed.success) {
       setError(firstIssue(parsed.error));
+      return;
+    }
+    if (TURNSTILE_ENABLED && !turnstileToken) {
+      setError("Espera un momento a que terminemos de verificar tu navegador.");
       return;
     }
 
@@ -154,6 +162,8 @@ export default function CheckoutForm({
       } catch {
         result = { error: "No pudimos conectar con el servidor. Revisa tu conexión e intenta de nuevo." };
       }
+      // Cada token de Turnstile sirve una sola vez.
+      setTurnstileReset((n) => n + 1);
       if (!result.initPoint) {
         // El código dejó de servir (se agotó o lo desactivaron): se quita y los totales se recalculan.
         if (result.promoInvalid) removePromo();
@@ -458,6 +468,8 @@ export default function CheckoutForm({
             <span className="tabular-nums">{formatMXN(total)}</span>
           </div>
         </div>
+
+        <Turnstile onToken={setTurnstileToken} resetKey={turnstileReset} />
 
         {error && (
           <p role="alert" className="rounded-[20px] bg-red-50 px-4 py-3 text-sm text-danger">

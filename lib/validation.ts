@@ -47,6 +47,7 @@ export const birthDateSchema = z
 /** Campos anti-spam que viajan con cada formulario público. */
 const antiSpamFields = {
   [HONEYPOT_FIELD]: z.string().optional(),
+  turnstileToken: z.string().max(2048).nullish(),
 };
 
 export const loginSchema = credentialsSchema.extend(antiSpamFields);
