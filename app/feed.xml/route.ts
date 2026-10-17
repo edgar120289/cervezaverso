@@ -1,5 +1,6 @@
 import { getProducts } from "@/lib/catalog";
 import { SITE } from "@/lib/site";
+import { productSeoDescription } from "@/lib/product-description";
 
 const AVAILABLE = new Set(["in_stock", "low_stock"]);
 
@@ -19,8 +20,7 @@ export async function GET() {
 
   const items = products
     .map((p) => {
-      const description =
-        p.notas_perfil ?? p.description_ai ?? `${p.style} de ${p.country}, ${p.abv}% ABV, ${p.volume_ml} ml.`;
+      const description = productSeoDescription(p);
       const image = p.image_urls[0] ?? p.image_url;
       return [
         "    <item>",

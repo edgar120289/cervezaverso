@@ -12,6 +12,7 @@ import ProductGallery from "@/components/ProductGallery";
 import SommelierAudio from "@/components/SommelierAudio";
 import ShareButton from "@/components/ShareButton";
 import { SITE } from "@/lib/site";
+import { productSeoDescription } from "@/lib/product-description";
 import type { StockStatus } from "@/lib/types";
 
 const SCHEMA_AVAILABILITY: Record<StockStatus, string> = {
@@ -64,8 +65,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
     sku: product.sku,
     url: productUrl,
     ...(images.length > 0 && { image: images }),
-    description:
-      product.notas_perfil ?? product.description_ai ?? `${product.style} de ${product.country}, ${product.abv}% ABV.`,
+    description: productSeoDescription(product),
     brand: { "@type": "Brand", name: SITE.name },
     offers: {
       "@type": "Offer",
