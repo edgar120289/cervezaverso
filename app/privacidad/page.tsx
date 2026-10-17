@@ -144,6 +144,16 @@ export default function PrivacidadPage() {
                 rechazas.
               </p>
               <p>
+                <strong>Publicidad (sólo si aceptas todas las cookies):</strong> este sitio utiliza el Meta Pixel de
+                Meta Platforms, Inc. para medir conversiones y mostrar anuncios a personas que ya visitaron la tienda
+                (retargeting). El Meta Pixel puede colocar cookies (como <code>_fbp</code>) y enviar a Meta datos de
+                tu navegación, como las páginas que visitas y tu dirección IP. Este rastreo publicitario está inactivo
+                por defecto: no se carga ni recaba información hasta que otorgas tu consentimiento para &ldquo;todas
+                las cookies&rdquo;. Si eliges &ldquo;Solo esenciales&rdquo; o retiras tu consentimiento después, el
+                Meta Pixel deja de registrar tu actividad. Meta trata esos datos conforme a su propia política de
+                privacidad.
+              </p>
+              <p>
                 Puedes cambiar tu elección en cualquier momento desde{" "}
                 <CookieSettingsButton className="font-semibold text-accent hover:underline" />, también disponible en
                 el pie de cada página.
