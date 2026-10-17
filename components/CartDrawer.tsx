@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
+import { trackInitiateCheckout } from "@/lib/meta-pixel";
 import { formatMXN, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
 import { DiscountRow } from "./PromoCodeField";
 import BottleFallback from "./BottleFallback";
@@ -158,7 +159,10 @@ export default function CartDrawer() {
 
                   <Link
                     href="/checkout"
-                    onClick={closeDrawer}
+                    onClick={() => {
+                      trackInitiateCheckout(items, total);
+                      closeDrawer();
+                    }}
                     className="block rounded-full bg-accent py-3.5 text-center font-semibold text-white shadow-accent transition-transform active:scale-[0.98]"
                   >
                     Ir a pagar

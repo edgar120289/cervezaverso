@@ -1,5 +1,5 @@
 import { feedId } from "@/lib/feed-id";
-import type { Product } from "@/lib/types";
+import type { CartItem, Product } from "@/lib/types";
 
 /** Evento estándar AddToCart del Meta Pixel; no hace nada si el pixel no cargó (sin consentimiento). */
 export function trackAddToCart(product: Product): void {
@@ -9,5 +9,17 @@ export function trackAddToCart(product: Product): void {
     content_type: "product",
     value: product.sale_price,
     currency: "MXN",
+  });
+}
+
+/** Evento estándar InitiateCheckout del Meta Pixel al pasar del carrito al pago. */
+export function trackInitiateCheckout(cartItems: CartItem[], totalPrice: number): void {
+  if (typeof window === "undefined" || !window.fbq || cartItems.length === 0) return;
+  window.fbq("track", "InitiateCheckout", {
+    content_ids: cartItems.map(({ product }) => feedId(product.sku)),
+    content_type: "product",
+    value: totalPrice,
+    currency: "MXN",
+    num_items: cartItems.reduce((sum, { quantity }) => sum + quantity, 0),
   });
 }

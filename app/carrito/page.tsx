@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
+import { trackInitiateCheckout } from "@/lib/meta-pixel";
 import { formatMXN, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
 import BottleFallback from "@/components/BottleFallback";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
@@ -133,6 +134,7 @@ export default function CarritoPage() {
 
           <Link
             href="/checkout"
+            onClick={() => trackInitiateCheckout(items, total)}
             className="block w-full rounded-full bg-accent py-3.5 text-center font-semibold text-white shadow-accent transition-transform active:scale-[0.98]"
           >
             Continuar al pago
