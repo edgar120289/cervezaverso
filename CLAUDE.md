@@ -85,6 +85,7 @@ Calidad Visual: Corrección estricta de contrastes de color, diseño responsivo 
 
 - 2026-10-16 · Envío nacional: $150 de tarifa base (temporal, hasta integrar la API de paquetería) y gratis desde $3,000 de subtotal antes del descuento; el local sigue en $0. Sustituye $490 / $2,000.
 - 2026-10-16 · Pago por transferencia (`pedidos.metodo_pago`, migración 019): no crea preferencia de Mercado Pago; el pedido queda Pendiente y el admin lo marca Pagado al ver el depósito (dispara lealtad y correo). El comprobante se envía al WhatsApp de `CONTACT`. Datos bancarios en `BANK_TRANSFER` (`lib/site.ts`); `reintentarPago` rechaza pedidos por transferencia. El checkout ya era de una página y con invitado; solo se añadió la sección de pago.
+- 2026-10-17 · Se retira «Continuar con Apple» (no se implementará); queda solo Google, ya configurado en Supabase Auth. `/auth/callback` canjea el código por la sesión.
 - 2026-10-16 · Login social con `signInWithOAuth` (retorno por `/auth/callback`). Quien entra con Google/Apple no captura fecha de nacimiento: el checkout se la pide (`requiresBirthDate`). Open Graph (`opengraph-image.tsx`) es dinámico y elige un logo de `logos/circular` al azar; los rastreadores pueden cachear el que reciban.
 - 2026-09-29 · Este CLAUDE.md describe la visión final del proyecto, no solo lo ya construido.
 - 2026-09-29 · El Sommelier actual (cuestionario con reglas en `lib/sommelier.ts`) se migrará a la API de Gemini en una fase posterior; es una funcionalidad nueva.
