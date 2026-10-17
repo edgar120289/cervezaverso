@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import type { Product } from "@/lib/types";
 import { useCart } from "@/lib/cart-context";
+import { trackAddToCart } from "@/lib/meta-pixel";
 
 export default function AddToCartButton({ product }: { product: Product }) {
   const { addItem, openDrawer } = useCart();
@@ -15,6 +16,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
       disabled={isOutOfStock}
       onClick={() => {
         addItem(product);
+        trackAddToCart(product);
         openDrawer();
       }}
       className="w-full rounded-full bg-accent px-7 py-3.5 font-semibold text-white shadow-accent transition hover:brightness-110 disabled:cursor-not-allowed disabled:bg-black/10 disabled:text-muted disabled:shadow-none sm:w-auto"

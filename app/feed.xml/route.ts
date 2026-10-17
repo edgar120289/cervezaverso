@@ -1,16 +1,7 @@
-import { createHash } from "node:crypto";
+import { feedId } from "@/lib/feed-id";
 import { getProducts } from "@/lib/catalog";
 import { SITE } from "@/lib/site";
 import { productSeoDescription } from "@/lib/product-description";
-
-const MAX_ID_LENGTH = 50;
-
-/** Google limita g:id a 50 caracteres: si el SKU es más largo, se recorta y se añade un hash para que siga siendo único y estable. */
-function feedId(sku: string): string {
-  if (sku.length <= MAX_ID_LENGTH) return sku;
-  const hash = createHash("sha1").update(sku).digest("hex").slice(0, 8);
-  return `${sku.slice(0, MAX_ID_LENGTH - 9)}-${hash}`;
-}
 
 const AVAILABLE = new Set(["in_stock", "low_stock"]);
 

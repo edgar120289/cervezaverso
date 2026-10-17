@@ -6,6 +6,7 @@ import { Droplet, GlassWater, Plus } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { formatMXN } from "@/lib/pricing";
 import { useCart } from "@/lib/cart-context";
+import { trackAddToCart } from "@/lib/meta-pixel";
 import CountryFlag from "./CountryFlag";
 import ProductImage from "./ProductImage";
 import FavoriteButton from "./FavoriteButton";
@@ -93,7 +94,10 @@ export default function ProductCard({ product }: { product: Product }) {
             <button
               type="button"
               disabled={isOutOfStock}
-              onClick={() => addItem(product)}
+              onClick={() => {
+                addItem(product);
+                trackAddToCart(product);
+              }}
               aria-label={`Agregar ${product.name} al carrito`}
               className="flex h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-pill bg-accent px-4 text-sm font-semibold text-white shadow-accent transition-transform active:scale-95 disabled:cursor-not-allowed disabled:bg-black/10 disabled:text-muted disabled:shadow-none"
             >
