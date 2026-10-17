@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -12,6 +13,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import SommelierFloating from "@/components/SommelierFloating";
 import { SommelierProvider } from "@/components/SommelierProvider";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import MetaPixel from "@/components/MetaPixel";
 import { listPublicImages, MEDIA_DIRS } from "@/lib/media";
 import { SITE } from "@/lib/site";
 
@@ -91,6 +93,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </CartProvider>
         </AccountProvider>
         <GoogleAnalytics />
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
       </body>
     </html>
   );

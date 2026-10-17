@@ -9,6 +9,8 @@ const isDev = process.env.NODE_ENV === "development";
 
 const TURNSTILE = "https://challenges.cloudflare.com";
 const GA_SCRIPT = "https://www.googletagmanager.com";
+const META = "https://connect.facebook.net";
+const META_COLLECT = "https://www.facebook.com";
 const GA_COLLECT = "https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com";
 
 /**
@@ -20,12 +22,12 @@ const GA_COLLECT = "https://*.google-analytics.com https://*.analytics.google.co
  */
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} ${TURNSTILE} ${GA_SCRIPT}`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} ${TURNSTILE} ${GA_SCRIPT} ${META}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: ${GA_SCRIPT} https://*.google-analytics.com https://flagcdn.com`,
+  `img-src 'self' data: blob: ${GA_SCRIPT} https://*.google-analytics.com https://flagcdn.com ${META_COLLECT}`,
   "font-src 'self'",
   `media-src 'self' ${supabaseOrigin ?? ""}`,
-  `connect-src 'self' ${supabaseOrigin ?? ""} ${GA_COLLECT}`,
+  `connect-src 'self' ${supabaseOrigin ?? ""} ${GA_COLLECT} ${META_COLLECT} ${META}`,
   `frame-src ${TURNSTILE}`,
   "object-src 'none'",
   "base-uri 'self'",
