@@ -7,12 +7,16 @@ import { WhatsAppIcon } from "@/components/SocialIcons";
 import { CONTACT } from "@/lib/site";
 import { z } from "zod";
 import ClearCart from "@/components/ClearCart";
+import PurchaseTracker from "@/components/PurchaseTracker";
 import RetryPaymentButton from "@/components/RetryPaymentButton";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatMXN, PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/pricing";
 import { ESTADO_BADGE, folio, formatFecha, PEDIDO_DETALLE_COLUMNS } from "@/lib/pedidos";
 import type { PedidoDetalle } from "@/lib/types";
+
+/** Estados en los que el pago ya está confirmado (el webhook o el admin lo marcaron). */
+const PEDIDO_COBRADO = new Set(["Pagado", "Enviado", "Entregado"]);
 
 export const metadata: Metadata = { title: "Tu pedido", robots: { index: false } };
 
@@ -61,6 +65,15 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
       {esNuevo ? (
         <section className="flex flex-col items-center gap-3 rounded-[28px] bg-white px-6 py-10 text-center shadow-card">
           <ClearCart />
+          {PEDIDO_COBRADO.has(pedido.estado) && (
+            <PurchaseTracker
+              order={{
+                id: pedido.id,
+                total: Number(pedido.total),
+                items: pedido.pedido_items.map((item) => ({ sku: item.sku, cantidad: item.cantidad })),
+              }}
+            />
+          )}
           <span className="flex h-14 w-14 items-center justify-center rounded-pill bg-accent text-white shadow-accent">
             <CircleCheck size={28} />
           </span>
