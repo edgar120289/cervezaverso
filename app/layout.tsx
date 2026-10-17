@@ -43,6 +43,7 @@ export const metadata: Metadata = {
     title: SITE.title,
     description: SITE.description,
   },
+  verification: { google: "qfTRU8D6tnx7ADiFdkp2BK9q67N9BmjMkF9N-mz9MfY" },
   twitter: {
     card: "summary_large_image",
     title: SITE.title,

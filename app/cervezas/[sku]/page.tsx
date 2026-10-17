@@ -11,6 +11,15 @@ import FavoriteButton from "@/components/FavoriteButton";
 import ProductGallery from "@/components/ProductGallery";
 import SommelierAudio from "@/components/SommelierAudio";
 import ShareButton from "@/components/ShareButton";
+import { SITE } from "@/lib/site";
+import type { StockStatus } from "@/lib/types";
+
+const SCHEMA_AVAILABILITY: Record<StockStatus, string> = {
+  in_stock: "https://schema.org/InStock",
+  low_stock: "https://schema.org/LimitedAvailability",
+  out_of_stock: "https://schema.org/OutOfStock",
+  preorder: "https://schema.org/PreOrder",
+};
 
 export async function generateMetadata({ params }: PageProps<"/cervezas/[sku]">): Promise<Metadata> {
   const { sku } = await params;
@@ -46,8 +55,33 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
     { icon: UtensilsCrossed, title: "Maridaje Perfecto", body: product.notas_maridaje ?? product.pairing_ai },
   ];
 
+  const productUrl = `${SITE.url}/cervezas/${encodeURIComponent(product.sku)}`;
+  const images = product.image_urls.length > 0 ? product.image_urls : product.image_url ? [product.image_url] : [];
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    sku: product.sku,
+    url: productUrl,
+    ...(images.length > 0 && { image: images }),
+    description:
+      product.notas_perfil ?? product.description_ai ?? `${product.style} de ${product.country}, ${product.abv}% ABV.`,
+    brand: { "@type": "Brand", name: SITE.name },
+    offers: {
+      "@type": "Offer",
+      url: productUrl,
+      price: product.sale_price.toFixed(2),
+      priceCurrency: "MXN",
+      availability: SCHEMA_AVAILABILITY[product.stock_status],
+    },
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+      />
       <Link
         href="/tienda"
         className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold text-muted transition-colors hover:bg-black/5 hover:text-black"
