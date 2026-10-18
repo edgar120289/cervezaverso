@@ -5,7 +5,7 @@ import { join } from "node:path";
 // Un logotipo distinto en cada generación: la imagen no se pre-renderiza en el build.
 export const dynamic = "force-dynamic";
 
-export const alt = "Cervezaverso — Tienda de cerveza artesanal e importada";
+export const alt = "Cervezaverso | Tienda de Cervezas del Mundo";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

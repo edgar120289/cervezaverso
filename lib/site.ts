@@ -3,9 +3,9 @@ export const SITE = {
   name: "Cervezaverso",
   url: (process.env.NEXT_PUBLIC_SITE_URL || "https://cervezaverso.com").replace(/\/$/, ""),
   /** Título por defecto: no repite la descripción. */
-  title: "Cervezaverso — Tienda de cerveza artesanal e importada",
+  title: "Cervezaverso | Tienda de Cervezas del Mundo",
   description:
-    "Distribución directa al consumidor de la mejor cerveza artesanal a todo México.",
+    "Descubre y compra las mejores cervezas artesanales e importadas. El universo de la cerveza entregado en la puerta de tu casa a todo México.",
   locale: "es_MX",
 } as const;
 
