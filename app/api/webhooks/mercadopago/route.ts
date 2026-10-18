@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { mpPayment } from "@/lib/mercadopago";
 import { isValidMercadoPagoSignature } from "@/lib/mercadopago-signature";
+import { sendMetaPurchase } from "@/lib/meta-capi";
 import { notificarEstadoPedido, procesarPedidoPagado } from "@/lib/lealtad-server";
 
 export const dynamic = "force-dynamic";
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
     const admin = createAdminClient();
     const { data: pedido, error } = await admin
       .from("pedidos")
-      .select("id, estado, total, mp_payment_id")
+      .select("id, estado, total, mp_payment_id, cliente_email, cliente_telefono")
       .eq("id", pedidoId.data)
       .maybeSingle();
     if (error) throw new Error(error.message);
@@ -72,6 +73,12 @@ export async function POST(request: Request) {
       if (actualizado?.length) {
         await procesarPedidoPagado(pedido.id);
         await notificarEstadoPedido(pedido.id, "Pagado");
+        await sendMetaPurchase({
+          orderId: pedido.id,
+          total: Number(pedido.total),
+          email: pedido.cliente_email,
+          phone: pedido.cliente_telefono,
+        });
       }
     } else if (ESTADOS_COBRADOS.includes(pedido.estado)) {
       if (pedido.mp_payment_id && pedido.mp_payment_id !== dataId) {
