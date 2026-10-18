@@ -5,7 +5,7 @@ export const SITE = {
   /** Título por defecto: no repite la descripción. */
   title: "Cervezaverso — Tienda de cerveza artesanal e importada",
   description:
-    "Explora nuestro catálogo de cervezas del mundo. Encuentra estilos únicos, orígenes exóticos y los mejores maridajes. Compra segura en línea.",
+    "Distribución directa al consumidor de la mejor cerveza artesanal a todo México.",
   locale: "es_MX",
 } as const;
 
