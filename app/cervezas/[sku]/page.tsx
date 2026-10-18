@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Globe2, UtensilsCrossed, Wine } from "lucide-react";
 import { getProductBySku, getSimilarProducts } from "@/lib/catalog";
 import ProductGrid from "@/components/ProductGrid";
-import { formatMXN } from "@/lib/pricing";
+import { calculateShippingCost, formatMXN } from "@/lib/pricing";
 import AddToCartButton from "@/components/AddToCartButton";
 import HealthNotice from "@/components/HealthNotice";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -62,7 +62,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    sku: product.sku,
+    sku: product.sku.trim().length >= 3 ? product.sku : `CVZ-${product.id}`,
     url: productUrl,
     ...(images.length > 0 && { image: images }),
     description: productSeoDescription(product),
@@ -73,6 +73,25 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
       price: product.sale_price.toFixed(2),
       priceCurrency: "MXN",
       availability: SCHEMA_AVAILABILITY[product.stock_status],
+      itemCondition: "https://schema.org/NewCondition",
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: { "@type": "MonetaryAmount", value: calculateShippingCost(product.sale_price).toFixed(2), currency: "MXN" },
+        shippingDestination: { "@type": "DefinedRegion", addressCountry: "MX" },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 6, unitCode: "DAY" },
+        },
+      },
+      // Debe coincidir con la sección "Cambios, devoluciones y cancelaciones" de /terminos.
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "MX",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 5,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/ReturnFeesCustomerResponsibility",
+      },
     },
   };
 
