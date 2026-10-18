@@ -15,6 +15,7 @@ import {
   type SortId,
 } from "@/lib/catalog-filters";
 import { activeFilterChips, FilterDrawer, FilterPanel } from "./CatalogFilterPanel";
+import CategoriesMenu from "./CategoriesMenu";
 import ProductCard from "./ProductCard";
 
 /** Catálogo con buscador y filtros en tiempo real (País, Precio, ABV y Marca). */
@@ -52,7 +53,7 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
 
   return (
     <div className="min-w-0 space-y-4">
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-3 md:gap-4">
         <div className="relative min-w-full flex-1 md:min-w-0">
           <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
           <input
@@ -65,12 +66,12 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
           />
         </div>
         <div className="relative min-w-0 flex-1 md:w-48 md:flex-none">
-          <ArrowUpDown size={16} aria-hidden className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2" />
+          <ArrowUpDown size={16} aria-hidden className="pointer-events-none absolute left-4 top-1/2 hidden -translate-y-1/2 sm:block" />
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortId)}
             aria-label="Ordenar por"
-            className="h-12 w-full cursor-pointer appearance-none truncate rounded-full bg-white pl-10 pr-10 text-sm font-semibold shadow-card outline-none focus:ring-2 focus:ring-black/15"
+            className="h-12 w-full cursor-pointer appearance-none truncate rounded-full bg-white pl-3 pr-7 text-sm sm:pl-10 sm:pr-10 font-semibold shadow-card outline-none focus:ring-2 focus:ring-black/15"
           >
             {SORT_OPTIONS.map((option) => (
               <option key={option.id} value={option.id}>
@@ -78,16 +79,16 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
               </option>
             ))}
           </select>
-          <ChevronDown size={16} aria-hidden className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2" />
+          <ChevronDown size={16} aria-hidden className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 sm:right-4" />
         </div>
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
           aria-haspopup="dialog"
           aria-expanded={drawerOpen}
-          className="flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-white px-4 text-sm font-semibold shadow-card md:w-48 md:flex-none"
+          className="flex h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-white px-3 text-sm font-semibold shadow-card sm:px-4 md:w-48 md:flex-none"
         >
-          <SlidersHorizontal size={16} />
+          <SlidersHorizontal size={16} className="hidden sm:block" />
           Filtros
           {activeCount > 0 && (
             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-[11px] text-white">
@@ -95,6 +96,7 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
             </span>
           )}
         </button>
+        <CategoriesMenu />
       </div>
 
       <FilterDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} resultCount={results.length} noun={["cerveza", "cervezas"]}>

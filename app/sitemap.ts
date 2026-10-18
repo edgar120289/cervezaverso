@@ -1,14 +1,25 @@
 import type { MetadataRoute } from "next";
-import { getProductSitemapEntries } from "@/lib/catalog";
+import { getProductSitemapEntries, getProducts } from "@/lib/catalog";
+import { COUNTRY_CATEGORIES, STYLE_CATEGORIES, productsInCountry, productsInStyle } from "@/lib/seo-categories";
 import { SITE } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const products = await getProductSitemapEntries();
+  const [products, catalog] = await Promise.all([getProductSitemapEntries(), getProducts()]);
+  const categories = [
+    ...COUNTRY_CATEGORIES.filter((c) => productsInCountry(catalog, c).length > 0).map((c) => `/catalogo/pais/${c.slug}`),
+    ...STYLE_CATEGORIES.filter((c) => productsInStyle(catalog, c).length > 0).map((c) => `/catalogo/estilo/${c.slug}`),
+  ];
 
   return [
     { url: SITE.url, lastModified: now, changeFrequency: "daily", priority: 1 },
     { url: `${SITE.url}/tienda`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    ...categories.map((path) => ({
+      url: `${SITE.url}${path}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
     ...products.map((product) => ({
       url: `${SITE.url}/cervezas/${encodeURIComponent(product.sku)}`,
       lastModified: product.updated_at ? new Date(product.updated_at) : now,
