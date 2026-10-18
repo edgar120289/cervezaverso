@@ -133,7 +133,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [items]
   );
   const { discount, shippingCost, total } = useMemo(
-    () => calculateOrderTotals(subtotal, "nacional", promo),
+    () => calculateOrderTotals(subtotal, promo),
     [subtotal, promo]
   );
   const itemCount = useMemo(

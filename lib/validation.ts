@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { ESTADOS_MX } from "@/lib/estados-mx";
-import { isLocalShippingState } from "@/lib/pricing";
 
 /**
  * Validación y anti-spam compartidos (MASTER PROMPT V2 · Bloque 4.3).
@@ -97,7 +96,7 @@ export const MAX_NOTAS = 500;
 export const checkoutSchema = z
   .object({
     email: z.email("Escribe un correo electrónico válido.").trim().toLowerCase(),
-    metodo_envio: z.enum(["nacional", "local"], "Elige un método de envío."),
+    metodo_envio: z.enum(["nacional"], "Elige un método de envío."),
     metodo_pago: z.enum(["mercadopago", "transferencia"], "Elige un método de pago."),
     direccion: direccionSchema,
     notas: z
@@ -119,14 +118,7 @@ export const checkoutSchema = z
     /** Obligatoria salvo que la cuenta ya tenga una registrada (lo decide el servidor). */
     fecha_nacimiento: birthDateSchema.nullish().transform((value) => value || null),
     ...antiSpamFields,
-  })
-  .refine(
-    (data) => data.metodo_envio !== "local" || isLocalShippingState(data.direccion.estado),
-    {
-      path: ["metodo_envio"],
-      message: "El envío local sólo aplica en CDMX y Estado de México (Área Metropolitana).",
-    }
-  );
+  });
 
 const optionalText = (max: number) =>
   z

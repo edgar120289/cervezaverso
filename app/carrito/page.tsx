@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { trackInitiateCheckout } from "@/lib/meta-pixel";
-import { formatMXN, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
+import { formatMXN, FREE_SHIPPING_THRESHOLD, SHIPPING_INFO } from "@/lib/pricing";
 import BottleFallback from "@/components/BottleFallback";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
 
@@ -140,7 +140,7 @@ export default function CarritoPage() {
             Continuar al pago
           </Link>
           <p className="text-center text-[11px] text-muted">
-            Envío local CDMX y Área Metropolitana sin costo · se elige en el siguiente paso.
+            {SHIPPING_INFO}
           </p>
         </div>
       </div>

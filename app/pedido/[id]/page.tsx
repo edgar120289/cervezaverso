@@ -11,7 +11,7 @@ import PurchaseTracker from "@/components/PurchaseTracker";
 import RetryPaymentButton from "@/components/RetryPaymentButton";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { formatMXN, PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/pricing";
+import { formatMXN, PAYMENT_METHODS, SHIPPING_INFO, SHIPPING_METHODS } from "@/lib/pricing";
 import { ESTADO_BADGE, folio, formatFecha, PEDIDO_DETALLE_COLUMNS } from "@/lib/pedidos";
 import type { PedidoDetalle } from "@/lib/types";
 
@@ -214,9 +214,7 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
           </h2>
           <p className="text-sm font-semibold">{envio.label}</p>
           <p className="text-sm text-muted">
-            {pedido.metodo_envio === "local"
-              ? "Sin costo · Entrega en 2 a 3 días hábiles."
-              : "Paquetería a toda la República."}
+            {pedido.metodo_envio === "local" ? "Método retirado." : SHIPPING_INFO}
           </p>
         </section>
       </div>

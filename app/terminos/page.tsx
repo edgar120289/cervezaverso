@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
-import { FLAT_SHIPPING_COST, formatMXN, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
+import { FLAT_SHIPPING_COST, formatMXN, FREE_SHIPPING_THRESHOLD, SHIPPING_INFO } from "@/lib/pricing";
 import { CONTACT, HEALTH_NOTICE, LEGAL } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -125,12 +125,9 @@ export default function TerminosPage() {
               <p>
                 Envío nacional por paquetería a toda la República: {formatMXN(FLAT_SHIPPING_COST)} en pedidos menores a{" "}
                 {formatMXN(FREE_SHIPPING_THRESHOLD)} y gratis a partir de ese monto. Los pedidos se procesan en un máximo de
-                24 horas y se envían a través de FedEx o DHL, con un tiempo estimado de entrega de 3 a 5 días hábiles.
+                24 horas y se envían a través de FedEx o DHL.
               </p>
-              <p>
-                Envío local sin costo en Ciudad de México y Estado de México (Área Metropolitana), con entrega en 2 a
-                3 días hábiles.
-              </p>
+              <p>{SHIPPING_INFO}</p>
               <p>
                 Revisa tu dirección antes de confirmar. En caso de no encontrar a nadie en el domicilio, la paquetería
                 realizará un intento al día siguiente o pondrá el paquete a disposición del cliente en un punto de

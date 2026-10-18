@@ -3,18 +3,16 @@
 import { useEffect, useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
 import { LEGAL } from "@/lib/site";
-import { Check, CreditCard, Landmark, MapPin, Truck, Zap } from "lucide-react";
+import { Check, CreditCard, Landmark, Truck, Zap } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import {
   calculateOrderTotals,
   calculateShippingCost,
   formatMXN,
   FREE_SHIPPING_THRESHOLD,
-  isLocalShippingState,
   PAYMENT_METHODS,
   SHIPPING_METHODS,
   type PaymentMethod,
-  type ShippingMethod,
 } from "@/lib/pricing";
 import { ESTADOS_MX } from "@/lib/estados-mx";
 import { checkoutSchema, firstIssue, isHoneypotFilled, MAX_NOTAS } from "@/lib/validation";
@@ -86,14 +84,7 @@ export default function CheckoutForm({
 
   const guardada = direcciones.find((d) => d.id === seleccion);
   const direccion: DireccionEnvio = guardada ?? nueva;
-  const localDisponible = isLocalShippingState(direccion.estado);
-  const [metodoElegido, setMetodo] = useState<ShippingMethod>(
-    predeterminada && isLocalShippingState(predeterminada.estado) ? "local" : "nacional"
-  );
-  // Si cambian a una dirección fuera de CDMX/Edomex, el envío local deja de aplicar.
-  const metodo: ShippingMethod = metodoElegido === "local" && !localDisponible ? "nacional" : metodoElegido;
-
-  const { discount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, metodo, promo);
+  const { discount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo);
   const faltaParaGratis = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
 
   if (!isHydrated || isRedirecting) {
@@ -123,7 +114,7 @@ export default function CheckoutForm({
 
     const input = {
       email,
-      metodo_envio: metodo,
+      metodo_envio: "nacional",
       metodo_pago: metodoPago,
       direccion: {
         nombre_completo: direccion.nombre_completo,
@@ -385,7 +376,7 @@ export default function CheckoutForm({
         <section className="rounded-[28px] bg-white p-6 shadow-card">
           <SectionTitle step={3} title="Método de envío" />
           <div className="space-y-2" role="radiogroup" aria-label="Método de envío">
-            <OptionCard checked={metodo === "nacional"} onSelect={() => setMetodo("nacional")} name="metodo_envio">
+            <OptionCard checked onSelect={() => undefined} name="metodo_envio">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex gap-3">
                   <Truck size={20} className="mt-0.5 shrink-0 text-muted" />
@@ -394,32 +385,11 @@ export default function CheckoutForm({
                     <p className="text-sm text-muted">{SHIPPING_METHODS.nacional.description}</p>
                   </div>
                 </div>
-                <ShippingPrice amount={calculateShippingCost(subtotal, "nacional")} />
-              </div>
-            </OptionCard>
-            <OptionCard
-              checked={metodo === "local"}
-              onSelect={() => setMetodo("local")}
-              disabled={!localDisponible}
-              name="metodo_envio"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex gap-3">
-                  <MapPin size={20} className="mt-0.5 shrink-0 text-muted" />
-                  <div>
-                    <p className="font-semibold">{SHIPPING_METHODS.local.label}</p>
-                    <p className="text-sm text-muted">
-                      {localDisponible
-                        ? SHIPPING_METHODS.local.description
-                        : "Disponible para direcciones en Ciudad de México y Estado de México."}
-                    </p>
-                  </div>
-                </div>
-                <ShippingPrice amount={0} />
+                <ShippingPrice amount={calculateShippingCost(subtotal)} />
               </div>
             </OptionCard>
           </div>
-          {metodo === "nacional" && faltaParaGratis > 0 && (
+          {faltaParaGratis > 0 && (
             <p className="mt-3 rounded-[20px] bg-canvas px-4 py-3 text-xs text-black/60">
               Agrega {formatMXN(faltaParaGratis)} más y tu envío nacional es gratis.
             </p>
@@ -501,7 +471,7 @@ export default function CheckoutForm({
           </div>
           {promo && <DiscountRow code={promo.code} amount={discount} />}
           <div className="flex justify-between text-black/60">
-            <span>Envío {metodo === "local" ? "local" : "nacional"}</span>
+            <span>Envío nacional</span>
             <span className="tabular-nums">{costoEnvio === 0 ? "Gratis" : formatMXN(costoEnvio)}</span>
           </div>
           <div className="flex justify-between pt-2 text-base font-semibold">

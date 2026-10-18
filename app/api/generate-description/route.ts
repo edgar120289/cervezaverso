@@ -22,12 +22,13 @@ Además de las tres secciones, devuelve tres campos cortos para el catálogo:
 Devuelve tres secciones:
 - "origen" — El Origen: historia breve del estilo y de la tradición cervecera del país, y qué hace especial a esta cerveza. 2 a 3 frases.
 - "perfil" — Perfil Sensorial: notas de cata en orden visual (color, espuma), olfativa (aromas) y gustativa (sabor, cuerpo, final). 3 a 4 frases evocadoras.
-- "maridaje" — El Maridaje Perfecto: exactamente 3 sugerencias, una de cada tipo, y por qué combinan (3 a 4 frases):
-  1) un plato de alta cocina,
-  2) una comida urbana o street food,
-  3) una botana local o un postre inesperado.
-  Varía: evita los platillos de siempre (tacos al pastor, hamburguesa, alitas, queso o chocolate) salvo que sean realmente lo ideal,
-  y elige opciones distintas en cada ficha, de preferencia con ingredientes o platillos mexicanos.`;
+- "maridaje" — El Maridaje Perfecto: entrega exactamente 3 opciones de maridaje muy distintas entre sí, y por qué combinan (3 a 4 frases):
+  1) una botana o snack básico comercial,
+  2) un platillo cotidiano o comida rápida (por ejemplo tacos o pizza),
+  3) un platillo de restaurante más elaborado.
+  Reglas estrictas: PROHIBIDO usar sugerencias repetitivas como "pato" a menos que sea estrictamente necesario.
+  Varía las proteínas y el estilo culinario (mexicana, asiática, americana) según el país de origen de la cerveza,
+  y elige opciones distintas en cada ficha.`;
 
 const RESPONSE_SCHEMA: ObjectSchema = {
   type: SchemaType.OBJECT,

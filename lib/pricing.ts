@@ -43,29 +43,29 @@ export const PAYMENT_METHODS: Record<
   },
 };
 
-/** Estados cubiertos por el envío local (CDMX y Área Metropolitana). */
-const LOCAL_SHIPPING_STATES = ["Ciudad de México", "Estado de México"] as const;
+/** Texto informativo único de envíos y tiempos de entrega. */
+export const SHIPPING_INFO =
+  "Envío a toda la República Mexicana con tiempo de entrega de 3 a 6 días hábiles. (El tiempo de procesamiento y envío se reduce si el pago es mediante transferencia bancaria)";
 
+/** `local` ya no se ofrece: se conserva solo para mostrar pedidos anteriores. */
 export const SHIPPING_METHODS: Record<
   ShippingMethod,
   { label: string; description: string }
 > = {
   nacional: {
     label: "Envío nacional por paquetería",
-    description: `A toda la República. Gratis en compras desde ${formatMXN(FREE_SHIPPING_THRESHOLD)}.`,
+    description: `${SHIPPING_INFO} Gratis en compras desde ${formatMXN(FREE_SHIPPING_THRESHOLD)}.`,
   },
   local: {
-    label: "Envío local CDMX y Área Metropolitana",
-    description: "Sin costo · Entrega en 2 a 3 días hábiles.",
+    label: "Envío local (anterior)",
+    description: "Método retirado.",
   },
 };
 
 /**
- * Nacional: tarifa base de $150, gratis desde $3,000 de subtotal.
- * Local (CDMX y Área Metropolitana): siempre $0.
+ * Envío nacional: tarifa base de $150, gratis desde $3,000 de subtotal.
  */
-export function calculateShippingCost(subtotal: number, method: ShippingMethod = "nacional"): number {
-  if (method === "local") return 0;
+export function calculateShippingCost(subtotal: number): number {
   return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : FLAT_SHIPPING_COST;
 }
 
@@ -89,21 +89,16 @@ export type OrderTotals = { subtotal: number; discount: number; shippingCost: nu
  */
 export function calculateOrderTotals(
   subtotal: number,
-  method: ShippingMethod,
   promo: AppliedPromo | null
 ): OrderTotals {
   const discount = calculateDiscount(subtotal, promo);
-  const shippingCost = subtotal > 0 ? calculateShippingCost(subtotal, method) : 0;
+  const shippingCost = subtotal > 0 ? calculateShippingCost(subtotal) : 0;
   return { subtotal, discount, shippingCost, total: subtotal - discount + shippingCost };
 }
 
 /** "10%" o "$500" */
 export function formatPromoValue(promo: Pick<AppliedPromo, "discount_type" | "value">): string {
   return promo.discount_type === "percent" ? `${promo.value}%` : formatMXN(promo.value);
-}
-
-export function isLocalShippingState(estado: string): boolean {
-  return (LOCAL_SHIPPING_STATES as readonly string[]).includes(estado);
 }
 
 export function formatMXN(amount: number): string {

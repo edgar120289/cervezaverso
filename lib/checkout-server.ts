@@ -112,7 +112,7 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
     if (promo) await admin.rpc("release_promo_code", { p_id: promo.id });
   };
 
-  const { discount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, metodo_envio, promo);
+  const { discount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo);
   const direccionEnvio: DireccionEnvio = direccion;
 
   const { data: pedido, error: pedidoError } = await admin
