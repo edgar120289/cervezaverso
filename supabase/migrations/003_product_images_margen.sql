@@ -3,7 +3,7 @@
 -- Requiere 002_checkout_cuentas.sql (usa public.is_admin()).
 
 -- ─────────────────────────────────────────────────────────────
--- products.margin_pct: margen de utilidad personalizado (por defecto 50%).
+-- products.margin_pct: margen de utilidad real (por defecto 35%).
 -- sale_price = floor(cost_price * (1 + margin_pct / 100) / 5) * 5
 -- ─────────────────────────────────────────────────────────────
 alter table public.products

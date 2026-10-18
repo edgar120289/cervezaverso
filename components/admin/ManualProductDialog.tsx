@@ -155,7 +155,7 @@ export default function ManualProductDialog() {
               <input id="mp-cost" type="number" inputMode="decimal" step="0.01" min="0" value={form.cost_price} onChange={update("cost_price")} className={INPUT_CLASS} required />
             </FormField>
             <FormField id="mp-margin" label="Margen (%)" hint={`Por defecto ${DEFAULT_MARGIN_PCT}%.`}>
-              <input id="mp-margin" type="number" inputMode="decimal" step="0.5" min="0" max="500" value={form.margin_pct} onChange={update("margin_pct")} className={INPUT_CLASS} />
+              <input id="mp-margin" type="number" inputMode="decimal" step="0.5" min="0" max="95" value={form.margin_pct} onChange={update("margin_pct")} className={INPUT_CLASS} />
             </FormField>
           </div>
 

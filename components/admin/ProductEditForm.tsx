@@ -199,7 +199,7 @@ export default function ProductEditForm({
             {salePrice === null ? "—" : formatMXN(salePrice)}
           </p>
           <p className="mt-2 text-xs text-muted">
-            Costo × (1 + margen) redondeado hacia abajo al múltiplo de $5.
+            Costo ÷ (1 − margen real) redondeado hacia abajo al múltiplo de $5.
           </p>
         </div>
       </div>
@@ -263,7 +263,7 @@ export default function ProductEditForm({
               type="number"
               step="0.5"
               min="0"
-              max="500"
+              max="95"
               value={form.margin_pct}
               onChange={update("margin_pct")}
               className={`${inputClass} bg-white`}

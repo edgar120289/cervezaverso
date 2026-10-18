@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ESTADOS_MX } from "@/lib/estados-mx";
+import { DEFAULT_MARGIN_PCT, MAX_MARGIN_PCT } from "@/lib/pricing";
 
 /**
  * Validación y anti-spam compartidos (MASTER PROMPT V2 · Bloque 4.3).
@@ -138,7 +139,7 @@ export const productUpdateSchema = z.object({
   abv: z.number("El ABV debe ser un número.").min(0, "El ABV no puede ser negativo.").max(99.99),
   volume_ml: z.number("El volumen debe ser un número.").int("El volumen debe ser entero.").min(0).max(100000),
   cost_price: z.number("El costo debe ser un número.").min(0, "El costo no puede ser negativo.").max(99999999),
-  margin_pct: z.number("El margen debe ser un número.").min(0, "El margen no puede ser negativo.").max(500, "El margen máximo es 500%."),
+  margin_pct: z.number("El margen debe ser un número.").min(0, "El margen no puede ser negativo.").max(MAX_MARGIN_PCT, `El margen máximo es ${MAX_MARGIN_PCT}%.`),
   stock_status: z.enum(["in_stock", "low_stock", "out_of_stock", "preorder"], "Elige una disponibilidad."),
   badges: z.array(z.string().trim().min(1).max(40)).max(10),
   description_ai: optionalText(4000),
@@ -151,7 +152,7 @@ export const productUpdateSchema = z.object({
 /** Alta manual desde el panel. `sku` y `sale_price` los calcula el servidor. */
 export const productCreateSchema = productUpdateSchema
   .pick({ name: true, brewery: true, country: true, style: true, abv: true, volume_ml: true, cost_price: true, margin_pct: true, stock_status: true })
-  .extend({ margin_pct: productUpdateSchema.shape.margin_pct.default(50) });
+  .extend({ margin_pct: productUpdateSchema.shape.margin_pct.default(DEFAULT_MARGIN_PCT) });
 
 export type ProductCreate = z.input<typeof productCreateSchema>;
 

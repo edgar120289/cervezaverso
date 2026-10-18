@@ -4,14 +4,17 @@ const FREE_SHIPPING_THRESHOLD = 3000;
 /** Tarifa base temporal: se sustituirá por la cotización de la paquetería. */
 const FLAT_SHIPPING_COST = 150;
 
-export const DEFAULT_MARGIN_PCT = 50;
+export const DEFAULT_MARGIN_PCT = 35;
+/** Tope del margen real: con 100% el divisor sería cero. */
+export const MAX_MARGIN_PCT = 95;
 
 /**
  * Regla de precio de venta obligatoria (SPEC.md #6.3):
- * costo + margen (50% por defecto) redondeado hacia abajo al múltiplo de 5.
+ * margen de utilidad real sobre el precio de venta (35% por defecto): costo / (1 - margen),
+ * redondeado hacia abajo al múltiplo de 5.
  */
 export function calculateSalePrice(costPrice: number, marginPct: number = DEFAULT_MARGIN_PCT): number {
-  const raw = (costPrice * (100 + marginPct)) / 100;
+  const raw = costPrice / (1 - marginPct / 100);
   // El épsilon evita que errores de coma flotante (114.99999…) bajen un múltiplo de 5.
   return Math.floor((raw + 1e-9) / 5) * 5;
 }

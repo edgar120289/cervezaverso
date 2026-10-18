@@ -7,7 +7,7 @@ import type { StockStatus } from "@/lib/types";
  * Ingesta de la lista "LISTA MONASTERIO" (MASTER PROMPT V2 · Bloque 2.2).
  * Lo usan tanto la API del panel (`/api/admin/import`) como el script de
  * consola (`scripts/import-monasterio.ts`), así la regla de precio vive en un
- * solo lugar: `calculateSalePrice` → Math.floor((costo * 1.5) / 5) * 5
+ * solo lugar: `calculateSalePrice` → Math.floor((costo / 0.65) / 5) * 5
  * (o el margen personalizado del producto, si el admin lo cambió).
  */
 
