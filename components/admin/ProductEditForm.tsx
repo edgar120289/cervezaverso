@@ -25,6 +25,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 }
 
 type FormState = {
+  sku: string;
   name: string;
   brewery: string;
   country: string;
@@ -62,6 +63,7 @@ export default function ProductEditForm({
 }) {
   const router = useRouter();
   const [form, setForm] = useState<FormState>({
+    sku: product.sku,
     name: product.name,
     brewery: product.brewery ?? "",
     country: product.country,
@@ -151,6 +153,7 @@ export default function ProductEditForm({
     try {
       const result = await actualizarProducto({
         id: product.id,
+        sku: form.sku,
         name: form.name,
         brewery: form.brewery,
         country: form.country,
@@ -208,10 +211,13 @@ export default function ProductEditForm({
       <div className="space-y-6 rounded-[28px] bg-white p-6 shadow-card sm:p-8">
         <div>
           <h2 className="text-xl font-semibold tracking-tight">{product.name}</h2>
-          <p className="mt-1 text-xs text-muted">SKU: {product.sku}</p>
+          <p className="mt-1 text-xs text-muted">SKU: {savedForm.sku}</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="SKU">
+            <input value={form.sku} onChange={update("sku")} className={inputClass} required minLength={3} maxLength={50} pattern="[A-Za-z0-9][A-Za-z0-9._\-]{2,49}" />
+          </Field>
           <Field label="Nombre">
             <input value={form.name} onChange={update("name")} className={inputClass} required />
           </Field>

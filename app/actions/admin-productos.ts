@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
-import { findExistingProduct, slugify } from "@/lib/monasterio";
+import { findExistingProduct, insertNewProduct, slugify } from "@/lib/monasterio";
 import { calculateSalePrice } from "@/lib/pricing";
 import {
   firstIssue,
@@ -32,7 +32,7 @@ export async function actualizarProducto(input: ProductUpdate): Promise<AdminAct
     .eq("id", id)
     .select("id");
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: error.code === "23505" ? "Ese SKU ya lo usa otra cerveza." : error.message };
   if (!data?.length) return { ok: false, error: "No se pudo guardar: el producto no existe o no tienes permiso." };
 
   refresh();
@@ -182,7 +182,7 @@ export async function crearProducto(input: ProductCreate): Promise<AdminActionRe
     return { ok: false, error: err instanceof Error ? err.message : "No se pudo verificar el catálogo." };
   }
 
-  const { error } = await supabase.from("products").insert({ ...fields, sku, sale_price });
+  const error = await insertNewProduct(supabase, { ...fields, sale_price });
   if (error) return { ok: false, error: error.code === "23505" ? "Ya existe una cerveza con ese país, nombre y volumen." : error.message };
 
   refresh();

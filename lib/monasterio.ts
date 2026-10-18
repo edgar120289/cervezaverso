@@ -120,6 +120,35 @@ export function slugify(...parts: string[]): string {
     .replace(/(^-|-$)/g, "");
 }
 
+/**
+ * Identidad de un producto nuevo: `CVZ-` + los primeros 10 caracteres alfanuméricos del nombre en
+ * mayúsculas + 6 caracteres del id (uuid generado aquí para poder derivarlo). Solo se usa al crear:
+ * un producto existente conserva su SKU, aunque se reimporte.
+ */
+export function newProductIdentity(name: string): { id: string; sku: string } {
+  const id = crypto.randomUUID();
+  const namePart = name
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^A-Za-z0-9]/g, "")
+    .toUpperCase()
+    .slice(0, 10);
+  return { id, sku: `CVZ-${namePart}${id.replace(/-/g, "").slice(0, 6).toUpperCase()}` };
+}
+
+/** Inserta un producto nuevo con SKU autogenerado; reintenta con otro id si el SKU choca (23505). */
+export async function insertNewProduct(client: SupabaseClient, fields: Record<string, unknown> & { name: string }) {
+  let last: { code?: string; message: string } | null = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const { id, sku } = newProductIdentity(fields.name);
+    const { error } = await client.from("products").insert({ ...fields, id, sku });
+    if (!error) return null;
+    last = error;
+    if (error.code !== "23505") break;
+  }
+  return last;
+}
+
 /** Lee el .xlsx y devuelve las filas válidas más las que se saltaron (sin nombre). */
 export async function parseMonasterio(
   data: ArrayBuffer
@@ -239,7 +268,10 @@ export async function upsertMonasterio(
         if (error) throw error;
         result.updated++;
       } else {
-        const { error } = await admin.from("products").insert(payload);
+        // `payload.sku` es solo la clave heredada para encontrar duplicados; el SKU nuevo se genera al insertar.
+        const { sku: _legacySku, ...fields } = payload;
+        void _legacySku;
+        const error = await insertNewProduct(admin, fields);
         if (error) throw error;
         result.inserted++;
       }

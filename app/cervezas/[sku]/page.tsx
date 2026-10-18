@@ -58,11 +58,14 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
 
   const productUrl = `${SITE.url}/cervezas/${encodeURIComponent(product.sku)}`;
   const images = product.image_urls.length > 0 ? product.image_urls : product.image_url ? [product.image_url] : [];
+  // Los SKU heredados del sistema anterior pasan de 40 caracteres: en el JSON-LD se usa uno corto y estable.
+  const schemaSku =
+    product.sku.length >= 3 && product.sku.length <= 40 ? product.sku : `CVZ-${product.id.replace(/-/g, "").slice(0, 12).toUpperCase()}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    sku: product.sku.trim().length >= 3 ? product.sku : `CVZ-${product.id}`,
+    sku: schemaSku,
     url: productUrl,
     ...(images.length > 0 && { image: images }),
     description: productSeoDescription(product),

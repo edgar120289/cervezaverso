@@ -132,6 +132,10 @@ const optionalText = (max: number) =>
 /** Edición de producto desde el panel. `sale_price` no viene aquí: lo calcula el servidor. */
 export const productUpdateSchema = z.object({
   id: z.uuid(),
+  sku: z
+    .string("Escribe el SKU.")
+    .trim()
+    .regex(/^[A-Za-z0-9][A-Za-z0-9._-]{2,49}$/, "El SKU debe tener de 3 a 50 caracteres: letras, números, punto, guion o guion bajo."),
   name: trimmed(160, "Escribe el nombre de la cerveza."),
   brewery: optionalText(160),
   country: trimmed(80, "Escribe el país."),
