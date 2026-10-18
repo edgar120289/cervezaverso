@@ -215,11 +215,11 @@ export default function ProductEditForm({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="SKU">
-            <input value={form.sku} onChange={update("sku")} className={inputClass} required minLength={3} maxLength={50} pattern="[A-Za-z0-9][A-Za-z0-9._\-]{2,49}" />
-          </Field>
           <Field label="Nombre">
             <input value={form.name} onChange={update("name")} className={inputClass} required />
+          </Field>
+          <Field label="SKU">
+            <input value={form.sku} readOnly aria-readonly className={`${inputClass} cursor-not-allowed bg-black/5 text-muted`} />
           </Field>
           <Field label="Cervecería">
             <input value={form.brewery} onChange={update("brewery")} className={inputClass} />
