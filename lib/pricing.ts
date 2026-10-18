@@ -39,7 +39,7 @@ export const PAYMENT_METHODS: Record<
   transferencia: {
     label: "Transferencia Interbancaria (Sin comisiones)",
     description: "Pagas desde tu banca en línea y nos envías el comprobante.",
-    delivery: "Entrega rápida: 24 a 48 horas hábiles",
+    delivery: "Procesamiento prioritario (reduce el tiempo estándar de 3 a 6 días hábiles).",
   },
 };
 
