@@ -20,7 +20,7 @@ import {
 } from "@/lib/landing";
 import { LandingModuleView } from "@/components/landing/LandingModules";
 import type { Product } from "@/lib/types";
-import StyleEditor, { type StyleFeatures } from "./StyleEditor";
+import BlockEditor, { type StyleFeatures } from "./BlockEditor";
 import HeroCtaEditor from "./HeroCtaEditor";
 import ImageUploadField from "./ImageUploadField";
 import Switch from "./Switch";
@@ -91,63 +91,62 @@ export default function LandingModulesEditor({ modules, onChange, products, prod
         {sorted.map((module) => {
           const info = LANDING_MODULES.find((item) => item.id === module.id)!;
           return (
-            <li key={module.id} className="space-y-3 rounded-[20px] bg-canvas p-4">
+            <li key={module.id} className="space-y-4 rounded-[20px] border border-black/10 p-4">
               <Switch
                 checked={module.enabled}
                 onChange={(enabled) => patch(module.id, { enabled })}
                 label={info.label}
                 description={info.description}
               />
-              <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
-                <label className={labelClass}>
-                  Título (opcional) · {module.title.length}/{MODULE_TITLE_MAX}
-                  <input
-                    type="text"
-                    value={module.title}
-                    maxLength={MODULE_TITLE_MAX}
-                    onChange={(e) => patch(module.id, { title: e.target.value })}
-                    className={inputClass}
-                  />
-                </label>
-                <label className={labelClass}>
-                  Orden
-                  <select
-                    value={module.order}
-                    onChange={(e) => changeOrder(module.id, Number(e.target.value) as LandingModule["order"])}
-                    className={`${inputClass} cursor-pointer font-semibold sm:w-28`}
-                  >
-                    {ORDERS.map((order) => (
-                      <option key={order} value={order}>
-                        {order}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
+              <label className={`${labelClass} sm:w-28`}>
+                Orden
+                <select
+                  value={module.order}
+                  onChange={(e) => changeOrder(module.id, Number(e.target.value) as LandingModule["order"])}
+                  className={`${inputClass} cursor-pointer font-semibold`}
+                >
+                  {ORDERS.map((order) => (
+                    <option key={order} value={order}>
+                      {order}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-              {module.id === "split" && <SplitFields module={module} onChange={(changes) => patch("split", changes)} />}
-              {module.id === "impact" && <ImpactFields module={module} onChange={(changes) => patch("impact", changes)} />}
-              {module.id === "grid" && <GridFields module={module} onChange={(changes) => patch("grid", changes)} />}
-
-              <StyleEditor
+              <BlockEditor
                 value={module.style}
                 onChange={(style) => patch(module.id, { style })}
                 features={STYLE_FEATURES[module.id]}
                 products={products}
                 productsLoading={productsLoading}
                 subtitleLabel={module.id === "split" ? "Párrafo" : "Subtítulo"}
+                imageSlot={
+                  module.id === "split" ? (
+                    <SplitFields part="image" module={module} onChange={(changes) => patch("split", changes)} />
+                  ) : module.id === "impact" ? (
+                    <ImpactFields part="image" module={module} onChange={(changes) => patch("impact", changes)} />
+                  ) : undefined
+                }
+                contentSlot={
+                  module.id === "split" ? (
+                    <SplitFields part="content" module={module} onChange={(changes) => patch("split", changes)} />
+                  ) : module.id === "impact" ? (
+                    <ImpactFields part="content" module={module} onChange={(changes) => patch("impact", changes)} />
+                  ) : (
+                    <GridFields module={module} onChange={(changes) => patch("grid", changes)} />
+                  )
+                }
+                preview={
+                  <>
+                    {!module.enabled && (
+                      <p className="mb-2 text-xs text-muted">Apagado: no se muestra en la tienda.</p>
+                    )}
+                    <div className={module.enabled ? "" : "opacity-50"}>
+                      <LandingModuleView module={module} preview products={products} />
+                    </div>
+                  </>
+                }
               />
-
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                  Vista previa{!module.enabled && " · apagado, no se muestra en la tienda"}
-                </p>
-                <div
-                  className={`overflow-hidden rounded-[28px] bg-canvas p-3 ring-1 ring-black/10 ${module.enabled ? "" : "opacity-50"}`}
-                >
-                  <LandingModuleView module={module} preview products={products} />
-                </div>
-              </div>
             </li>
           );
         })}
@@ -156,7 +155,51 @@ export default function LandingModulesEditor({ modules, onChange, products, prod
   );
 }
 
-function SplitFields({ module, onChange }: { module: SplitModule; onChange: (changes: Partial<SplitModule>) => void }) {
+function TitleField({ module, onChange }: { module: LandingModule; onChange: (changes: Partial<LandingModule>) => void }) {
+  return (
+    <label className={labelClass}>
+      Título (opcional) · {module.title.length}/{MODULE_TITLE_MAX}
+      <input
+        type="text"
+        value={module.title}
+        maxLength={MODULE_TITLE_MAX}
+        onChange={(e) => onChange({ title: e.target.value })}
+        className={inputClass}
+      />
+    </label>
+  );
+}
+
+type Part = "image" | "content";
+
+function SplitFields({
+  part,
+  module,
+  onChange,
+}: {
+  part: Part;
+  module: SplitModule;
+  onChange: (changes: Partial<SplitModule>) => void;
+}) {
+  if (part === "content") {
+    return (
+      <div className="space-y-3">
+        <TitleField module={module} onChange={(changes) => onChange(changes as Partial<SplitModule>)} />
+        <label className={labelClass}>
+          Párrafo · {module.body.length}/{MODULE_BODY_MAX}
+          <textarea
+            value={module.body}
+            maxLength={MODULE_BODY_MAX}
+            rows={6}
+            onChange={(e) => onChange({ body: e.target.value })}
+            className={textareaClass}
+          />
+        </label>
+        <HeroCtaEditor label="Layout dividido" ctas={module.ctas} max={MAX_SPLIT_CTAS} onChange={(ctas) => onChange({ ctas })} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
       <ImageUploadField
@@ -198,32 +241,29 @@ function SplitFields({ module, onChange }: { module: SplitModule; onChange: (cha
           </button>
         </div>
       </fieldset>
-      <label className={labelClass}>
-        Párrafo · {module.body.length}/{MODULE_BODY_MAX}
-        <textarea
-          value={module.body}
-          maxLength={MODULE_BODY_MAX}
-          rows={6}
-          onChange={(e) => onChange({ body: e.target.value })}
-          className={textareaClass}
-        />
-      </label>
-      <HeroCtaEditor label="Layout dividido" ctas={module.ctas} max={MAX_SPLIT_CTAS} onChange={(ctas) => onChange({ ctas })} />
     </div>
   );
 }
 
-function ImpactFields({ module, onChange }: { module: ImpactModule; onChange: (changes: Partial<ImpactModule>) => void }) {
-  return (
-    <div className="space-y-3">
-      <ImageUploadField
-        label="Imagen de fondo"
-        recommended="1920x600px"
-        value={module.image_url}
-        onChange={(image_url) => onChange({ image_url })}
-      />
-      {module.image_url && (
-        <>
+function ImpactFields({
+  part,
+  module,
+  onChange,
+}: {
+  part: Part;
+  module: ImpactModule;
+  onChange: (changes: Partial<ImpactModule>) => void;
+}) {
+  if (part === "image") {
+    return (
+      <div className="space-y-3">
+        <ImageUploadField
+          label="Imagen de fondo"
+          recommended="1920x600px"
+          value={module.image_url}
+          onChange={(image_url) => onChange({ image_url })}
+        />
+        {module.image_url && (
           <label className={labelClass}>
             Descripción de la imagen (Opcional - Mejora el SEO)
             <input
@@ -234,8 +274,14 @@ function ImpactFields({ module, onChange }: { module: ImpactModule; onChange: (c
               className={inputClass}
             />
           </label>
-        </>
-      )}
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <TitleField module={module} onChange={(changes) => onChange(changes as Partial<ImpactModule>)} />
       <label className={labelClass}>
         Subtítulo · {module.subtitle.length}/{MODULE_SUBTITLE_MAX}
         <textarea
@@ -257,6 +303,8 @@ function GridFields({ module, onChange }: { module: GridModule; onChange: (chang
   }
 
   return (
+    <div className="space-y-3">
+      <TitleField module={module} onChange={(changes) => onChange(changes as Partial<GridModule>)} />
     <fieldset className="space-y-2">
       <legend className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
         Elementos ({module.items.length}/{MAX_GRID_ITEMS})
@@ -331,5 +379,6 @@ function GridFields({ module, onChange }: { module: GridModule; onChange: (chang
         </button>
       )}
     </fieldset>
+    </div>
   );
 }

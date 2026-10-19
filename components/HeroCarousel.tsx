@@ -48,13 +48,14 @@ export default function HeroCarousel({ banners, intervalSeconds, products }: Her
       onMouseLeave={() => setHovering(false)}
       onFocus={() => setHovering(true)}
       onBlur={() => setHovering(false)}
-      className="relative"
+      className="relative w-full"
     >
       {/* Un solo slide montado a la vez: el anterior sale antes de que entre el siguiente. */}
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={`${index}-${active.image_url}`}
-          initial={{ opacity: 0 }}
+          // El primer slide llega ya visible desde el servidor: no depende de que el JS hidrate para verse.
+          initial={index === 0 ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: reduceMotion ? 0 : 0.35 }}

@@ -11,7 +11,7 @@ import HeroBannerList from "./HeroBannerList";
 import HeroCtaEditor from "./HeroCtaEditor";
 import HeroTextFields from "./HeroTextFields";
 import LandingModulesEditor from "./LandingModulesEditor";
-import StyleEditor from "./StyleEditor";
+import BlockEditor from "./BlockEditor";
 import Switch from "./Switch";
 
 const sectionClass = "space-y-4 rounded-[28px] bg-white p-6 shadow-card";
@@ -119,6 +119,13 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
           <h2 id="hero-video" className="font-semibold tracking-tight">
             Video
           </h2>
+          <BlockEditor
+            value={settings.hero_video_style}
+            onChange={(hero_video_style) => update({ hero_video_style })}
+            features={{ subtitle: true, layout: true, overlay: true, spotlight: true }}
+            products={products}
+            productsLoading={productsLoading}
+            imageSlot={
           <label className="block text-xs font-semibold uppercase tracking-wide text-muted">
             URL del video
             <input
@@ -133,6 +140,9 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
               Ruta del sitio (por ejemplo, /video/hero/mi-video.mp4) o URL https:// de Supabase Storage.
             </span>
           </label>
+            }
+            contentSlot={
+              <>
           <HeroTextFields
             title={settings.hero_video_title ?? ""}
             subtitle={settings.hero_video_subtitle ?? ""}
@@ -144,16 +154,9 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
             ctas={settings.hero_video_ctas}
             onChange={(hero_video_ctas) => update({ hero_video_ctas })}
           />
-          <StyleEditor
-            value={settings.hero_video_style}
-            onChange={(hero_video_style) => update({ hero_video_style })}
-            features={{ subtitle: true, layout: true, overlay: true, spotlight: true }}
-            products={products}
-            productsLoading={productsLoading}
-          />
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Vista previa (sin el video)</p>
-            <div className="overflow-hidden rounded-[28px] bg-canvas p-3 ring-1 ring-black/10">
+              </>
+            }
+            preview={
               <StyledBanner
                 headingTag="div"
                 title={settings.hero_video_title}
@@ -166,8 +169,8 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
                     : null
                 }
               />
-            </div>
-          </div>
+            }
+          />
         </section>
       ) : (
         <section className={sectionClass} aria-labelledby="hero-carousel">

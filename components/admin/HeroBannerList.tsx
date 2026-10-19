@@ -17,7 +17,7 @@ import StyledBanner from "@/components/landing/StyledBanner";
 import { DEFAULT_HERO_STYLE } from "@/lib/landing-style";
 import type { Product } from "@/lib/types";
 import HeroTextFields from "./HeroTextFields";
-import StyleEditor from "./StyleEditor";
+import BlockEditor from "./BlockEditor";
 
 type HeroBannerListProps = {
   banners: HeroBanner[];
@@ -146,6 +146,14 @@ export default function HeroBannerList({ banners, onChange, products, productsLo
                 dragIndex === index ? "opacity-40" : ""
               }`}
             >
+              <BlockEditor
+                value={banner.style}
+                onChange={(style) => patch(index, { style })}
+                features={{ subtitle: true, layout: true, overlay: true, spotlight: true }}
+                products={products}
+                productsLoading={productsLoading}
+                imageSlot={
+                  <>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-2xl bg-canvas sm:w-56">
                   <Image
@@ -199,6 +207,10 @@ export default function HeroBannerList({ banners, onChange, products, productsLo
                   </div>
                 </div>
               </div>
+                  </>
+                }
+                contentSlot={
+                  <>
               <HeroTextFields
                 title={banner.title ?? ""}
                 subtitle={banner.subtitle ?? ""}
@@ -210,16 +222,9 @@ export default function HeroBannerList({ banners, onChange, products, productsLo
                 ctas={banner.ctas}
                 onChange={(ctas) => patch(index, { ctas })}
               />
-              <StyleEditor
-                value={banner.style}
-                onChange={(style) => patch(index, { style })}
-                features={{ subtitle: true, layout: true, overlay: true, spotlight: true }}
-                products={products}
-                productsLoading={productsLoading}
-              />
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted">Vista previa del banner {index + 1}</p>
-                <div className="overflow-hidden rounded-[28px] bg-canvas p-3 ring-1 ring-black/10">
+                  </>
+                }
+                preview={
                   <StyledBanner
                     headingTag="div"
                     title={banner.title}
@@ -230,8 +235,8 @@ export default function HeroBannerList({ banners, onChange, products, productsLo
                     imageAlt={banner.alt}
                     product={banner.style.spotlight.enabled ? (products[banner.style.spotlight.sku.trim()] ?? null) : null}
                   />
-                </div>
-              </div>
+                }
+              />
             </li>
           ))}
         </ul>

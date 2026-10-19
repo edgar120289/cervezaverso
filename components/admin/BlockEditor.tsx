@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
 import { buscarProductosActivos, type ProductOption } from "@/app/actions/admin-landing";
 import {
@@ -29,7 +29,7 @@ export type StyleFeatures = {
   spotlight?: boolean;
 };
 
-type StyleEditorProps = {
+type BlockEditorProps = {
   value: BlockStyle;
   onChange: (style: BlockStyle) => void;
   features: StyleFeatures;
@@ -38,6 +38,12 @@ type StyleEditorProps = {
   productsLoading: boolean;
   /** Texto del segundo campo de tipografía: "Subtítulo" o "Párrafo". */
   subtitleLabel?: string;
+  /** 1 · Imagen o video de fondo (el control de la capa oscura se añade debajo). */
+  imageSlot?: ReactNode;
+  /** 2 · Título, subtítulo, texto del botón y URL de destino. */
+  contentSlot: ReactNode;
+  /** Vista previa en vivo: queda fija a la vista mientras se recorren los controles. */
+  preview: ReactNode;
 };
 
 const PALETTE = [
@@ -254,22 +260,79 @@ function SpotlightFields({
   );
 }
 
+function Group({ step, title, children }: { step: number; title: string; children: ReactNode }) {
+  return (
+    <section className="space-y-3 rounded-[20px] bg-canvas p-4" aria-label={title}>
+      <h3 className="text-sm font-semibold tracking-tight">
+        {step} · {title}
+      </h3>
+      {children}
+    </section>
+  );
+}
+
 /**
- * Controles de diseño de un bloque (Hero, banner o sección de la landing): tipografía, alineación,
- * disposición, botones, capa oscura y cerveza destacada. Cada bloque activa solo los que le aplican.
+ * Editor de un bloque de la landing (Hero, banner o sección) en dos columnas: a la izquierda los controles
+ * en orden (imagen y fondo, textos, tipografía y colores, forma y disposición, cerveza destacada) y a la
+ * derecha la vista previa en vivo, fija mientras se recorren los controles. En móvil, la vista previa va primero.
  */
-export default function StyleEditor({ value, onChange, features, products, productsLoading, subtitleLabel = "Subtítulo" }: StyleEditorProps) {
+export default function BlockEditor({
+  value,
+  onChange,
+  features,
+  products,
+  productsLoading,
+  subtitleLabel = "Subtítulo",
+  imageSlot,
+  contentSlot,
+  preview,
+}: BlockEditorProps) {
+  const overlayId = useId();
+
   function patch(changes: Partial<BlockStyle>) {
     onChange({ ...value, ...changes });
   }
 
+  const showOverlay = features.overlay && value.layout === "background";
+  let step = 0;
+
   return (
-    <details className="group rounded-[20px] bg-canvas p-4">
-      <summary className="flex min-h-11 cursor-pointer items-center text-sm font-semibold tracking-tight">
-        Estilo y diseño
-      </summary>
-      <div className="mt-3 space-y-5">
-        <div className="space-y-3">
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div className="order-2 space-y-4 lg:order-1">
+        {(imageSlot || showOverlay) && (
+          <Group step={++step} title="Imagen y fondo">
+            {imageSlot}
+            {showOverlay && (
+              <div>
+                <label htmlFor={overlayId} className={labelClass}>
+                  Capa oscura sobre la imagen · {value.overlay} %
+                </label>
+                <input
+                  id={overlayId}
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={25}
+                  value={value.overlay}
+                  onChange={(e) => patch({ overlay: Number(e.target.value) as BlockStyle["overlay"] })}
+                  className="mt-1 h-11 w-full cursor-pointer accent-accent"
+                />
+                <div aria-hidden className="flex justify-between text-[11px] text-muted">
+                  {OVERLAYS.map((overlay) => (
+                    <span key={overlay}>{overlay}%</span>
+                  ))}
+                </div>
+                <p className="mt-1 text-[11px] text-muted">Con 0 % la imagen se ve limpia, sin filtro.</p>
+              </div>
+            )}
+          </Group>
+        )}
+
+        <Group step={++step} title="Textos y contenido">
+          {contentSlot}
+        </Group>
+
+        <Group step={++step} title="Tipografía y colores">
           <Segments legend="Tamaño del título">
             {TITLE_SIZES.map((size) => (
               <button
@@ -284,115 +347,105 @@ export default function StyleEditor({ value, onChange, features, products, produ
             ))}
           </Segments>
           <ColorField legend="Color del título" value={value.title_color} onChange={(title_color) => patch({ title_color })} />
-        </div>
+          {features.subtitle !== false && (
+            <>
+              <Segments legend={`Tamaño del ${subtitleLabel.toLowerCase()}`}>
+                {SUBTITLE_SIZES.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    aria-pressed={value.subtitle_size === size}
+                    onClick={() => patch({ subtitle_size: size })}
+                    className={segmentClass(value.subtitle_size === size)}
+                  >
+                    {size.toUpperCase()}
+                  </button>
+                ))}
+              </Segments>
+              <ColorField
+                legend={`Color del ${subtitleLabel.toLowerCase()}`}
+                value={value.subtitle_color}
+                onChange={(subtitle_color) => patch({ subtitle_color })}
+              />
+            </>
+          )}
+        </Group>
 
-        {features.subtitle !== false && (
-          <div className="space-y-3">
-            <Segments legend={`Tamaño del ${subtitleLabel.toLowerCase()}`}>
-              {SUBTITLE_SIZES.map((size) => (
+        <Group step={++step} title="Forma y disposición">
+          <Segments legend="Alineación del texto y los botones">
+            {ALIGNS.map((align) => {
+              const { label, Icon } = ALIGN_LABELS[align];
+              return (
                 <button
-                  key={size}
+                  key={align}
                   type="button"
-                  aria-pressed={value.subtitle_size === size}
-                  onClick={() => patch({ subtitle_size: size })}
-                  className={segmentClass(value.subtitle_size === size)}
+                  aria-pressed={value.align === align}
+                  onClick={() => patch({ align })}
+                  className={segmentClass(value.align === align)}
                 >
-                  {size.toUpperCase()}
+                  <Icon size={16} aria-hidden />
+                  {label}
                 </button>
-              ))}
-            </Segments>
-            <ColorField
-              legend={`Color del ${subtitleLabel.toLowerCase()}`}
-              value={value.subtitle_color}
-              onChange={(subtitle_color) => patch({ subtitle_color })}
-            />
-          </div>
-        )}
-
-        <Segments legend="Alineación del texto y los botones">
-          {ALIGNS.map((align) => {
-            const { label, Icon } = ALIGN_LABELS[align];
-            return (
-              <button
-                key={align}
-                type="button"
-                aria-pressed={value.align === align}
-                onClick={() => patch({ align })}
-                className={segmentClass(value.align === align)}
-              >
-                <Icon size={16} aria-hidden />
-                {label}
-              </button>
-            );
-          })}
-        </Segments>
-
-        {features.layout && (
-          <Segments legend="Disposición">
-            {LAYOUTS.map((layout) => (
-              <button
-                key={layout}
-                type="button"
-                aria-pressed={value.layout === layout}
-                onClick={() => patch({ layout })}
-                className={segmentClass(value.layout === layout)}
-              >
-                {LAYOUT_LABELS[layout]}
-              </button>
-            ))}
+              );
+            })}
           </Segments>
-        )}
-
-        {features.buttons !== false && (
-          <div className="space-y-3">
-            <Segments legend="Estilo de los botones">
-              {BUTTON_VARIANTS.map((variant) => (
+          {features.layout && (
+            <Segments legend="Disposición">
+              {LAYOUTS.map((layout) => (
                 <button
-                  key={variant}
+                  key={layout}
                   type="button"
-                  aria-pressed={value.button_variant === variant}
-                  onClick={() => patch({ button_variant: variant })}
-                  className={segmentClass(value.button_variant === variant)}
+                  aria-pressed={value.layout === layout}
+                  onClick={() => patch({ layout })}
+                  className={segmentClass(value.layout === layout)}
                 >
-                  {VARIANT_LABELS[variant]}
+                  {LAYOUT_LABELS[layout]}
                 </button>
               ))}
             </Segments>
-            <ColorField
-              legend="Color de fondo del botón (o del contorno)"
-              value={value.button_bg}
-              onChange={(button_bg) => patch({ button_bg })}
-            />
-            <ColorField legend="Color del texto del botón" value={value.button_text} onChange={(button_text) => patch({ button_text })} />
-          </div>
-        )}
-
-        {features.overlay && value.layout === "background" && (
-          <fieldset>
-            <legend className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
-              Capa oscura sobre la imagen
-            </legend>
-            <div className="flex flex-wrap gap-2">
-              {OVERLAYS.map((overlay) => (
-                <button
-                  key={overlay}
-                  type="button"
-                  aria-pressed={value.overlay === overlay}
-                  onClick={() => patch({ overlay })}
-                  className={segmentClass(value.overlay === overlay)}
-                >
-                  {overlay} %
-                </button>
-              ))}
-            </div>
-            <p className="mt-1 text-[11px] text-muted">Con 0 % la imagen se ve limpia, sin filtro.</p>
-          </fieldset>
-        )}
+          )}
+          {features.buttons !== false && (
+            <>
+              <Segments legend="Estilo de los botones">
+                {BUTTON_VARIANTS.map((variant) => (
+                  <button
+                    key={variant}
+                    type="button"
+                    aria-pressed={value.button_variant === variant}
+                    onClick={() => patch({ button_variant: variant })}
+                    className={segmentClass(value.button_variant === variant)}
+                  >
+                    {VARIANT_LABELS[variant]}
+                  </button>
+                ))}
+              </Segments>
+              <ColorField
+                legend="Color de fondo del botón (o del contorno)"
+                value={value.button_bg}
+                onChange={(button_bg) => patch({ button_bg })}
+              />
+              <ColorField
+                legend="Color del texto del botón"
+                value={value.button_text}
+                onChange={(button_text) => patch({ button_text })}
+              />
+            </>
+          )}
+        </Group>
 
         {features.spotlight && (
-          <SpotlightFields value={value} onChange={onChange} products={products} loading={productsLoading} />
+          <Group step={++step} title="Cerveza destacada">
+            <SpotlightFields value={value} onChange={onChange} products={products} loading={productsLoading} />
+          </Group>
         )}
       </div>
-    </details>
+
+      <div className="order-1 lg:order-2">
+        <div className="space-y-2 lg:sticky lg:top-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Vista previa en vivo</p>
+          <div className="overflow-hidden rounded-[28px] bg-canvas p-3 ring-1 ring-black/10">{preview}</div>
+        </div>
+      </div>
+    </div>
   );
 }

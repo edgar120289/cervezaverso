@@ -36,7 +36,7 @@ export default async function CuentaPage() {
 
   // RLS limita cada consulta a las filas del propio cliente.
   const [perfilRes, recompensasRes, pedidosRes, favoritosRes, direccionesRes] = await Promise.all([
-    supabase.from("users").select("avatar_team, avatar_url, bottle_count, niveles_secretos").eq("id", user.id).maybeSingle(),
+    supabase.from("users").select("role, avatar_team, avatar_url, bottle_count, niveles_secretos").eq("id", user.id).maybeSingle(),
     supabase
       .from("promo_codes")
       .select("code, reward_level, reward_label, times_used")
@@ -58,6 +58,9 @@ export default async function CuentaPage() {
       .order("predeterminada", { ascending: false })
       .order("created_at", { ascending: false }),
   ]);
+
+  // Los administradores no tienen perfil de cliente: van directo al panel.
+  if (perfilRes.data?.role === "admin") redirect("/admin");
 
   const pedidos = (pedidosRes.data ?? []) as unknown as PedidoResumen[];
   const favoritos = (favoritosRes.data ?? [])

@@ -157,7 +157,7 @@ export default function StyledBanner({
     <section
       id={id}
       aria-label={ariaLabel}
-      className={`relative isolate flex min-h-[26rem] scroll-mt-24 items-center overflow-hidden rounded-[28px] shadow-card sm:min-h-[30rem] lg:min-h-[34rem] ${
+      className={`relative isolate flex min-h-[22rem] w-full scroll-mt-24 items-center overflow-hidden rounded-[28px] shadow-card sm:min-h-[28rem] lg:min-h-[34rem] ${
         accentBackdrop ? "bg-accent" : "bg-neutral-900"
       }`}
     >
