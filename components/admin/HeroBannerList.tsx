@@ -13,11 +13,17 @@ import {
   type HeroBanner,
 } from "@/lib/hero";
 import HeroCtaEditor from "./HeroCtaEditor";
+import StyledBanner from "@/components/landing/StyledBanner";
+import { DEFAULT_HERO_STYLE } from "@/lib/landing-style";
+import type { Product } from "@/lib/types";
 import HeroTextFields from "./HeroTextFields";
+import StyleEditor from "./StyleEditor";
 
 type HeroBannerListProps = {
   banners: HeroBanner[];
   onChange: (banners: HeroBanner[]) => void;
+  products: Record<string, Product>;
+  productsLoading: boolean;
 };
 
 const iconButton =
@@ -27,7 +33,7 @@ const iconButton =
  * Banners del carrusel: subir (directo al bucket), reordenar (arrastrar o flechas), quitar,
  * descripción de la imagen y botones por banner. Los cambios se guardan con el botón del formulario.
  */
-export default function HeroBannerList({ banners, onChange }: HeroBannerListProps) {
+export default function HeroBannerList({ banners, onChange, products, productsLoading }: HeroBannerListProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -73,7 +79,7 @@ export default function HeroBannerList({ banners, onChange }: HeroBannerListProp
           .upload(path, file, { contentType: file.type, cacheControl: "31536000", upsert: false });
         if (uploadError) throw uploadError;
         uploadedPaths.push(path);
-        added.push({ image_url: supabase.storage.from(HERO_BUCKET).getPublicUrl(path).data.publicUrl, alt: "", ctas: [] });
+        added.push({ image_url: supabase.storage.from(HERO_BUCKET).getPublicUrl(path).data.publicUrl, alt: "", ctas: [], style: DEFAULT_HERO_STYLE });
       }
       onChange([...banners, ...added]);
     } catch (err) {
@@ -204,6 +210,28 @@ export default function HeroBannerList({ banners, onChange }: HeroBannerListProp
                 ctas={banner.ctas}
                 onChange={(ctas) => patch(index, { ctas })}
               />
+              <StyleEditor
+                value={banner.style}
+                onChange={(style) => patch(index, { style })}
+                features={{ subtitle: true, layout: true, overlay: true, spotlight: true }}
+                products={products}
+                productsLoading={productsLoading}
+              />
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted">Vista previa del banner {index + 1}</p>
+                <div className="overflow-hidden rounded-[28px] bg-canvas p-3 ring-1 ring-black/10">
+                  <StyledBanner
+                    headingTag="div"
+                    title={banner.title}
+                    subtitle={banner.subtitle}
+                    ctas={banner.ctas}
+                    style={banner.style}
+                    imageUrl={banner.image_url}
+                    imageAlt={banner.alt}
+                    product={banner.style.spotlight.enabled ? (products[banner.style.spotlight.sku.trim()] ?? null) : null}
+                  />
+                </div>
+              </div>
             </li>
           ))}
         </ul>

@@ -3,6 +3,7 @@ import { cache } from "react";
 import { connection } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Product } from "@/lib/types";
+import { isProductId } from "@/lib/landing-style";
 
 /**
  * Lectura del catálogo desde Supabase (única fuente de productos).
@@ -104,6 +105,32 @@ export const getProductBySku = cache(async (sku: string): Promise<Product | null
   }
   return data ? toProduct(data) : null;
 });
+
+/**
+ * Productos del módulo "Cerveza destacada" de la landing: cada referencia es un SKU o un ID y solo se
+ * resuelven productos activos. El resultado se indexa por la referencia tal cual se guardó; una
+ * referencia sin producto activo no aparece, y el banner se muestra sin la tarjeta.
+ */
+export async function getSpotlightProducts(refs: string[]): Promise<Record<string, Product>> {
+  if (refs.length === 0) return {};
+  await connection();
+  const supabase = getClient();
+  if (!supabase) return {};
+
+  const found = await Promise.all(
+    refs.map(async (ref) => {
+      const { data, error } = await supabase
+        .from("products")
+        .select(PRODUCT_COLUMNS)
+        .eq(isProductId(ref) ? "id" : "sku", ref)
+        .eq("is_active", true)
+        .maybeSingle();
+      if (error) console.error(`[catalog] Error al leer el producto destacado ${ref}:`, error.message);
+      return data ? ([ref, toProduct(data)] as const) : null;
+    }),
+  );
+  return Object.fromEntries(found.filter((entry) => entry !== null));
+}
 
 /**
  * Venta cruzada: hasta `limit` cervezas activas con el mismo estilo o la misma

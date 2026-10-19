@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import type { HeroCta } from "@/lib/hero";
-import HeroCtas from "./HeroCtas";
-import HeroHeading from "./HeroHeading";
+import type { BlockStyle } from "@/lib/landing-style";
+import type { Product } from "@/lib/types";
+import StyledBanner from "./landing/StyledBanner";
 
 type HeroVideoProps = {
   /** Sin video (o si falla al cargar) queda un fondo gris oscuro. */
@@ -12,9 +13,11 @@ type HeroVideoProps = {
   ctas: HeroCta[];
   title?: string | null;
   subtitle?: string | null;
+  style: BlockStyle;
+  product?: Product | null;
 };
 
-export default function HeroVideo({ videoSrc, ctas, title, subtitle }: HeroVideoProps) {
+export default function HeroVideo({ videoSrc, ctas, title, subtitle, style, product }: HeroVideoProps) {
   const reduceMotion = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoFailed, setVideoFailed] = useState(false);
@@ -35,32 +38,31 @@ export default function HeroVideo({ videoSrc, ctas, title, subtitle }: HeroVideo
     return () => observer.disconnect();
   }, [hasVideo]);
 
-  return (
-    <section
-      aria-label="Bienvenida"
-      className="relative isolate flex min-h-[420px] flex-col items-center justify-center gap-8 overflow-hidden rounded-[28px] bg-neutral-900 py-12 shadow-card md:min-h-[560px]"
-    >
-      {hasVideo && (
-        <video
-          ref={videoRef}
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="metadata"
-          aria-hidden="true"
-          onError={() => setVideoFailed(true)}
-          className="absolute inset-0 z-0 h-full w-full object-cover"
-          src={videoSrc}
-        />
-      )}
-      <div aria-hidden className="absolute inset-0 z-0 bg-black/55" />
-      <div aria-hidden className="absolute inset-0 z-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+  const media = hasVideo ? (
+    <video
+      ref={videoRef}
+      autoPlay
+      loop
+      muted
+      playsInline
+      preload="metadata"
+      aria-hidden="true"
+      onError={() => setVideoFailed(true)}
+      className="absolute inset-0 h-full w-full object-cover"
+      src={videoSrc}
+    />
+  ) : undefined;
 
-      <div className="relative z-10 flex flex-col items-center gap-8">
-        <HeroHeading title={title} subtitle={subtitle} />
-        <HeroCtas ctas={ctas} />
-      </div>
-    </section>
+  return (
+    <StyledBanner
+      headingTag="h1"
+      ariaLabel="Bienvenida"
+      title={title}
+      subtitle={subtitle}
+      ctas={ctas}
+      style={style}
+      media={media}
+      product={product}
+    />
   );
 }

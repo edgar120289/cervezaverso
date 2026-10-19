@@ -1,4 +1,13 @@
 import { z } from "zod";
+import {
+  DEFAULT_GRID_STYLE,
+  DEFAULT_IMPACT_STYLE,
+  DEFAULT_SPLIT_STYLE,
+  gridStyleSchema,
+  impactStyleSchema,
+  splitStyleSchema,
+  spotlightRef,
+} from "@/lib/landing-style";
 import { ctaListSchema, DEFAULT_HERO_SETTINGS, heroSettingsSchema } from "@/lib/hero";
 
 export const LANDING_MODULES = [
@@ -64,6 +73,7 @@ const splitSchema = z.object({
   image_alt: z.string().trim().max(200, "La descripción de la imagen admite 200 caracteres.").default(""),
   image_position: z.enum(["left", "right"]).default("right"),
   ctas: ctaListSchema(MAX_SPLIT_CTAS).default([]),
+  style: splitStyleSchema,
 });
 
 const impactSchema = z.object({
@@ -72,24 +82,40 @@ const impactSchema = z.object({
   subtitle: z.string().trim().max(MODULE_SUBTITLE_MAX, `El subtítulo admite ${MODULE_SUBTITLE_MAX} caracteres.`).default(""),
   image_url: imageUrl.default(null),
   image_alt: z.string().trim().max(200, "La descripción de la imagen admite 200 caracteres.").default(""),
-  darken: z.boolean().default(true),
   ctas: ctaListSchema(MAX_IMPACT_CTAS).default([]),
+  style: impactStyleSchema,
 });
+
+/** Lo guardado antes de los estilos usaba `darken: false` para ver la foto limpia: ahora es opacidad 0. */
+function migrateDarken(raw: unknown): unknown {
+  if (!Array.isArray(raw)) return raw;
+  return raw.map((item) => {
+    if (!item || typeof item !== "object" || (item as { darken?: unknown }).darken !== false) return item;
+    const rest = { ...(item as Record<string, unknown>) };
+    delete rest.darken;
+    const style = rest.style && typeof rest.style === "object" ? (rest.style as Record<string, unknown>) : {};
+    return { ...rest, style: { overlay: 0, ...style } };
+  });
+}
 
 const gridSchema = z.object({
   ...base,
   id: z.literal("grid"),
   items: z.array(gridItemSchema).max(MAX_GRID_ITEMS, `Máximo ${MAX_GRID_ITEMS} elementos.`).default([]),
+  style: gridStyleSchema,
 });
 
 const moduleSchema = z.discriminatedUnion("id", [splitSchema, impactSchema, gridSchema]);
 
 /** Los 3 bloques, uno por tipo, con un orden distinto cada uno. */
-const modulesSchema = z
-  .array(moduleSchema)
-  .length(3, "Deben ser 3 bloques.")
-  .refine((modules) => new Set(modules.map((m) => m.id)).size === 3, "Cada bloque debe ser de un tipo distinto.")
-  .refine((modules) => new Set(modules.map((m) => m.order)).size === 3, "Dos bloques no pueden tener el mismo orden (1, 2 y 3).");
+const modulesSchema = z.preprocess(
+  migrateDarken,
+  z
+    .array(moduleSchema)
+    .length(3, "Deben ser 3 bloques.")
+    .refine((modules) => new Set(modules.map((m) => m.id)).size === 3, "Cada bloque debe ser de un tipo distinto.")
+    .refine((modules) => new Set(modules.map((m) => m.order)).size === 3, "Dos bloques no pueden tener el mismo orden (1, 2 y 3)."),
+);
 
 export const landingSettingsSchema = z.object({
   hero: heroSettingsSchema,
@@ -104,9 +130,9 @@ export type GridItem = z.infer<typeof gridItemSchema>;
 export type LandingSettings = z.infer<typeof landingSettingsSchema>;
 
 export const DEFAULT_LANDING_MODULES: LandingModule[] = [
-  { id: "split", enabled: false, title: "", order: 1, body: "", image_url: null, image_alt: "", image_position: "right", ctas: [] },
-  { id: "impact", enabled: false, title: "", order: 2, subtitle: "", image_url: null, image_alt: "", darken: true, ctas: [] },
-  { id: "grid", enabled: false, title: "", order: 3, items: [] },
+  { id: "split", enabled: false, title: "", order: 1, body: "", image_url: null, image_alt: "", image_position: "right", ctas: [], style: DEFAULT_SPLIT_STYLE },
+  { id: "impact", enabled: false, title: "", order: 2, subtitle: "", image_url: null, image_alt: "", ctas: [], style: DEFAULT_IMPACT_STYLE },
+  { id: "grid", enabled: false, title: "", order: 3, items: [], style: DEFAULT_GRID_STYLE },
 ];
 
 export const DEFAULT_LANDING_SETTINGS: LandingSettings = {
@@ -125,6 +151,13 @@ export function collectImageUrls(settings: LandingSettings): string[] {
     }
   }
   return urls;
+}
+
+/** SKU o ID de todos los productos destacados que la configuración tiene activos (Hero y bloques). */
+export function collectSpotlightRefs(settings: LandingSettings): string[] {
+  const { hero, modules } = settings;
+  const styles = [hero.hero_video_style, ...hero.hero_banners.map((banner) => banner.style), ...modules.map((m) => m.style)];
+  return [...new Set(styles.map(spotlightRef).filter((ref): ref is string => ref !== null))];
 }
 
 /**

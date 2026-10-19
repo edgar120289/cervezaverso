@@ -19,6 +19,8 @@ import {
   type SplitModule,
 } from "@/lib/landing";
 import { LandingModuleView } from "@/components/landing/LandingModules";
+import type { Product } from "@/lib/types";
+import StyleEditor, { type StyleFeatures } from "./StyleEditor";
 import HeroCtaEditor from "./HeroCtaEditor";
 import ImageUploadField from "./ImageUploadField";
 import Switch from "./Switch";
@@ -26,6 +28,14 @@ import Switch from "./Switch";
 type LandingModulesEditorProps = {
   modules: LandingModule[];
   onChange: (modules: LandingModule[]) => void;
+  products: Record<string, Product>;
+  productsLoading: boolean;
+};
+
+const STYLE_FEATURES: Record<LandingModule["id"], StyleFeatures> = {
+  split: { subtitle: true },
+  impact: { subtitle: true, layout: true, overlay: true, spotlight: true },
+  grid: { subtitle: false, buttons: false },
 };
 
 const ORDERS = [1, 2, 3] as const;
@@ -47,7 +57,7 @@ function segmentClass(active: boolean) {
  * los campos de su tipo; al elegir un orden ya ocupado, los dos bloques intercambian su lugar.
  * Cada vista previa es el mismo componente de la tienda, alimentado con el estado en edición.
  */
-export default function LandingModulesEditor({ modules, onChange }: LandingModulesEditorProps) {
+export default function LandingModulesEditor({ modules, onChange, products, productsLoading }: LandingModulesEditorProps) {
   function patch(id: LandingModule["id"], changes: Partial<LandingModule>) {
     onChange(modules.map((module) => (module.id === id ? ({ ...module, ...changes } as LandingModule) : module)));
   }
@@ -119,6 +129,15 @@ export default function LandingModulesEditor({ modules, onChange }: LandingModul
               {module.id === "impact" && <ImpactFields module={module} onChange={(changes) => patch("impact", changes)} />}
               {module.id === "grid" && <GridFields module={module} onChange={(changes) => patch("grid", changes)} />}
 
+              <StyleEditor
+                value={module.style}
+                onChange={(style) => patch(module.id, { style })}
+                features={STYLE_FEATURES[module.id]}
+                products={products}
+                productsLoading={productsLoading}
+                subtitleLabel={module.id === "split" ? "Párrafo" : "Subtítulo"}
+              />
+
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted">
                   Vista previa{!module.enabled && " · apagado, no se muestra en la tienda"}
@@ -126,7 +145,7 @@ export default function LandingModulesEditor({ modules, onChange }: LandingModul
                 <div
                   className={`overflow-hidden rounded-[28px] bg-canvas p-3 ring-1 ring-black/10 ${module.enabled ? "" : "opacity-50"}`}
                 >
-                  <LandingModuleView module={module} preview />
+                  <LandingModuleView module={module} preview products={products} />
                 </div>
               </div>
             </li>
@@ -215,12 +234,6 @@ function ImpactFields({ module, onChange }: { module: ImpactModule; onChange: (c
               className={inputClass}
             />
           </label>
-          <Switch
-            checked={module.darken}
-            onChange={(darken) => onChange({ darken })}
-            label="Oscurecer fondo"
-            description="Añade una capa oscura para que el texto blanco se lea sobre cualquier foto."
-          />
         </>
       )}
       <label className={labelClass}>

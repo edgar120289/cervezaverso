@@ -2,6 +2,8 @@
 
 import { refresh } from "next/cache";
 import { requireAdmin } from "@/lib/admin-auth";
+import { getSpotlightProducts } from "@/lib/catalog";
+import type { Product } from "@/lib/types";
 import { firstIssue } from "@/lib/validation";
 import { HERO_BUCKET } from "@/lib/hero";
 import { collectImageUrls, landingSettingsSchema, parseLandingSettings, type LandingSettings } from "@/lib/landing";
@@ -95,4 +97,13 @@ export async function buscarProductosActivos(query: string): Promise<ProductOpti
     return [];
   }
   return data;
+}
+
+/** Vista previa de "Cerveza destacada": resuelve las referencias (SKU o ID) a productos activos. Solo admins. */
+export async function obtenerProductosDestacados(refs: string[]): Promise<Record<string, Product>> {
+  await requireAdmin("/admin/landing");
+  const clean = [...new Set((Array.isArray(refs) ? refs : []).map((ref) => String(ref).trim()))]
+    .filter((ref) => /^[A-Za-z0-9._-]{1,60}$/.test(ref))
+    .slice(0, 16);
+  return getSpotlightProducts(clean);
 }

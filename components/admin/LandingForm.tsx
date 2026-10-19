@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Loader2, Save } from "lucide-react";
-import { guardarLanding } from "@/app/actions/admin-landing";
+import { guardarLanding, obtenerProductosDestacados } from "@/app/actions/admin-landing";
+import StyledBanner from "@/components/landing/StyledBanner";
 import { HERO_INTERVALS, type HeroSettings } from "@/lib/hero";
-import type { LandingModule, LandingSettings } from "@/lib/landing";
+import { collectSpotlightRefs, type LandingModule, type LandingSettings } from "@/lib/landing";
+import type { Product } from "@/lib/types";
 import HeroBannerList from "./HeroBannerList";
 import HeroCtaEditor from "./HeroCtaEditor";
 import HeroTextFields from "./HeroTextFields";
 import LandingModulesEditor from "./LandingModulesEditor";
+import StyleEditor from "./StyleEditor";
 import Switch from "./Switch";
 
 const sectionClass = "space-y-4 rounded-[28px] bg-white p-6 shadow-card";
@@ -27,7 +30,29 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
+  const [lookup, setLookup] = useState<Record<string, Product | null>>({});
+
   const settings = landing.hero;
+  const refs = collectSpotlightRefs(landing);
+  const refsKey = refs.join("|");
+  const products = Object.fromEntries(
+    Object.entries(lookup).filter((entry): entry is [string, Product] => entry[1] !== null),
+  );
+  const productsLoading = refs.some((ref) => !(ref in lookup));
+
+  // Resuelve las cervezas destacadas para las vistas previas; espera a que se deje de escribir el SKU.
+  useEffect(() => {
+    const missing = refsKey ? refsKey.split("|").filter((ref) => !(ref in lookup)) : [];
+    if (missing.length === 0) return;
+    const timer = window.setTimeout(() => {
+      obtenerProductosDestacados(missing).then(
+        (found) =>
+          setLookup((current) => ({ ...current, ...Object.fromEntries(missing.map((ref) => [ref, found[ref] ?? null])) })),
+        () => setLookup((current) => ({ ...current, ...Object.fromEntries(missing.map((ref) => [ref, null])) })),
+      );
+    }, 400);
+    return () => window.clearTimeout(timer);
+  }, [refsKey, lookup]);
   const isDirty = JSON.stringify(landing) !== JSON.stringify(saved);
 
   function update(patch: Partial<HeroSettings>) {
@@ -119,6 +144,30 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
             ctas={settings.hero_video_ctas}
             onChange={(hero_video_ctas) => update({ hero_video_ctas })}
           />
+          <StyleEditor
+            value={settings.hero_video_style}
+            onChange={(hero_video_style) => update({ hero_video_style })}
+            features={{ subtitle: true, layout: true, overlay: true, spotlight: true }}
+            products={products}
+            productsLoading={productsLoading}
+          />
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">Vista previa (sin el video)</p>
+            <div className="overflow-hidden rounded-[28px] bg-canvas p-3 ring-1 ring-black/10">
+              <StyledBanner
+                headingTag="div"
+                title={settings.hero_video_title}
+                subtitle={settings.hero_video_subtitle}
+                ctas={settings.hero_video_ctas}
+                style={settings.hero_video_style}
+                product={
+                  settings.hero_video_style.spotlight.enabled
+                    ? (products[settings.hero_video_style.spotlight.sku.trim()] ?? null)
+                    : null
+                }
+              />
+            </div>
+          </div>
         </section>
       ) : (
         <section className={sectionClass} aria-labelledby="hero-carousel">
@@ -143,11 +192,21 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
               ))}
             </div>
           </fieldset>
-          <HeroBannerList banners={settings.hero_banners} onChange={(hero_banners) => update({ hero_banners })} />
+          <HeroBannerList
+            banners={settings.hero_banners}
+            onChange={(hero_banners) => update({ hero_banners })}
+            products={products}
+            productsLoading={productsLoading}
+          />
         </section>
       )}
 
-      <LandingModulesEditor modules={landing.modules} onChange={updateModules} />
+      <LandingModulesEditor
+        modules={landing.modules}
+        onChange={updateModules}
+        products={products}
+        productsLoading={productsLoading}
+      />
 
       <div className="sticky bottom-4 z-10 flex flex-col gap-2 rounded-[28px] bg-white p-4 shadow-card sm:flex-row sm:items-center sm:justify-between">
         <div aria-live="polite" className="text-sm">

@@ -1,7 +1,6 @@
 import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { DEFAULT_HERO_SETTINGS, type HeroSettings } from "@/lib/hero";
 import { DEFAULT_LANDING_SETTINGS, parseLandingSettings, type LandingSettings } from "@/lib/landing";
 
 /**
@@ -18,7 +17,3 @@ export const getLandingSettings = cache(async (): Promise<LandingSettings> => {
   if (!data) return DEFAULT_LANDING_SETTINGS;
   return parseLandingSettings(data.landing_settings);
 });
-
-export async function getHeroSettings(): Promise<HeroSettings> {
-  return (await getLandingSettings()).hero ?? DEFAULT_HERO_SETTINGS;
-}

@@ -23,7 +23,7 @@ export default async function OpengraphImage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          background: "#f2f4f5",
+          background: "#FFFFFF",
           padding: 48,
         }}
       >
@@ -34,10 +34,10 @@ export default async function OpengraphImage() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            background: "#000",
+            background: "#FFFFFF",
             borderRadius: 28,
             padding: "0 72px",
-            color: "#fff",
+            color: "#000000",
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", maxWidth: 560 }}>

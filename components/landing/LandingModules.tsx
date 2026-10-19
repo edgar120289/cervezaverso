@@ -1,27 +1,27 @@
 import Image from "next/image";
 import { Sparkles } from "lucide-react";
 import CtaLink from "@/components/CtaLink";
-import { CTA_BASE, CTA_PRIMARY, CTA_SECONDARY } from "@/components/HeroCtas";
 import type { GridModule, ImpactModule, LandingModule, SplitModule } from "@/lib/landing";
+import { spotlightRef, type BlockStyle } from "@/lib/landing-style";
+import type { Product } from "@/lib/types";
+import { ALIGN_COLUMN, ALIGN_ROW, SECTION_TITLE_CLASS, SUBTITLE_CLASS, ctaLook } from "./banner-style";
 import { GRID_ICONS } from "./icons";
+import StyledBanner from "./StyledBanner";
 
 const EMPTY_HINT = "Aún sin contenido: llena los campos de este bloque y aparecerá aquí.";
 
-/** Botón principal sobre el fondo de acento del banner: blanco para que no se pierda. */
-const CTA_ON_ACCENT = `${CTA_BASE} bg-white text-black hover:bg-white/90`;
+const TEXT_ALIGN = { left: "text-left", center: "text-center", right: "text-right" } as const;
 
-const OUTLINE_DARK =
-  "inline-flex min-h-12 items-center justify-center rounded-full border-2 border-black/80 px-7 text-sm font-semibold transition-colors hover:bg-black hover:text-white active:scale-[0.98]";
-
-function Heading({ id, title, className }: { id: string; title: string; className: string }) {
+function Heading({ id, title, className, style }: { id: string; title: string; className: string; style: BlockStyle }) {
   return title ? (
-    <h2 id={id} className={className}>
+    <h2 id={id} style={style.title_color ? { color: style.title_color } : undefined} className={className}>
       {title}
     </h2>
   ) : null;
 }
 
 function SplitView({ module, preview }: { module: SplitModule; preview: boolean }) {
+  const { style } = module;
   const hasText = Boolean(module.title || module.body || module.ctas.length);
   if (!hasText && !module.image_url) return preview ? <EmptyView /> : null;
 
@@ -35,17 +35,34 @@ function SplitView({ module, preview }: { module: SplitModule; preview: boolean 
     >
       {hasText && (
         <div
-          className={`flex flex-col justify-center rounded-[28px] bg-white p-8 shadow-card sm:p-10 ${
+          className={`flex flex-col justify-center rounded-[28px] bg-white p-8 shadow-card sm:p-10 ${ALIGN_COLUMN[style.align]} ${
             imageFirst ? "md:order-2" : ""
           }`}
         >
-          <Heading id="module-split" title={module.title} className="text-2xl font-semibold tracking-[-0.04em] sm:text-3xl" />
-          {module.body && <p className="mt-3 whitespace-pre-line text-pretty text-muted">{module.body}</p>}
+          <Heading
+            id="module-split"
+            title={module.title}
+            style={style}
+            className={`break-words font-semibold tracking-[-0.04em] ${SECTION_TITLE_CLASS[style.title_size]}`}
+          />
+          {module.body && (
+            <p
+              style={style.subtitle_color ? { color: style.subtitle_color } : undefined}
+              className={`mt-3 whitespace-pre-line text-pretty text-muted ${SUBTITLE_CLASS[style.subtitle_size]}`}
+            >
+              {module.body}
+            </p>
+          )}
           {module.ctas.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-3">
-              {module.ctas.map((cta, index) => (
-                <CtaLink key={`${cta.text}-${index}`} cta={cta} className={index === 0 ? CTA_PRIMARY : OUTLINE_DARK} />
-              ))}
+            <div className={`mt-6 flex w-full flex-wrap gap-3 ${ALIGN_ROW[style.align]}`}>
+              {module.ctas.map((cta, index) => {
+                const look = ctaLook(style, index, false);
+                return (
+                  <CtaLink key={`${cta.text}-${index}`} cta={cta} className={look.className} style={look.style}>
+                    {look.arrow ? `${cta.text} →` : undefined}
+                  </CtaLink>
+                );
+              })}
             </div>
           )}
         </div>
@@ -69,57 +86,41 @@ function SplitView({ module, preview }: { module: SplitModule; preview: boolean 
   );
 }
 
-function ImpactView({ module, preview }: { module: ImpactModule; preview: boolean }) {
-  const hasContent = Boolean(module.title || module.subtitle || module.ctas.length);
+function ImpactView({ module, preview, product }: { module: ImpactModule; preview: boolean; product: Product | null }) {
+  const hasContent = Boolean(
+    module.title || module.subtitle || module.ctas.length || (module.style.spotlight.enabled && product),
+  );
   if (!hasContent) return preview ? <EmptyView /> : null;
 
   return (
-    <section
+    <StyledBanner
       id="modulo-banner"
-      aria-labelledby={module.title ? "module-impact" : undefined}
-      className="scroll-mt-24 relative isolate overflow-hidden rounded-[28px] bg-accent px-6 py-14 text-center text-white shadow-accent sm:px-12 sm:py-20"
-    >
-      {module.image_url && (
-        <>
-          <Image
-            src={module.image_url}
-            alt={module.image_alt}
-            fill
-            sizes="(min-width: 1152px) 1152px, 100vw"
-            className="-z-10 object-cover"
-          />
-          {module.darken && <div aria-hidden className="absolute inset-0 -z-10 bg-black/55" />}
-        </>
-      )}
-      <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 [text-shadow:0_2px_16px_rgb(0_0_0/0.45)]">
-        <Heading
-          id="module-impact"
-          title={module.title}
-          className="text-balance text-3xl font-semibold leading-[1.05] tracking-[-0.045em] sm:text-5xl"
-        />
-        {module.subtitle && <p className="max-w-xl text-pretty text-white/90 sm:text-lg">{module.subtitle}</p>}
-      </div>
-      {module.ctas.length > 0 && (
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          {module.ctas.map((cta, index) => (
-            <CtaLink
-              key={`${cta.text}-${index}`}
-              cta={cta}
-              className={index === 0 ? CTA_ON_ACCENT : CTA_SECONDARY}
-            />
-          ))}
-        </div>
-      )}
-    </section>
+      ariaLabel={module.title || "Promoción"}
+      headingTag={preview ? "div" : "h2"}
+      title={module.title}
+      subtitle={module.subtitle}
+      ctas={module.ctas}
+      style={module.style}
+      imageUrl={module.image_url}
+      imageAlt={module.image_alt}
+      product={product}
+      accentBackdrop
+    />
   );
 }
 
 function GridView({ module, preview }: { module: GridModule; preview: boolean }) {
+  const { style } = module;
   if (!module.title && module.items.length === 0) return preview ? <EmptyView /> : null;
 
   return (
     <section id="modulo-cuadricula" aria-labelledby={module.title ? "module-grid" : undefined} className="scroll-mt-24">
-      <Heading id="module-grid" title={module.title} className="mb-4 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl" />
+      <Heading
+        id="module-grid"
+        title={module.title}
+        style={style}
+        className={`mb-4 break-words font-semibold tracking-[-0.04em] ${SECTION_TITLE_CLASS[style.title_size]} ${TEXT_ALIGN[style.align]}`}
+      />
       {module.items.length > 0 && (
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {module.items.map((item, index) => {
@@ -157,25 +158,41 @@ function EmptyView() {
  * Un bloque tal como se ve en la tienda. El editor de /admin/landing lo reutiliza con `preview`
  * para mostrar un aviso cuando el bloque aún no tiene contenido (en la tienda no se pinta nada).
  */
-export function LandingModuleView({ module, preview = false }: { module: LandingModule; preview?: boolean }) {
+export function LandingModuleView({
+  module,
+  preview = false,
+  products = {},
+}: {
+  module: LandingModule;
+  preview?: boolean;
+  products?: Record<string, Product>;
+}) {
   switch (module.id) {
     case "split":
       return <SplitView module={module} preview={preview} />;
-    case "impact":
-      return <ImpactView module={module} preview={preview} />;
+    case "impact": {
+      const ref = spotlightRef(module.style);
+      return <ImpactView module={module} preview={preview} product={ref ? (products[ref] ?? null) : null} />;
+    }
     case "grid":
       return <GridView module={module} preview={preview} />;
   }
 }
 
 /** Bloques de `landing_settings.modules`: solo los activos y en el orden configurado (1, 2, 3). */
-export default function LandingModules({ modules }: { modules: LandingModule[] }) {
+export default function LandingModules({
+  modules,
+  products,
+}: {
+  modules: LandingModule[];
+  products: Record<string, Product>;
+}) {
   const visible = modules.filter((module) => module.enabled).sort((a, b) => a.order - b.order);
 
   return (
     <>
       {visible.map((module) => (
-        <LandingModuleView key={module.id} module={module} />
+        <LandingModuleView key={module.id} module={module} products={products} />
       ))}
     </>
   );

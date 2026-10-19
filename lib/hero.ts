@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DEFAULT_HERO_STYLE, heroStyleSchema } from "@/lib/landing-style";
 
 /** Debe coincidir con `hero_banners_valid` y los demás checks de la migración 007. */
 export const HERO_BUCKET = "hero-banners";
@@ -46,6 +47,7 @@ const heroBannerSchema = z.object({
   title: z.string().trim().max(120, "El título admite 120 caracteres.").optional(),
   subtitle: z.string().trim().max(240, "El subtítulo admite 240 caracteres.").optional(),
   ctas: heroCtasSchema,
+  style: heroStyleSchema,
 });
 
 export const heroSettingsSchema = z.object({
@@ -61,6 +63,7 @@ export const heroSettingsSchema = z.object({
   hero_video_title: z.string().trim().max(120, "El título admite 120 caracteres.").nullable(),
   hero_video_subtitle: z.string().trim().max(240, "El subtítulo admite 240 caracteres.").nullable(),
   hero_video_ctas: heroCtasSchema,
+  hero_video_style: heroStyleSchema,
   hero_banners: z.array(heroBannerSchema).max(MAX_HERO_BANNERS, `Máximo ${MAX_HERO_BANNERS} banners.`),
   hero_carousel_interval_seconds: z.union([z.literal(3), z.literal(5), z.literal(7)]),
 });
@@ -78,6 +81,7 @@ export const DEFAULT_HERO_SETTINGS: HeroSettings = {
   hero_video_title: null,
   hero_video_subtitle: null,
   hero_video_ctas: [],
+  hero_video_style: DEFAULT_HERO_STYLE,
   hero_banners: [],
   hero_carousel_interval_seconds: 5,
 };
