@@ -1,62 +1,34 @@
 import { ImageResponse } from "next/og";
-import { readdir, readFile } from "node:fs/promises";
-import { join } from "node:path";
-
-// Un logotipo distinto en cada generación: la imagen no se pre-renderiza en el build.
-export const dynamic = "force-dynamic";
+import { OG_LOGO_SRC } from "./og-logo";
 
 export const alt = "Cervezaverso | Tienda de Cervezas del Mundo";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export default async function OpengraphImage() {
-  const logosDir = join(process.cwd(), "public/img/cervezaverso-logos-v2/logos/circular");
-  const logos = (await readdir(logosDir)).filter((name) => name.toLowerCase().endsWith(".png"));
-  const logo = await readFile(join(logosDir, logos[Math.floor(Math.random() * logos.length)]));
-
+export default function OpengraphImage() {
   return new ImageResponse(
     (
       <div
         style={{
+          display: "flex",
           width: "100%",
           height: "100%",
-          display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
-          background: "#FFFFFF",
-          padding: 48,
+          justifyContent: "center",
+          backgroundColor: "#FFFFFF",
+          padding: "0 72px",
         }}
       >
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            background: "#FFFFFF",
-            borderRadius: 28,
-            padding: "0 72px",
-            color: "#000000",
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", maxWidth: 560 }}>
-            <div style={{ fontSize: 32, opacity: 0.6, letterSpacing: "-0.02em" }}>Cervezaverso</div>
-            <div style={{ fontSize: 72, fontWeight: 600, lineHeight: 1.02, letterSpacing: "-0.045em", marginTop: 16 }}>
-              Cerveza artesanal, nacional e importada.
-            </div>
+        <div style={{ display: "flex", flexDirection: "column", width: 600, color: "#000000" }}>
+          <div style={{ display: "flex", fontSize: 32, color: "#666361" }}>Cervezaverso</div>
+          <div style={{ display: "flex", fontSize: 68, fontWeight: 700, lineHeight: 1.05, marginTop: 16 }}>
+            Cerveza artesanal, nacional e importada
           </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`data:image/png;base64,${logo.toString("base64")}`}
-            alt=""
-            width={440}
-            height={440}
-            style={{ objectFit: "contain" }}
-          />
         </div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={OG_LOGO_SRC} alt="" width={400} height={400} style={{ marginLeft: 48 }} />
       </div>
     ),
-    size
+    size,
   );
 }
