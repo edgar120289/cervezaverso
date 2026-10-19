@@ -41,7 +41,7 @@ type StyledBannerProps = {
  * foto de fondo completo (con capa oscura de 0 a 100 %) o dividido 50/50 (texto a un lado, imagen o
  * producto al otro). Todo es fluido: el texto se reacomoda en móvil y la imagen cubre sin tamaños fijos.
  */
-export default function StyledBanner({
+function Banner({
   title,
   subtitle,
   ctas,
@@ -136,14 +136,14 @@ export default function StyledBanner({
         id={id}
         aria-label={ariaLabel}
         className={`scroll-mt-24 grid overflow-hidden rounded-[28px] bg-white shadow-card ${
-          hasSide && hasText ? "md:grid-cols-2" : ""
+          hasSide && hasText ? "@min-[736px]:grid-cols-2" : ""
         }`}
       >
-        {hasText && <div className={`flex items-center p-6 sm:p-10 lg:p-14 ${mediaFirst ? "md:order-2" : ""}`}>{text}</div>}
+        {hasText && <div className={`flex items-center p-6 @min-[608px]:p-10 @min-[992px]:p-14 ${mediaFirst ? "@min-[736px]:order-2" : ""}`}>{text}</div>}
         {hasSide && (
           <div
-            className={`relative min-h-72 md:min-h-[26rem] ${card ? "flex items-center bg-canvas p-6" : "bg-neutral-900"} ${
-              mediaFirst ? "md:order-1" : ""
+            className={`relative min-h-72 @min-[736px]:min-h-[26rem] ${card ? "flex items-center bg-canvas p-6" : "bg-neutral-900"} ${
+              mediaFirst ? "@min-[736px]:order-1" : ""
             }`}
           >
             {card ?? mediaNode}
@@ -157,7 +157,7 @@ export default function StyledBanner({
     <section
       id={id}
       aria-label={ariaLabel}
-      className={`relative isolate flex min-h-[22rem] w-full scroll-mt-24 items-center overflow-hidden rounded-[28px] shadow-card sm:min-h-[28rem] lg:min-h-[34rem] ${
+      className={`relative isolate flex min-h-[22rem] w-full scroll-mt-24 items-center overflow-hidden rounded-[28px] shadow-card @min-[608px]:min-h-[28rem] @min-[992px]:min-h-[34rem] ${
         accentBackdrop ? "bg-accent" : "bg-neutral-900"
       }`}
     >
@@ -166,13 +166,25 @@ export default function StyledBanner({
         <div aria-hidden className="absolute inset-0 z-0" style={{ backgroundColor: `rgb(0 0 0 / ${style.overlay / 100})` }} />
       )}
       <div
-        className={`relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-5 py-12 sm:px-10 sm:py-16 ${
-          card ? "lg:grid-cols-2 lg:items-center" : ""
+        className={`relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-5 py-12 @min-[608px]:px-10 @min-[608px]:py-16 ${
+          card ? "@min-[992px]:grid-cols-2 @min-[992px]:items-center" : ""
         }`}
       >
-        {hasText && <div className={card && style.align === "right" ? "lg:order-2" : ""}>{text}</div>}
+        {hasText && <div className={card && style.align === "right" ? "@min-[992px]:order-2" : ""}>{text}</div>}
         {card}
       </div>
     </section>
+  );
+}
+
+/**
+ * Los puntos de quiebre responden al ancho del propio banner (container queries), no al de la ventana:
+ * así la vista previa del admin en modo móvil (375 px) se ve igual que en un teléfono real.
+ */
+export default function StyledBanner(props: StyledBannerProps) {
+  return (
+    <div className="@container w-full">
+      <Banner {...props} />
+    </div>
   );
 }

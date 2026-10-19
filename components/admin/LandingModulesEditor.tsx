@@ -18,19 +18,11 @@ import {
   type LandingModule,
   type SplitModule,
 } from "@/lib/landing";
-import { LandingModuleView } from "@/components/landing/LandingModules";
 import type { Product } from "@/lib/types";
 import BlockEditor, { type StyleFeatures } from "./BlockEditor";
 import HeroCtaEditor from "./HeroCtaEditor";
 import ImageUploadField from "./ImageUploadField";
 import Switch from "./Switch";
-
-type LandingModulesEditorProps = {
-  modules: LandingModule[];
-  onChange: (modules: LandingModule[]) => void;
-  products: Record<string, Product>;
-  productsLoading: boolean;
-};
 
 const STYLE_FEATURES: Record<LandingModule["id"], StyleFeatures> = {
   split: { subtitle: true },
@@ -53,105 +45,80 @@ function segmentClass(active: boolean) {
 }
 
 /**
- * Tres bloques modulares de la landing. Cada uno tiene interruptor, título, orden (1, 2 o 3) y
- * los campos de su tipo; al elegir un orden ya ocupado, los dos bloques intercambian su lugar.
- * Cada vista previa es el mismo componente de la tienda, alimentado con el estado en edición.
+ * Controles de un bloque modular: interruptor, orden (1, 2 o 3; al elegir uno ocupado los dos bloques
+ * intercambian lugar) y las secciones del Studio. La vista previa vive en el lienzo.
  */
-export default function LandingModulesEditor({ modules, onChange, products, productsLoading }: LandingModulesEditorProps) {
-  function patch(id: LandingModule["id"], changes: Partial<LandingModule>) {
-    onChange(modules.map((module) => (module.id === id ? ({ ...module, ...changes } as LandingModule) : module)));
-  }
-
-  function changeOrder(id: LandingModule["id"], order: LandingModule["order"]) {
-    const moving = modules.find((module) => module.id === id);
-    if (!moving) return;
-    onChange(
-      modules.map((module) => {
-        if (module.id === id) return { ...module, order };
-        if (module.order === order) return { ...module, order: moving.order };
-        return module;
-      }),
-    );
-  }
-
-  const sorted = [...modules].sort((a, b) => a.order - b.order);
+export function ModuleEditor({
+  module,
+  onPatch,
+  onOrderChange,
+  products,
+  productsLoading,
+}: {
+  module: LandingModule;
+  onPatch: (changes: Partial<LandingModule>) => void;
+  onOrderChange: (order: LandingModule["order"]) => void;
+  products: Record<string, Product>;
+  productsLoading: boolean;
+}) {
+  const info = LANDING_MODULES.find((item) => item.id === module.id)!;
 
   return (
-    <section className="space-y-4 rounded-[28px] bg-white p-6 shadow-card" aria-labelledby="landing-modules">
-      <div>
-        <h2 id="landing-modules" className="font-semibold tracking-tight">
-          Bloques de la landing
-        </h2>
-        <p className="text-xs text-muted">
-          Se apilan debajo del Hero según su orden. Un bloque apagado no se muestra. La vista previa es el bloque real y
-          se actualiza mientras escribes.
-        </p>
+    <div>
+      <div className="space-y-3 px-4 pb-4">
+        <Switch
+          checked={module.enabled}
+          onChange={(enabled) => onPatch({ enabled })}
+          label={info.label}
+          description={info.description}
+        />
+        <label className={`${labelClass} sm:w-28`}>
+          Orden
+          <select
+            value={module.order}
+            onChange={(e) => onOrderChange(Number(e.target.value) as LandingModule["order"])}
+            className={`${inputClass} cursor-pointer font-semibold`}
+          >
+            {ORDERS.map((order) => (
+              <option key={order} value={order}>
+                {order}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
-      <ul className="space-y-3">
-        {sorted.map((module) => {
-          const info = LANDING_MODULES.find((item) => item.id === module.id)!;
-          return (
-            <li key={module.id} className="space-y-4 rounded-[20px] border border-black/10 p-4">
-              <Switch
-                checked={module.enabled}
-                onChange={(enabled) => patch(module.id, { enabled })}
-                label={info.label}
-                description={info.description}
-              />
-              <label className={`${labelClass} sm:w-28`}>
-                Orden
-                <select
-                  value={module.order}
-                  onChange={(e) => changeOrder(module.id, Number(e.target.value) as LandingModule["order"])}
-                  className={`${inputClass} cursor-pointer font-semibold`}
-                >
-                  {ORDERS.map((order) => (
-                    <option key={order} value={order}>
-                      {order}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <BlockEditor
-                value={module.style}
-                onChange={(style) => patch(module.id, { style })}
-                features={STYLE_FEATURES[module.id]}
-                products={products}
-                productsLoading={productsLoading}
-                subtitleLabel={module.id === "split" ? "Párrafo" : "Subtítulo"}
-                imageSlot={
-                  module.id === "split" ? (
-                    <SplitFields part="image" module={module} onChange={(changes) => patch("split", changes)} />
-                  ) : module.id === "impact" ? (
-                    <ImpactFields part="image" module={module} onChange={(changes) => patch("impact", changes)} />
-                  ) : undefined
-                }
-                contentSlot={
-                  module.id === "split" ? (
-                    <SplitFields part="content" module={module} onChange={(changes) => patch("split", changes)} />
-                  ) : module.id === "impact" ? (
-                    <ImpactFields part="content" module={module} onChange={(changes) => patch("impact", changes)} />
-                  ) : (
-                    <GridFields module={module} onChange={(changes) => patch("grid", changes)} />
-                  )
-                }
-                preview={
-                  <>
-                    {!module.enabled && (
-                      <p className="mb-2 text-xs text-muted">Apagado: no se muestra en la tienda.</p>
-                    )}
-                    <div className={module.enabled ? "" : "opacity-50"}>
-                      <LandingModuleView module={module} preview products={products} />
-                    </div>
-                  </>
-                }
-              />
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+      <BlockEditor
+        value={module.style}
+        onChange={(style) => onPatch({ style })}
+        features={STYLE_FEATURES[module.id]}
+        products={products}
+        productsLoading={productsLoading}
+        subtitleLabel={module.id === "split" ? "Párrafo" : "Subtítulo"}
+        imageSlot={
+          module.id === "split" ? (
+            <SplitFields part="image" module={module} onChange={onPatch} />
+          ) : module.id === "impact" ? (
+            <ImpactFields part="image" module={module} onChange={onPatch} />
+          ) : undefined
+        }
+        textSlot={
+          module.id === "split" ? (
+            <SplitFields part="text" module={module} onChange={onPatch} />
+          ) : module.id === "impact" ? (
+            <ImpactFields part="text" module={module} onChange={onPatch} />
+          ) : (
+            <GridFields module={module} onChange={onPatch} />
+          )
+        }
+        ctaSlot={
+          module.id === "split" ? (
+            <SplitFields part="cta" module={module} onChange={onPatch} />
+          ) : module.id === "impact" ? (
+            <ImpactFields part="cta" module={module} onChange={onPatch} />
+          ) : undefined
+        }
+      />
+    </div>
   );
 }
 
@@ -160,6 +127,8 @@ function TitleField({ module, onChange }: { module: LandingModule; onChange: (ch
     <label className={labelClass}>
       Título (opcional) · {module.title.length}/{MODULE_TITLE_MAX}
       <input
+        spellCheck
+        lang="es"
         type="text"
         value={module.title}
         maxLength={MODULE_TITLE_MAX}
@@ -170,7 +139,7 @@ function TitleField({ module, onChange }: { module: LandingModule; onChange: (ch
   );
 }
 
-type Part = "image" | "content";
+type Part = "image" | "text" | "cta";
 
 function SplitFields({
   part,
@@ -181,13 +150,19 @@ function SplitFields({
   module: SplitModule;
   onChange: (changes: Partial<SplitModule>) => void;
 }) {
-  if (part === "content") {
+  if (part === "cta") {
+    return <HeroCtaEditor label="Layout dividido" ctas={module.ctas} max={MAX_SPLIT_CTAS} onChange={(ctas) => onChange({ ctas })} />;
+  }
+
+  if (part === "text") {
     return (
       <div className="space-y-3">
         <TitleField module={module} onChange={(changes) => onChange(changes as Partial<SplitModule>)} />
         <label className={labelClass}>
           Párrafo · {module.body.length}/{MODULE_BODY_MAX}
           <textarea
+            spellCheck
+            lang="es"
             value={module.body}
             maxLength={MODULE_BODY_MAX}
             rows={6}
@@ -195,7 +170,6 @@ function SplitFields({
             className={textareaClass}
           />
         </label>
-        <HeroCtaEditor label="Layout dividido" ctas={module.ctas} max={MAX_SPLIT_CTAS} onChange={(ctas) => onChange({ ctas })} />
       </div>
     );
   }
@@ -212,6 +186,8 @@ function SplitFields({
         <label className={labelClass}>
           Descripción de la imagen (Opcional - Mejora el SEO)
           <input
+            spellCheck
+            lang="es"
             type="text"
             value={module.image_alt}
             maxLength={200}
@@ -254,6 +230,10 @@ function ImpactFields({
   module: ImpactModule;
   onChange: (changes: Partial<ImpactModule>) => void;
 }) {
+  if (part === "cta") {
+    return <HeroCtaEditor label="Banner de impacto" ctas={module.ctas} max={MAX_IMPACT_CTAS} onChange={(ctas) => onChange({ ctas })} />;
+  }
+
   if (part === "image") {
     return (
       <div className="space-y-3">
@@ -267,6 +247,8 @@ function ImpactFields({
           <label className={labelClass}>
             Descripción de la imagen (Opcional - Mejora el SEO)
             <input
+              spellCheck
+              lang="es"
               type="text"
               value={module.image_alt}
               maxLength={200}
@@ -285,6 +267,8 @@ function ImpactFields({
       <label className={labelClass}>
         Subtítulo · {module.subtitle.length}/{MODULE_SUBTITLE_MAX}
         <textarea
+          spellCheck
+          lang="es"
           value={module.subtitle}
           maxLength={MODULE_SUBTITLE_MAX}
           rows={3}
@@ -292,7 +276,6 @@ function ImpactFields({
           className={textareaClass}
         />
       </label>
-      <HeroCtaEditor label="Banner de impacto" ctas={module.ctas} max={MAX_IMPACT_CTAS} onChange={(ctas) => onChange({ ctas })} />
     </div>
   );
 }
@@ -349,6 +332,8 @@ function GridFields({ module, onChange }: { module: GridModule; onChange: (chang
           <label className={labelClass}>
             Título corto · {item.title.length}/{GRID_ITEM_TITLE_MAX}
             <input
+              spellCheck
+              lang="es"
               type="text"
               value={item.title}
               maxLength={GRID_ITEM_TITLE_MAX}
@@ -359,6 +344,8 @@ function GridFields({ module, onChange }: { module: GridModule; onChange: (chang
           <label className={labelClass}>
             Texto corto · {item.text.length}/{GRID_ITEM_TEXT_MAX}
             <textarea
+              spellCheck
+              lang="es"
               value={item.text}
               maxLength={GRID_ITEM_TEXT_MAX}
               rows={2}

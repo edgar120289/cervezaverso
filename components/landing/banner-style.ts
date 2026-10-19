@@ -9,26 +9,26 @@ import {
 
 /** Escala de títulos para banners a todo el ancho (Hero y banner de impacto). */
 export const BANNER_TITLE_CLASS: Record<TitleSize, string> = {
-  s: "text-2xl sm:text-3xl lg:text-4xl",
-  m: "text-3xl sm:text-4xl lg:text-5xl",
-  l: "text-4xl sm:text-5xl lg:text-6xl",
-  xl: "text-4xl sm:text-6xl lg:text-7xl",
-  xxl: "text-5xl sm:text-7xl lg:text-8xl",
+  s: "text-2xl @min-[608px]:text-3xl @min-[992px]:text-4xl",
+  m: "text-3xl @min-[608px]:text-4xl @min-[992px]:text-5xl",
+  l: "text-4xl @min-[608px]:text-5xl @min-[992px]:text-6xl",
+  xl: "text-4xl @min-[608px]:text-6xl @min-[992px]:text-7xl",
+  xxl: "text-5xl @min-[608px]:text-7xl @min-[992px]:text-8xl",
 };
 
 /** Escala de títulos de sección (layout dividido y cuadrícula). */
 export const SECTION_TITLE_CLASS: Record<TitleSize, string> = {
-  s: "text-xl sm:text-2xl",
-  m: "text-2xl sm:text-3xl",
-  l: "text-3xl sm:text-4xl",
-  xl: "text-4xl sm:text-5xl",
-  xxl: "text-5xl sm:text-6xl",
+  s: "text-xl @min-[608px]:text-2xl",
+  m: "text-2xl @min-[608px]:text-3xl",
+  l: "text-3xl @min-[608px]:text-4xl",
+  xl: "text-4xl @min-[608px]:text-5xl",
+  xxl: "text-5xl @min-[608px]:text-6xl",
 };
 
 export const SUBTITLE_CLASS: Record<SubtitleSize, string> = {
-  s: "text-sm sm:text-base",
-  m: "text-base sm:text-lg",
-  l: "text-lg sm:text-xl lg:text-2xl",
+  s: "text-sm @min-[608px]:text-base",
+  m: "text-base @min-[608px]:text-lg",
+  l: "text-lg @min-[608px]:text-xl @min-[992px]:text-2xl",
 };
 
 export const ALIGN_COLUMN: Record<Align, string> = {

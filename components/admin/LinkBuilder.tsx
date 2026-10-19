@@ -82,7 +82,7 @@ export default function LinkBuilder({ label, value, onChange }: LinkBuilderProps
   }
 
   return (
-    <div className="grid gap-2 sm:grid-cols-[13rem_1fr]">
+    <div className="grid gap-2 ">
       <select
         value={mode}
         onChange={(e) => changeMode(e.target.value as Mode)}

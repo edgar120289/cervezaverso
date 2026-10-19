@@ -28,8 +28,10 @@ export default function HeroCtaEditor({ label, ctas, onChange, max = MAX_HERO_CT
         Botones ({ctas.length}/{max})
       </legend>
       {ctas.map((cta, index) => (
-        <div key={index} className="grid gap-2 rounded-[20px] border border-black/5 p-3 lg:grid-cols-[14rem_1fr_auto]">
+        <div key={index} className="grid gap-2 rounded-[20px] border border-black/5 p-3">
           <input
+            spellCheck
+            lang="es"
             type="text"
             value={cta.text}
             maxLength={40}

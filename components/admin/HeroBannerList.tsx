@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 import Image from "next/image";
-import { ArrowDown, ArrowUp, GripVertical, ImageUp, Loader2, X } from "lucide-react";
+import { ArrowDown, ArrowUp, GripVertical, ImageUp, Loader2, Pencil, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { firstIssue } from "@/lib/validation";
 import {
@@ -12,28 +12,24 @@ import {
   MAX_HERO_BANNERS,
   type HeroBanner,
 } from "@/lib/hero";
-import HeroCtaEditor from "./HeroCtaEditor";
-import StyledBanner from "@/components/landing/StyledBanner";
 import { DEFAULT_HERO_STYLE } from "@/lib/landing-style";
-import type { Product } from "@/lib/types";
-import HeroTextFields from "./HeroTextFields";
-import BlockEditor from "./BlockEditor";
 
 type HeroBannerListProps = {
   banners: HeroBanner[];
   onChange: (banners: HeroBanner[]) => void;
-  products: Record<string, Product>;
-  productsLoading: boolean;
+  /** Banner abierto en el lienzo del Studio (`null` si se edita otro elemento). */
+  selected: number | null;
+  onSelect: (index: number) => void;
 };
 
 const iconButton =
   "flex h-11 w-11 items-center justify-center rounded-full bg-canvas text-black/70 transition-colors hover:bg-black hover:text-white disabled:pointer-events-none disabled:opacity-40";
 
 /**
- * Banners del carrusel: subir (directo al bucket), reordenar (arrastrar o flechas), quitar,
- * descripción de la imagen y botones por banner. Los cambios se guardan con el botón del formulario.
+ * Banners del carrusel: subir (directo al bucket), reordenar (arrastrar o flechas), quitar y elegir cuál
+ * editar en el lienzo. Textos, botones y estilo de cada banner se editan en las secciones del Studio.
  */
-export default function HeroBannerList({ banners, onChange, products, productsLoading }: HeroBannerListProps) {
+export default function HeroBannerList({ banners, onChange, selected, onSelect }: HeroBannerListProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -45,10 +41,7 @@ export default function HeroBannerList({ banners, onChange, products, productsLo
     const next = [...banners];
     next.splice(to, 0, next.splice(from, 1)[0]);
     onChange(next);
-  }
-
-  function patch(index: number, change: Partial<HeroBanner>) {
-    onChange(banners.map((banner, i) => (i === index ? { ...banner, ...change } : banner)));
+    if (selected === from) onSelect(to);
   }
 
   async function handleFiles(e: ChangeEvent<HTMLInputElement>) {
@@ -82,6 +75,7 @@ export default function HeroBannerList({ banners, onChange, products, productsLo
         added.push({ image_url: supabase.storage.from(HERO_BUCKET).getPublicUrl(path).data.publicUrl, alt: "", ctas: [], style: DEFAULT_HERO_STYLE });
       }
       onChange([...banners, ...added]);
+      onSelect(banners.length);
     } catch (err) {
       if (uploadedPaths.length > 0) await supabase.storage.from(HERO_BUCKET).remove(uploadedPaths);
       setError(err instanceof Error ? err.message : "No se pudo subir la imagen.");
@@ -97,16 +91,16 @@ export default function HeroBannerList({ banners, onChange, products, productsLo
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-3">
         <p className="text-xs text-muted">
-          Arrastra o usa las flechas para ordenar · {banners.length}/{MAX_HERO_BANNERS}
+          Arrastra o usa las flechas · {banners.length}/{MAX_HERO_BANNERS}
         </p>
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading || isFull}
-          className="flex min-h-11 items-center justify-center gap-2 rounded-full bg-ink px-5 text-sm font-semibold text-white transition-transform active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
+          className="flex min-h-11 items-center justify-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold text-white transition-transform active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
         >
           {uploading ? <Loader2 size={16} className="animate-spin" /> : <ImageUp size={16} />}
           {uploading ? "Subiendo…" : "Subir banners"}
@@ -125,118 +119,69 @@ export default function HeroBannerList({ banners, onChange, products, productsLo
       <p className="text-[11px] text-muted">Tamaño recomendado: 1920x1080px</p>
 
       {banners.length === 0 ? (
-        <p className="rounded-[20px] bg-canvas px-4 py-10 text-center text-sm text-muted">
+        <p className="rounded-[20px] bg-canvas px-4 py-8 text-center text-sm text-muted">
           Sin banners. Sube al menos una imagen para usar el carrusel.
         </p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-2">
           {banners.map((banner, index) => (
             <li
               key={banner.image_url}
               draggable={!uploading}
-              onDragStart={(e) => {
-                // Solo se arrastra desde la tarjeta, no desde los campos de texto.
-                if ((e.target as HTMLElement).closest("input, select, textarea")) return e.preventDefault();
-                setDragIndex(index);
-              }}
+              onDragStart={() => setDragIndex(index)}
               onDragEnd={() => setDragIndex(null)}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => handleDrop(e, index)}
-              className={`space-y-3 rounded-[28px] border border-black/5 bg-white p-4 transition-opacity ${
-                dragIndex === index ? "opacity-40" : ""
-              }`}
+              className={`flex items-center gap-2 rounded-[20px] border p-2 transition-opacity ${
+                selected === index ? "border-accent bg-accent/5" : "border-black/10"
+              } ${dragIndex === index ? "opacity-40" : ""}`}
             >
-              <BlockEditor
-                value={banner.style}
-                onChange={(style) => patch(index, { style })}
-                features={{ subtitle: true, layout: true, overlay: true, spotlight: true }}
-                products={products}
-                productsLoading={productsLoading}
-                imageSlot={
-                  <>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-2xl bg-canvas sm:w-56">
-                  <Image
-                    src={banner.image_url}
-                    alt={banner.alt || `Banner ${index + 1}`}
-                    fill
-                    sizes="(min-width: 640px) 224px, 100vw"
-                    className="object-cover"
-                    draggable={false}
-                  />
-                </div>
-                <div className="flex-1 space-y-2">
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-muted">
-                    Banner {index + 1} · Descripción de la imagen (Opcional - Mejora el SEO)
-                    <input
-                      type="text"
-                      value={banner.alt}
-                      maxLength={200}
-                      onChange={(e) => patch(index, { alt: e.target.value })}
-                                      className="mt-1 min-h-11 w-full rounded-full bg-canvas px-4 text-sm font-normal normal-case tracking-normal text-black outline-none focus:ring-2 focus:ring-black/15"
-                    />
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <GripVertical size={16} aria-hidden className="hidden text-muted md:block" />
-                    <button
-                      type="button"
-                      onClick={() => move(index, index - 1)}
-                      disabled={index === 0}
-                      aria-label={`Subir el banner ${index + 1}`}
-                      className={iconButton}
-                    >
-                      <ArrowUp size={16} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => move(index, index + 1)}
-                      disabled={index === banners.length - 1}
-                      aria-label={`Bajar el banner ${index + 1}`}
-                      className={iconButton}
-                    >
-                      <ArrowDown size={16} />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onChange(banners.filter((_, i) => i !== index))}
-                      aria-label={`Quitar el banner ${index + 1}`}
-                      className={`${iconButton} hover:bg-danger`}
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                </div>
+              <GripVertical size={16} aria-hidden className="hidden shrink-0 text-muted lg:block" />
+              <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-xl bg-canvas">
+                <Image
+                  src={banner.image_url}
+                  alt={banner.alt || `Banner ${index + 1}`}
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                  draggable={false}
+                />
               </div>
-                  </>
-                }
-                contentSlot={
-                  <>
-              <HeroTextFields
-                title={banner.title ?? ""}
-                subtitle={banner.subtitle ?? ""}
-                onTitleChange={(title) => patch(index, { title })}
-                onSubtitleChange={(subtitle) => patch(index, { subtitle })}
-              />
-              <HeroCtaEditor
-                label={`Banner ${index + 1}`}
-                ctas={banner.ctas}
-                onChange={(ctas) => patch(index, { ctas })}
-              />
-                  </>
-                }
-                preview={
-                  <StyledBanner
-                    headingTag="div"
-                    title={banner.title}
-                    subtitle={banner.subtitle}
-                    ctas={banner.ctas}
-                    style={banner.style}
-                    imageUrl={banner.image_url}
-                    imageAlt={banner.alt}
-                    product={banner.style.spotlight.enabled ? (products[banner.style.spotlight.sku.trim()] ?? null) : null}
-                  />
-                }
-              />
+              <button
+                type="button"
+                onClick={() => onSelect(index)}
+                aria-pressed={selected === index}
+                className="flex min-h-11 flex-1 items-center gap-1.5 text-left text-sm font-semibold"
+              >
+                <Pencil size={14} aria-hidden />
+                Banner {index + 1}
+              </button>
+              <button
+                type="button"
+                onClick={() => move(index, index - 1)}
+                disabled={index === 0}
+                aria-label={`Subir el banner ${index + 1}`}
+                className={iconButton}
+              >
+                <ArrowUp size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => move(index, index + 1)}
+                disabled={index === banners.length - 1}
+                aria-label={`Bajar el banner ${index + 1}`}
+                className={iconButton}
+              >
+                <ArrowDown size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={() => onChange(banners.filter((_, i) => i !== index))}
+                aria-label={`Quitar el banner ${index + 1}`}
+                className={`${iconButton} hover:bg-danger`}
+              >
+                <X size={16} />
+              </button>
             </li>
           ))}
         </ul>

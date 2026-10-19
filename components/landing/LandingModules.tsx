@@ -31,12 +31,12 @@ function SplitView({ module, preview }: { module: SplitModule; preview: boolean 
     <section
       id="modulo-dividido"
       aria-labelledby={module.title ? "module-split" : undefined}
-      className={`scroll-mt-24 grid gap-4 ${module.image_url && hasText ? "md:grid-cols-2" : ""}`}
+      className={`scroll-mt-24 grid gap-4 ${module.image_url && hasText ? "@min-[736px]:grid-cols-2" : ""}`}
     >
       {hasText && (
         <div
-          className={`flex flex-col justify-center rounded-[28px] bg-white p-8 shadow-card sm:p-10 ${ALIGN_COLUMN[style.align]} ${
-            imageFirst ? "md:order-2" : ""
+          className={`flex flex-col justify-center rounded-[28px] bg-white p-8 shadow-card @min-[608px]:p-10 ${ALIGN_COLUMN[style.align]} ${
+            imageFirst ? "@min-[736px]:order-2" : ""
           }`}
         >
           <Heading
@@ -69,8 +69,8 @@ function SplitView({ module, preview }: { module: SplitModule; preview: boolean 
       )}
       {module.image_url && (
         <div
-          className={`relative min-h-64 overflow-hidden rounded-[28px] bg-white shadow-card md:min-h-80 ${
-            hasText ? (imageFirst ? "md:order-1" : "") : "aspect-[2/1]"
+          className={`relative min-h-64 overflow-hidden rounded-[28px] bg-white shadow-card @min-[736px]:min-h-80 ${
+            hasText ? (imageFirst ? "@min-[736px]:order-1" : "") : "aspect-[2/1]"
           }`}
         >
           <Image
@@ -122,7 +122,7 @@ function GridView({ module, preview }: { module: GridModule; preview: boolean })
         className={`mb-4 break-words font-semibold tracking-[-0.04em] ${SECTION_TITLE_CLASS[style.title_size]} ${TEXT_ALIGN[style.align]}`}
       />
       {module.items.length > 0 && (
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-4 @min-[608px]:grid-cols-2 @min-[992px]:grid-cols-3">
           {module.items.map((item, index) => {
             const Icon = GRID_ICONS[item.icon];
             return (
@@ -154,11 +154,7 @@ function EmptyView() {
   );
 }
 
-/**
- * Un bloque tal como se ve en la tienda. El editor de /admin/landing lo reutiliza con `preview`
- * para mostrar un aviso cuando el bloque aún no tiene contenido (en la tienda no se pinta nada).
- */
-export function LandingModuleView({
+function ModuleBody({
   module,
   preview = false,
   products = {},
@@ -177,6 +173,26 @@ export function LandingModuleView({
     case "grid":
       return <GridView module={module} preview={preview} />;
   }
+}
+
+/**
+ * Un bloque tal como se ve en la tienda. El editor de /admin/landing lo reutiliza con `preview`
+ * para mostrar un aviso cuando el bloque aún no tiene contenido (en la tienda no se pinta nada).
+ */
+export function LandingModuleView({
+  module,
+  preview = false,
+  products = {},
+}: {
+  module: LandingModule;
+  preview?: boolean;
+  products?: Record<string, Product>;
+}) {
+  return (
+    <div className="@container">
+      <ModuleBody module={module} preview={preview} products={products} />
+    </div>
+  );
 }
 
 /** Bloques de `landing_settings.modules`: solo los activos y en el orden configurado (1, 2, 3). */

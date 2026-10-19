@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
-import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, ChevronDown } from "lucide-react";
 import { buscarProductosActivos, type ProductOption } from "@/app/actions/admin-landing";
 import {
   ALIGNS,
@@ -38,12 +38,12 @@ type BlockEditorProps = {
   productsLoading: boolean;
   /** Texto del segundo campo de tipografía: "Subtítulo" o "Párrafo". */
   subtitleLabel?: string;
-  /** 1 · Imagen o video de fondo (el control de la capa oscura se añade debajo). */
+  /** 1 · Imagen o video de fondo (disposición y capa oscura se añaden debajo). */
   imageSlot?: ReactNode;
-  /** 2 · Título, subtítulo, texto del botón y URL de destino. */
-  contentSlot: ReactNode;
-  /** Vista previa en vivo: queda fija a la vista mientras se recorren los controles. */
-  preview: ReactNode;
+  /** 2 · Título, subtítulo o párrafo y demás textos. */
+  textSlot: ReactNode;
+  /** 4 · Botones: texto y URL de destino (los controles de estilo se añaden debajo). */
+  ctaSlot?: ReactNode;
 };
 
 const PALETTE = [
@@ -79,7 +79,7 @@ const ALIGN_LABELS: Record<Align, { label: string; Icon: typeof AlignLeft }> = {
 
 function segmentClass(active: boolean) {
   return `inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-colors ${
-    active ? "bg-black text-white" : "bg-white text-black/65 hover:bg-black/10 hover:text-black"
+    active ? "bg-black text-white" : "bg-canvas text-black/65 hover:bg-black/10 hover:text-black"
   }`;
 }
 
@@ -140,7 +140,7 @@ function ColorField({ legend, value, onChange }: { legend: string; value: string
           onChange={(e) => handleText(e.target.value.trim())}
           onBlur={() => setDraft(null)}
           aria-label={`${legend}: código HEX`}
-          className="min-h-11 w-24 rounded-full bg-white px-3 text-sm uppercase outline-none focus:ring-2 focus:ring-black/15"
+          className="min-h-11 w-24 rounded-full bg-canvas px-3 text-sm uppercase outline-none focus:ring-2 focus:ring-black/15"
         />
         <button
           type="button"
@@ -218,7 +218,7 @@ function SpotlightFields({
               className={inputClass}
             />
             {results.length > 0 && (
-              <ul className="mt-2 space-y-1 rounded-[20px] bg-white p-2">
+              <ul className="mt-2 space-y-1 rounded-[20px] bg-canvas p-2">
                 {results.map((option) => (
                   <li key={option.sku}>
                     <button
@@ -246,6 +246,8 @@ function SpotlightFields({
           <label className={labelClass}>
             Etiqueta (opcional) · {spotlight.badge.length}/{SPOTLIGHT_BADGE_MAX}
             <input
+              spellCheck
+              lang="es"
               type="text"
               value={spotlight.badge}
               maxLength={SPOTLIGHT_BADGE_MAX}
@@ -260,21 +262,21 @@ function SpotlightFields({
   );
 }
 
-function Group({ step, title, children }: { step: number; title: string; children: ReactNode }) {
+function Section({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: ReactNode }) {
   return (
-    <section className="space-y-3 rounded-[20px] bg-canvas p-4" aria-label={title}>
-      <h3 className="text-sm font-semibold tracking-tight">
-        {step} · {title}
-      </h3>
-      {children}
-    </section>
+    <details open={defaultOpen} className="group border-b border-black/10">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-semibold tracking-tight [&::-webkit-details-marker]:hidden">
+        {title}
+        <ChevronDown size={16} aria-hidden className="shrink-0 transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="space-y-4 px-4 pb-5 pt-1">{children}</div>
+    </details>
   );
 }
 
 /**
- * Editor de un bloque de la landing (Hero, banner o sección) en dos columnas: a la izquierda los controles
- * en orden (imagen y fondo, textos, tipografía y colores, forma y disposición, cerveza destacada) y a la
- * derecha la vista previa en vivo, fija mientras se recorren los controles. En móvil, la vista previa va primero.
+ * Controles de un bloque de la landing en acordeones: 1 Fondo e imagen, 2 Textos y contenido,
+ * 3 Tipografía y colores, 4 Botones y CTA, 5 Cerveza destacada. La vista previa vive en el lienzo del Studio.
  */
 export default function BlockEditor({
   value,
@@ -284,8 +286,8 @@ export default function BlockEditor({
   productsLoading,
   subtitleLabel = "Subtítulo",
   imageSlot,
-  contentSlot,
-  preview,
+  textSlot,
+  ctaSlot,
 }: BlockEditorProps) {
   const overlayId = useId();
 
@@ -294,101 +296,16 @@ export default function BlockEditor({
   }
 
   const showOverlay = features.overlay && value.layout === "background";
-  let step = 0;
+  const showBackground = Boolean(imageSlot) || features.layout || showOverlay;
+  const showButtons = features.buttons !== false;
+  const sections: { title: string; node: ReactNode }[] = [];
 
-  return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <div className="order-2 space-y-4 lg:order-1">
-        {(imageSlot || showOverlay) && (
-          <Group step={++step} title="Imagen y fondo">
-            {imageSlot}
-            {showOverlay && (
-              <div>
-                <label htmlFor={overlayId} className={labelClass}>
-                  Capa oscura sobre la imagen · {value.overlay} %
-                </label>
-                <input
-                  id={overlayId}
-                  type="range"
-                  min={0}
-                  max={100}
-                  step={25}
-                  value={value.overlay}
-                  onChange={(e) => patch({ overlay: Number(e.target.value) as BlockStyle["overlay"] })}
-                  className="mt-1 h-11 w-full cursor-pointer accent-accent"
-                />
-                <div aria-hidden className="flex justify-between text-[11px] text-muted">
-                  {OVERLAYS.map((overlay) => (
-                    <span key={overlay}>{overlay}%</span>
-                  ))}
-                </div>
-                <p className="mt-1 text-[11px] text-muted">Con 0 % la imagen se ve limpia, sin filtro.</p>
-              </div>
-            )}
-          </Group>
-        )}
-
-        <Group step={++step} title="Textos y contenido">
-          {contentSlot}
-        </Group>
-
-        <Group step={++step} title="Tipografía y colores">
-          <Segments legend="Tamaño del título">
-            {TITLE_SIZES.map((size) => (
-              <button
-                key={size}
-                type="button"
-                aria-pressed={value.title_size === size}
-                onClick={() => patch({ title_size: size })}
-                className={segmentClass(value.title_size === size)}
-              >
-                {size.toUpperCase()}
-              </button>
-            ))}
-          </Segments>
-          <ColorField legend="Color del título" value={value.title_color} onChange={(title_color) => patch({ title_color })} />
-          {features.subtitle !== false && (
-            <>
-              <Segments legend={`Tamaño del ${subtitleLabel.toLowerCase()}`}>
-                {SUBTITLE_SIZES.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    aria-pressed={value.subtitle_size === size}
-                    onClick={() => patch({ subtitle_size: size })}
-                    className={segmentClass(value.subtitle_size === size)}
-                  >
-                    {size.toUpperCase()}
-                  </button>
-                ))}
-              </Segments>
-              <ColorField
-                legend={`Color del ${subtitleLabel.toLowerCase()}`}
-                value={value.subtitle_color}
-                onChange={(subtitle_color) => patch({ subtitle_color })}
-              />
-            </>
-          )}
-        </Group>
-
-        <Group step={++step} title="Forma y disposición">
-          <Segments legend="Alineación del texto y los botones">
-            {ALIGNS.map((align) => {
-              const { label, Icon } = ALIGN_LABELS[align];
-              return (
-                <button
-                  key={align}
-                  type="button"
-                  aria-pressed={value.align === align}
-                  onClick={() => patch({ align })}
-                  className={segmentClass(value.align === align)}
-                >
-                  <Icon size={16} aria-hidden />
-                  {label}
-                </button>
-              );
-            })}
-          </Segments>
+  if (showBackground) {
+    sections.push({
+      title: "Fondo e imagen",
+      node: (
+        <>
+          {imageSlot}
           {features.layout && (
             <Segments legend="Disposición">
               {LAYOUTS.map((layout) => (
@@ -404,48 +321,145 @@ export default function BlockEditor({
               ))}
             </Segments>
           )}
-          {features.buttons !== false && (
-            <>
-              <Segments legend="Estilo de los botones">
-                {BUTTON_VARIANTS.map((variant) => (
-                  <button
-                    key={variant}
-                    type="button"
-                    aria-pressed={value.button_variant === variant}
-                    onClick={() => patch({ button_variant: variant })}
-                    className={segmentClass(value.button_variant === variant)}
-                  >
-                    {VARIANT_LABELS[variant]}
-                  </button>
+          {showOverlay && (
+            <div>
+              <label htmlFor={overlayId} className={labelClass}>
+                Capa oscura sobre la imagen · {value.overlay} %
+              </label>
+              <input
+                id={overlayId}
+                type="range"
+                min={0}
+                max={100}
+                step={25}
+                value={value.overlay}
+                onChange={(e) => patch({ overlay: Number(e.target.value) as BlockStyle["overlay"] })}
+                className="mt-1 h-11 w-full cursor-pointer accent-accent"
+              />
+              <div aria-hidden className="flex justify-between text-[11px] text-muted">
+                {OVERLAYS.map((overlay) => (
+                  <span key={overlay}>{overlay}%</span>
                 ))}
-              </Segments>
-              <ColorField
-                legend="Color de fondo del botón (o del contorno)"
-                value={value.button_bg}
-                onChange={(button_bg) => patch({ button_bg })}
-              />
-              <ColorField
-                legend="Color del texto del botón"
-                value={value.button_text}
-                onChange={(button_text) => patch({ button_text })}
-              />
-            </>
+              </div>
+              <p className="mt-1 text-[11px] text-muted">Con 0 % la imagen se ve limpia, sin filtro.</p>
+            </div>
           )}
-        </Group>
+        </>
+      ),
+    });
+  }
 
-        {features.spotlight && (
-          <Group step={++step} title="Cerveza destacada">
-            <SpotlightFields value={value} onChange={onChange} products={products} loading={productsLoading} />
-          </Group>
+  sections.push({ title: "Textos y contenido", node: textSlot });
+
+  sections.push({
+    title: "Tipografía y colores",
+    node: (
+      <>
+        <Segments legend="Tamaño del título">
+          {TITLE_SIZES.map((size) => (
+            <button
+              key={size}
+              type="button"
+              aria-pressed={value.title_size === size}
+              onClick={() => patch({ title_size: size })}
+              className={segmentClass(value.title_size === size)}
+            >
+              {size.toUpperCase()}
+            </button>
+          ))}
+        </Segments>
+        <ColorField legend="Color del título" value={value.title_color} onChange={(title_color) => patch({ title_color })} />
+        {features.subtitle !== false && (
+          <>
+            <Segments legend={`Tamaño del ${subtitleLabel.toLowerCase()}`}>
+              {SUBTITLE_SIZES.map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  aria-pressed={value.subtitle_size === size}
+                  onClick={() => patch({ subtitle_size: size })}
+                  className={segmentClass(value.subtitle_size === size)}
+                >
+                  {size.toUpperCase()}
+                </button>
+              ))}
+            </Segments>
+            <ColorField
+              legend={`Color del ${subtitleLabel.toLowerCase()}`}
+              value={value.subtitle_color}
+              onChange={(subtitle_color) => patch({ subtitle_color })}
+            />
+          </>
         )}
-      </div>
+        <Segments legend="Alineación del texto y los botones">
+          {ALIGNS.map((align) => {
+            const { label, Icon } = ALIGN_LABELS[align];
+            return (
+              <button
+                key={align}
+                type="button"
+                aria-pressed={value.align === align}
+                onClick={() => patch({ align })}
+                className={segmentClass(value.align === align)}
+              >
+                <Icon size={16} aria-hidden />
+                {label}
+              </button>
+            );
+          })}
+        </Segments>
+      </>
+    ),
+  });
 
-      <div className="order-1 lg:order-2">
-        <div className="space-y-2 lg:sticky lg:top-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted">Vista previa en vivo</p>
-          <div className="overflow-hidden rounded-[28px] bg-canvas p-3 ring-1 ring-black/10">{preview}</div>
-        </div>
-      </div>
+  if (showButtons) {
+    sections.push({
+      title: "Botones y CTA",
+      node: (
+        <>
+          {ctaSlot}
+          <Segments legend="Estilo de los botones">
+            {BUTTON_VARIANTS.map((variant) => (
+              <button
+                key={variant}
+                type="button"
+                aria-pressed={value.button_variant === variant}
+                onClick={() => patch({ button_variant: variant })}
+                className={segmentClass(value.button_variant === variant)}
+              >
+                {VARIANT_LABELS[variant]}
+              </button>
+            ))}
+          </Segments>
+          <ColorField
+            legend="Color de fondo del botón (o del contorno)"
+            value={value.button_bg}
+            onChange={(button_bg) => patch({ button_bg })}
+          />
+          <ColorField
+            legend="Color del texto del botón"
+            value={value.button_text}
+            onChange={(button_text) => patch({ button_text })}
+          />
+        </>
+      ),
+    });
+  }
+
+  if (features.spotlight) {
+    sections.push({
+      title: "Cerveza destacada",
+      node: <SpotlightFields value={value} onChange={onChange} products={products} loading={productsLoading} />,
+    });
+  }
+
+  return (
+    <div className="border-t border-black/10">
+      {sections.map((section, index) => (
+        <Section key={section.title} title={`${index + 1}. ${section.title}`} defaultOpen={index < 2}>
+          {section.node}
+        </Section>
+      ))}
     </div>
   );
 }
