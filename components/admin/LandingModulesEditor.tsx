@@ -127,7 +127,7 @@ function TitleField({ module, onChange }: { module: LandingModule; onChange: (ch
     <label className={labelClass}>
       Título (opcional) · {module.title.length}/{MODULE_TITLE_MAX}
       <input
-        spellCheck
+        spellCheck={true}
         lang="es"
         type="text"
         value={module.title}
@@ -161,7 +161,7 @@ function SplitFields({
         <label className={labelClass}>
           Párrafo · {module.body.length}/{MODULE_BODY_MAX}
           <textarea
-            spellCheck
+            spellCheck={true}
             lang="es"
             value={module.body}
             maxLength={MODULE_BODY_MAX}
@@ -186,7 +186,7 @@ function SplitFields({
         <label className={labelClass}>
           Descripción de la imagen (Opcional - Mejora el SEO)
           <input
-            spellCheck
+            spellCheck={true}
             lang="es"
             type="text"
             value={module.image_alt}
@@ -247,7 +247,7 @@ function ImpactFields({
           <label className={labelClass}>
             Descripción de la imagen (Opcional - Mejora el SEO)
             <input
-              spellCheck
+              spellCheck={true}
               lang="es"
               type="text"
               value={module.image_alt}
@@ -267,7 +267,7 @@ function ImpactFields({
       <label className={labelClass}>
         Subtítulo · {module.subtitle.length}/{MODULE_SUBTITLE_MAX}
         <textarea
-          spellCheck
+          spellCheck={true}
           lang="es"
           value={module.subtitle}
           maxLength={MODULE_SUBTITLE_MAX}
@@ -332,7 +332,7 @@ function GridFields({ module, onChange }: { module: GridModule; onChange: (chang
           <label className={labelClass}>
             Título corto · {item.title.length}/{GRID_ITEM_TITLE_MAX}
             <input
-              spellCheck
+              spellCheck={true}
               lang="es"
               type="text"
               value={item.title}
@@ -344,7 +344,7 @@ function GridFields({ module, onChange }: { module: GridModule; onChange: (chang
           <label className={labelClass}>
             Texto corto · {item.text.length}/{GRID_ITEM_TEXT_MAX}
             <textarea
-              spellCheck
+              spellCheck={true}
               lang="es"
               value={item.text}
               maxLength={GRID_ITEM_TEXT_MAX}

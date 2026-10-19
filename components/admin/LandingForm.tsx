@@ -152,6 +152,7 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
         ctas={settings.hero_video_ctas}
         style={settings.hero_video_style}
         product={productFor(settings.hero_video_style)}
+        tall={Boolean(productFor(settings.hero_video_style))}
       />
     );
   } else if (banners[activeBanner]) {
@@ -166,6 +167,7 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
         imageUrl={banner.image_url}
         imageAlt={banner.alt}
         product={productFor(banner.style)}
+        tall={banners.some((item) => Boolean(productFor(item.style)))}
       />
     );
   } else {
@@ -316,7 +318,7 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
                       Banner {activeBanner + 1} · Descripción de la imagen (Opcional - Mejora el SEO)
                       <input
                         type="text"
-                        spellCheck
+                        spellCheck={true}
                         lang="es"
                         value={banners[activeBanner].alt}
                         maxLength={200}

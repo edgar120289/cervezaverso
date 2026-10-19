@@ -246,7 +246,7 @@ function SpotlightFields({
           <label className={labelClass}>
             Etiqueta (opcional) · {spotlight.badge.length}/{SPOTLIGHT_BADGE_MAX}
             <input
-              spellCheck
+              spellCheck={true}
               lang="es"
               type="text"
               value={spotlight.badge}

@@ -105,6 +105,7 @@ function ImpactView({ module, preview, product }: { module: ImpactModule; previe
       imageAlt={module.image_alt}
       product={product}
       accentBackdrop
+      tall={module.style.spotlight.enabled && Boolean(product)}
     />
   );
 }

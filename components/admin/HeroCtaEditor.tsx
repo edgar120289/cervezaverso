@@ -30,7 +30,7 @@ export default function HeroCtaEditor({ label, ctas, onChange, max = MAX_HERO_CT
       {ctas.map((cta, index) => (
         <div key={index} className="grid gap-2 rounded-[20px] border border-black/5 p-3">
           <input
-            spellCheck
+            spellCheck={true}
             lang="es"
             type="text"
             value={cta.text}

@@ -32,6 +32,8 @@ type StyledBannerProps = {
   priority?: boolean;
   /** El banner de impacto usa el acento de la marca como fondo cuando no hay imagen. */
   accentBackdrop?: boolean;
+  /** Hay una tarjeta de producto: en pantallas angostas se apila bajo el texto y el banner necesita más alto. */
+  tall?: boolean;
   id?: string;
   ariaLabel?: string;
 };
@@ -54,6 +56,7 @@ function Banner({
   headingId,
   priority = false,
   accentBackdrop = false,
+  tall = false,
   id,
   ariaLabel,
 }: StyledBannerProps) {
@@ -135,14 +138,14 @@ function Banner({
       <section
         id={id}
         aria-label={ariaLabel}
-        className={`scroll-mt-24 grid overflow-hidden rounded-[28px] bg-white shadow-card ${
+        className={`scroll-mt-24 grid ${tall ? "h-[64rem]" : "h-[40rem]"} grid-rows-2 overflow-hidden rounded-[28px] bg-white shadow-card @min-[736px]:h-[34rem] @min-[736px]:grid-rows-1 ${
           hasSide && hasText ? "@min-[736px]:grid-cols-2" : ""
         }`}
       >
         {hasText && <div className={`flex items-center p-6 @min-[608px]:p-10 @min-[992px]:p-14 ${mediaFirst ? "@min-[736px]:order-2" : ""}`}>{text}</div>}
         {hasSide && (
           <div
-            className={`relative min-h-72 @min-[736px]:min-h-[26rem] ${card ? "flex items-center bg-canvas p-6" : "bg-neutral-900"} ${
+            className={`relative min-h-0 ${card ? "flex items-center bg-canvas p-6" : "bg-neutral-900"} ${
               mediaFirst ? "@min-[736px]:order-1" : ""
             }`}
           >
@@ -157,7 +160,9 @@ function Banner({
     <section
       id={id}
       aria-label={ariaLabel}
-      className={`relative isolate flex min-h-[22rem] w-full scroll-mt-24 items-center overflow-hidden rounded-[28px] shadow-card @min-[608px]:min-h-[28rem] @min-[992px]:min-h-[34rem] ${
+      className={`relative isolate flex w-full scroll-mt-24 items-center overflow-hidden rounded-[28px] shadow-card ${
+        tall ? "h-[56rem] @min-[992px]:h-[36rem]" : "h-[30rem] @min-[608px]:h-[32rem] @min-[992px]:h-[36rem]"
+      } ${
         accentBackdrop ? "bg-accent" : "bg-neutral-900"
       }`}
     >

@@ -25,7 +25,7 @@ export default function HeroTextFields({ title, subtitle, onTitleChange, onSubti
       <label className={labelClass}>
         Título (opcional) · {title.length}/{HERO_TITLE_MAX}
         <input
-          spellCheck
+          spellCheck={true}
           lang="es"
           type="text"
           value={title}
@@ -38,7 +38,7 @@ export default function HeroTextFields({ title, subtitle, onTitleChange, onSubti
       <label className={labelClass}>
         Subtítulo (opcional) · {subtitle.length}/{HERO_SUBTITLE_MAX}
         <textarea
-          spellCheck
+          spellCheck={true}
           lang="es"
           value={subtitle}
           maxLength={HERO_SUBTITLE_MAX}

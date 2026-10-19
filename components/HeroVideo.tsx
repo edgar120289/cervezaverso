@@ -63,6 +63,7 @@ export default function HeroVideo({ videoSrc, ctas, title, subtitle, style, prod
       style={style}
       media={media}
       product={product}
+      tall={style.spotlight.enabled && Boolean(product)}
     />
   );
 }

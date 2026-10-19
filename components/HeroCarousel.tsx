@@ -35,6 +35,11 @@ export default function HeroCarousel({ banners, intervalSeconds, products }: Her
     return () => window.clearInterval(timer);
   }, [isRotating, banners.length, intervalSeconds, index]);
 
+  // Todos los slides miden lo mismo: si alguno lleva tarjeta de producto, todos usan el alto mayor.
+  const tall = banners.some((banner) => {
+    const slideRef = spotlightRef(banner.style);
+    return slideRef !== null && slideRef in products;
+  });
   const active = banners[index] ?? banners[0];
   const ref = spotlightRef(active.style);
 
@@ -70,6 +75,7 @@ export default function HeroCarousel({ banners, intervalSeconds, products }: Her
             imageAlt={active.alt}
             product={ref ? (products[ref] ?? null) : null}
             priority={index === 0}
+            tall={tall}
           />
         </motion.div>
       </AnimatePresence>
