@@ -34,6 +34,8 @@ type StyledBannerProps = {
   accentBackdrop?: boolean;
   /** Hay una tarjeta de producto: en pantallas angostas se apila bajo el texto y el banner necesita más alto. */
   tall?: boolean;
+  /** Ocupa el 100 % de una caja de alto fijo del padre (carrusel del Hero): el contenido nunca dicta la altura. */
+  fill?: boolean;
   id?: string;
   ariaLabel?: string;
 };
@@ -57,6 +59,7 @@ function Banner({
   priority = false,
   accentBackdrop = false,
   tall = false,
+  fill = false,
   id,
   ariaLabel,
 }: StyledBannerProps) {
@@ -97,7 +100,7 @@ function Banner({
           style={titleStyle}
           className={`text-balance break-words font-semibold leading-[1.05] tracking-[-0.04em] ${BANNER_TITLE_CLASS[style.title_size]} ${
             onDark ? "text-white" : "text-black"
-          }`}
+          } ${fill ? "line-clamp-3 overflow-hidden" : ""}`}
         >
           {heading}
         </Heading>
@@ -107,7 +110,9 @@ function Banner({
       {sub && (
         <p
           style={subtitleStyle}
-          className={`max-w-xl text-pretty ${SUBTITLE_CLASS[style.subtitle_size]} ${onDark ? "text-white/90" : "text-muted"}`}
+          className={`max-w-xl text-pretty ${SUBTITLE_CLASS[style.subtitle_size]} ${onDark ? "text-white/90" : "text-muted"} ${
+            fill ? "line-clamp-3 overflow-hidden" : ""
+          }`}
         >
           {sub}
         </p>
@@ -138,7 +143,9 @@ function Banner({
       <section
         id={id}
         aria-label={ariaLabel}
-        className={`scroll-mt-24 grid ${tall ? "h-[64rem]" : "h-[40rem]"} grid-rows-2 overflow-hidden rounded-[28px] bg-white shadow-card @min-[736px]:h-[34rem] @min-[736px]:grid-rows-1 ${
+        className={`scroll-mt-24 grid ${fill ? "h-full" : tall ? "h-[64rem]" : "h-[40rem]"} grid-rows-2 overflow-hidden rounded-[28px] bg-white shadow-card ${
+          fill ? "" : "@min-[736px]:h-[34rem]"
+        } @min-[736px]:grid-rows-1 ${
           hasSide && hasText ? "@min-[736px]:grid-cols-2" : ""
         }`}
       >
@@ -161,7 +168,11 @@ function Banner({
       id={id}
       aria-label={ariaLabel}
       className={`relative isolate flex w-full scroll-mt-24 items-center overflow-hidden rounded-[28px] shadow-card ${
-        tall ? "h-[56rem] @min-[992px]:h-[36rem]" : "h-[30rem] @min-[608px]:h-[32rem] @min-[992px]:h-[36rem]"
+        fill
+          ? "h-full"
+          : tall
+            ? "h-[56rem] @min-[992px]:h-[36rem]"
+            : "h-[30rem] @min-[608px]:h-[32rem] @min-[992px]:h-[36rem]"
       } ${
         accentBackdrop ? "bg-accent" : "bg-neutral-900"
       }`}
@@ -188,7 +199,7 @@ function Banner({
  */
 export default function StyledBanner(props: StyledBannerProps) {
   return (
-    <div className="@container w-full">
+    <div className={`@container w-full ${props.fill ? "h-full" : ""}`}>
       <Banner {...props} />
     </div>
   );

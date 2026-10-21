@@ -7,6 +7,17 @@ import { safeNextPath } from "@/lib/safe-next";
 import { SITE } from "@/lib/site";
 import type { UserRole } from "@/lib/types";
 
+/**
+ * Con "Captcha protection" activo en Supabase Auth (Authentication → Attack Protection), Supabase exige
+ * `captchaToken` en cada llamada y consume el token, así que aquí no se valida por segunda vez.
+ * Con `SUPABASE_AUTH_CAPTCHA=true` el token viaja a Supabase; sin ella, lo valida solo el servidor (siteverify).
+ */
+const SUPABASE_CAPTCHA = process.env.SUPABASE_AUTH_CAPTCHA === "true";
+
+function captchaOptions(token: string | null | undefined) {
+  return SUPABASE_CAPTCHA && token ? { captchaToken: token } : {};
+}
+
 export type AuthResult<T = object> = ({ ok: true } & T) | { ok: false; error: string };
 
 /**
@@ -19,11 +30,15 @@ export async function iniciarSesion(input: unknown): Promise<AuthResult<{ role: 
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
   const { email, password, website, turnstileToken } = parsed.data;
 
-  const guard = await guardPublicForm("login", { honeypot: website, turnstileToken });
+  const guard = await guardPublicForm("login", { honeypot: website, turnstileToken, deferCaptcha: SUPABASE_CAPTCHA });
   if (!guard.ok) return guard;
 
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+    options: captchaOptions(turnstileToken),
+  });
   if (error || !data.user) {
     if (error) console.error("[auth] Error al iniciar sesión:", error.code, error.status, error.message);
     if (error?.code === "email_not_confirmed") {
@@ -41,7 +56,7 @@ export async function registrarCuenta(input: unknown): Promise<AuthResult<{ need
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
   const { email, password, fecha_nacimiento, next, website, turnstileToken } = parsed.data;
 
-  const guard = await guardPublicForm("signup", { honeypot: website, turnstileToken });
+  const guard = await guardPublicForm("signup", { honeypot: website, turnstileToken, deferCaptcha: SUPABASE_CAPTCHA });
   if (!guard.ok) return guard;
 
   const supabase = await createClient();
@@ -49,6 +64,7 @@ export async function registrarCuenta(input: unknown): Promise<AuthResult<{ need
     email,
     password,
     options: {
+      ...captchaOptions(turnstileToken),
       // El trigger `handle_new_user` (migración 005) la copia a public.users y vuelve a validar los 18 años.
       data: { fecha_nacimiento },
       emailRedirectTo: `${SITE.url}/auth/callback?next=${encodeURIComponent(safeNextPath(next))}`,
@@ -66,12 +82,13 @@ export async function solicitarRecuperacion(input: unknown): Promise<AuthResult>
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
   const { email, website, turnstileToken } = parsed.data;
 
-  const guard = await guardPublicForm("recover", { honeypot: website, turnstileToken });
+  const guard = await guardPublicForm("recover", { honeypot: website, turnstileToken, deferCaptcha: SUPABASE_CAPTCHA });
   if (!guard.ok) return guard;
 
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${SITE.url}/auth/callback?next=/recuperar/nueva`,
+    ...captchaOptions(turnstileToken),
   });
   // Mismo resultado exista o no la cuenta: no revela qué correos están registrados.
   if (error) console.error("[auth] Error al enviar recuperación:", error.code, error.message);

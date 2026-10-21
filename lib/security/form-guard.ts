@@ -19,7 +19,16 @@ export async function getClientIp(): Promise<string | null> {
  */
 export async function guardPublicForm(
   action: RateLimitAction,
-  { honeypot, turnstileToken }: { honeypot?: unknown; turnstileToken?: string | null }
+  {
+    honeypot,
+    turnstileToken,
+    deferCaptcha = false,
+  }: {
+    honeypot?: unknown;
+    turnstileToken?: string | null;
+    /** Supabase Auth valida el token por su cuenta: aquí solo se exige que exista (cada token sirve una vez). */
+    deferCaptcha?: boolean;
+  }
 ): Promise<GuardResult> {
   if (isHoneypotFilled(honeypot)) return { ok: false, error: "No pudimos procesar tu solicitud." };
 
@@ -27,7 +36,8 @@ export async function guardPublicForm(
   if (!(await isWithinRateLimit(action, ip))) {
     return { ok: false, error: "Demasiados intentos. Espera unos minutos y vuelve a intentarlo." };
   }
-  if (!(await verifyTurnstile(turnstileToken, ip))) {
+  const captchaOk = deferCaptcha ? Boolean(turnstileToken) : await verifyTurnstile(turnstileToken, ip);
+  if (!captchaOk) {
     return { ok: false, error: "No pudimos verificar que eres una persona. Recarga la página e intenta de nuevo." };
   }
   return { ok: true };

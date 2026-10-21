@@ -35,11 +35,6 @@ export default function HeroCarousel({ banners, intervalSeconds, products }: Her
     return () => window.clearInterval(timer);
   }, [isRotating, banners.length, intervalSeconds, index]);
 
-  // Todos los slides miden lo mismo: si alguno lleva tarjeta de producto, todos usan el alto mayor.
-  const tall = banners.some((banner) => {
-    const slideRef = spotlightRef(banner.style);
-    return slideRef !== null && slideRef in products;
-  });
   const active = banners[index] ?? banners[0];
   const ref = spotlightRef(active.style);
 
@@ -53,7 +48,7 @@ export default function HeroCarousel({ banners, intervalSeconds, products }: Her
       onMouseLeave={() => setHovering(false)}
       onFocus={() => setHovering(true)}
       onBlur={() => setHovering(false)}
-      className="relative w-full"
+      className="relative h-[500px] w-full overflow-hidden rounded-[28px] md:h-[650px]"
     >
       {/* Un solo slide montado a la vez: el anterior sale antes de que entre el siguiente. */}
       <AnimatePresence mode="wait" initial={false}>
@@ -64,6 +59,7 @@ export default function HeroCarousel({ banners, intervalSeconds, products }: Her
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: reduceMotion ? 0 : 0.35 }}
+          className="absolute inset-0"
         >
           <StyledBanner
             headingTag="h1"
@@ -75,7 +71,7 @@ export default function HeroCarousel({ banners, intervalSeconds, products }: Her
             imageAlt={active.alt}
             product={ref ? (products[ref] ?? null) : null}
             priority={index === 0}
-            tall={tall}
+            fill
           />
         </motion.div>
       </AnimatePresence>
