@@ -25,6 +25,7 @@ export async function iniciarSesion(input: unknown): Promise<AuthResult<{ role: 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error || !data.user) {
+    if (error) console.error("[auth] Error al iniciar sesión:", error.code, error.status, error.message);
     if (error?.code === "email_not_confirmed") {
       return { ok: false, error: "Confirma tu correo con el enlace que te enviamos antes de entrar." };
     }
