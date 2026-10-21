@@ -48,7 +48,7 @@ export default function HeroCarousel({ banners, intervalSeconds, products }: Her
       onMouseLeave={() => setHovering(false)}
       onFocus={() => setHovering(true)}
       onBlur={() => setHovering(false)}
-      className="relative h-[500px] w-full overflow-hidden rounded-[28px] md:h-[650px]"
+      className="relative aspect-[4/5] w-full overflow-hidden rounded-[28px] md:aspect-[21/9]"
     >
       {/* Un solo slide montado a la vez: el anterior sale antes de que entre el siguiente. */}
       <AnimatePresence mode="wait" initial={false}>
