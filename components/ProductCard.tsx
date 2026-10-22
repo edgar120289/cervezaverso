@@ -69,27 +69,27 @@ export default function ProductCard({ product }: { product: Product }) {
           </Link>
         </h3>
 
-        <ul className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
-          <li className="flex items-center gap-1">
-            <Droplet size={13} aria-hidden />
-            <span className="sr-only">Alcohol: </span>
-            {product.abv}% ABV
-          </li>
-          <li className="flex items-center gap-1">
-            <GlassWater size={13} aria-hidden />
-            <span className="sr-only">Volumen: </span>
-            {product.volume_ml} ml
-          </li>
-        </ul>
+        <div className="mt-auto flex flex-col gap-2 pt-2">
+          <ul className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+            <li className="flex items-center gap-1">
+              <Droplet size={13} aria-hidden />
+              <span className="sr-only">Alcohol: </span>
+              {product.abv}% ABV
+            </li>
+            <li className="flex items-center gap-1">
+              <GlassWater size={13} aria-hidden />
+              <span className="sr-only">Volumen: </span>
+              {product.volume_ml} ml
+            </li>
+          </ul>
 
-        <p className="flex items-center gap-1.5 text-sm font-bold text-black">
-          <CountryFlag country={product.country} />
-          {product.country}
-        </p>
+          <p className="flex items-center gap-1.5 text-sm font-bold text-black">
+            <CountryFlag country={product.country} />
+            {product.country}
+          </p>
 
-        <div className="mt-auto pt-2">
-          <span className="text-lg font-semibold">{formatMXN(product.sale_price)}</span>
-          <div className="mt-2 flex items-center gap-2">
+          <span className="text-xl font-bold">{formatMXN(product.sale_price)} MXN</span>
+          <div className="flex items-center gap-2">
             <FavoriteButton productId={product.id} productName={product.name} />
             <button
               type="button"
