@@ -6,8 +6,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { trackInitiateCheckout } from "@/lib/meta-pixel";
-import { formatMXN, FREE_SHIPPING_THRESHOLD } from "@/lib/pricing";
+import { formatMXN, FREE_SHIPPING_THRESHOLD_METRO } from "@/lib/pricing";
 import { DiscountRow } from "./PromoCodeField";
+import { VolumeDiscountNotice, VolumeDiscountRow } from "./VolumeDiscount";
 import BottleFallback from "./BottleFallback";
 
 export default function CartDrawer() {
@@ -20,11 +21,12 @@ export default function CartDrawer() {
     subtotal,
     promo,
     discount,
+    volumeDiscount,
     shippingCost,
     total,
   } = useCart();
 
-  const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD_METRO - subtotal);
 
   return (
     <AnimatePresence>
@@ -133,13 +135,15 @@ export default function CartDrawer() {
                 <div className="space-y-3 rounded-[28px] bg-white p-5 shadow-card">
                   {remainingForFreeShipping > 0 ? (
                     <p className="text-xs text-muted">
-                      Agrega {formatMXN(remainingForFreeShipping)} más y obtén envío gratis.
+                      Te faltan {formatMXN(remainingForFreeShipping)} para el envío gratis.
                     </p>
                   ) : (
                     <p className="text-xs font-semibold text-black/60">
-                      ¡Envío gratis desbloqueado!
+                      ¡Envío gratis desbloqueado en CDMX y zona metropolitana!
                     </p>
                   )}
+
+                  <VolumeDiscountNotice />
 
                   <div className="space-y-1.5 text-sm">
                     <div className="flex justify-between text-black/60">
@@ -147,8 +151,9 @@ export default function CartDrawer() {
                       <span>{formatMXN(subtotal)}</span>
                     </div>
                     {promo && <DiscountRow code={promo.code} amount={discount} />}
+                    <VolumeDiscountRow amount={volumeDiscount} />
                     <div className="flex justify-between text-black/60">
-                      <span>Envío nacional</span>
+                      <span>Envío (CDMX y zona metropolitana)</span>
                       <span>{shippingCost === 0 ? "Gratis" : formatMXN(shippingCost)}</span>
                     </div>
                     <div className="flex justify-between pt-1.5 text-base font-semibold">

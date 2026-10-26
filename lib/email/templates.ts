@@ -51,7 +51,14 @@ export function premioDesbloqueadoEmail({ nombre, nivel, premio, code }: PremioE
   return { subject, html, text };
 }
 
-export type EstadoEmailInput = { nombre: string; folio: string; total: string; pedidoUrl: string };
+export type EstadoEmailInput = {
+  nombre: string;
+  folio: string;
+  total: string;
+  pedidoUrl: string;
+  /** Monto ya formateado; solo si el pedido tuvo descuento por volumen. */
+  descuentoVolumen?: string;
+};
 
 const ESTADO_EMAIL = {
   Pagado: {
@@ -78,7 +85,7 @@ export function esEstadoConCorreo(estado: string): estado is EstadoConCorreo {
 }
 
 /** Correo de cambio de estado del pedido: pago confirmado, enviado o cancelado. */
-export function estadoPedidoEmail(estado: EstadoConCorreo, { nombre, folio, total, pedidoUrl }: EstadoEmailInput) {
+export function estadoPedidoEmail(estado: EstadoConCorreo, { nombre, folio, total, pedidoUrl, descuentoVolumen }: EstadoEmailInput) {
   const copy = ESTADO_EMAIL[estado];
   const subject = `${copy.subject} · pedido #${folio} · ${SITE.name}`;
   const html = emailLayout({
@@ -86,10 +93,11 @@ export function estadoPedidoEmail(estado: EstadoConCorreo, { nombre, folio, tota
     bodyHtml: `
       <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Hola ${esc(nombre)}, ${esc(copy.message)}</p>
       <p style="margin:0 0 24px;padding:16px;border-radius:20px;background:${CANVAS};font-size:14px;line-height:1.8;">
-        Pedido <strong>#${esc(folio)}</strong><br>Total: <strong>${esc(total)}</strong>
+        Pedido <strong>#${esc(folio)}</strong><br>${descuentoVolumen ? `Descuento por volumen (10%): <strong>−${esc(descuentoVolumen)}</strong><br>` : ""}Total: <strong>${esc(total)}</strong>
       </p>
       <a href="${esc(pedidoUrl)}" style="display:inline-block;padding:14px 28px;border-radius:9999px;background:${ACCENT};color:#fff;font-weight:600;text-decoration:none;">Ver mi pedido</a>`,
   });
-  const text = `Hola ${nombre}, ${copy.message}\nPedido #${folio} · Total: ${total}\nVer pedido: ${pedidoUrl}\n\n${HEALTH_NOTICE}`;
+  const descuentoTexto = descuentoVolumen ? ` · Descuento por volumen (10%): −${descuentoVolumen}` : "";
+  const text = `Hola ${nombre}, ${copy.message}\nPedido #${folio}${descuentoTexto} · Total: ${total}\nVer pedido: ${pedidoUrl}\n\n${HEALTH_NOTICE}`;
   return { subject, html, text };
 }

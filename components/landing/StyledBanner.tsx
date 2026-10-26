@@ -82,7 +82,8 @@ function Banner({
         src={imageUrl}
         alt={imageAlt}
         fill
-        priority={priority}
+        preload={priority}
+        fetchPriority={priority ? "high" : undefined}
         sizes={isSplit ? "(min-width: 1152px) 576px, (min-width: 768px) 50vw, 100vw" : "(min-width: 1152px) 1152px, 100vw"}
         className="object-cover object-center"
       />

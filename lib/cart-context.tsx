@@ -30,7 +30,9 @@ type CartContextValue = {
   applyPromo: (code: string) => Promise<string | null>;
   removePromo: () => void;
   discount: number;
-  /** Envío nacional estimado (el checkout recalcula según el método elegido). */
+  /** Descuento por volumen (10% en compras mayores a $6,000), no acumulable con códigos. */
+  volumeDiscount: number;
+  /** Envío estimado con la regla de CDMX y zona metropolitana; el checkout recalcula según la dirección. */
   shippingCost: number;
   total: number;
   itemCount: number;
@@ -132,8 +134,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     () => items.reduce((sum, item) => sum + item.product.sale_price * item.quantity, 0),
     [items]
   );
-  const { discount, shippingCost, total } = useMemo(
-    () => calculateOrderTotals(subtotal, promo),
+  const { discount, volumeDiscount, shippingCost, total } = useMemo(
+    () => calculateOrderTotals(subtotal, promo, "metro"),
     [subtotal, promo]
   );
   const itemCount = useMemo(
@@ -152,6 +154,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     applyPromo,
     removePromo,
     discount,
+    volumeDiscount,
     shippingCost,
     total,
     itemCount,

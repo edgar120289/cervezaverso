@@ -55,7 +55,7 @@ export default function HeroVideo({ videoSrc, ctas, title, subtitle, style, prod
 
   return (
     <StyledBanner
-      headingTag="h1"
+      headingTag="div"
       ariaLabel="Bienvenida"
       title={title}
       subtitle={subtitle}

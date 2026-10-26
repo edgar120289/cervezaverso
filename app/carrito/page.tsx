@@ -5,13 +5,14 @@ import Link from "next/link";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { trackInitiateCheckout } from "@/lib/meta-pixel";
-import { formatMXN, FREE_SHIPPING_THRESHOLD, SHIPPING_INFO } from "@/lib/pricing";
+import { formatMXN, FREE_SHIPPING_THRESHOLD_METRO, SHIPPING_INFO } from "@/lib/pricing";
 import BottleFallback from "@/components/BottleFallback";
+import { VolumeDiscountNotice, VolumeDiscountRow } from "@/components/VolumeDiscount";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
 
 export default function CarritoPage() {
-  const { items, setQuantity, removeItem, subtotal, promo, discount, shippingCost, total } = useCart();
-  const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const { items, setQuantity, removeItem, subtotal, promo, discount, volumeDiscount, shippingCost, total } = useCart();
+  const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD_METRO - subtotal);
 
   if (items.length === 0) {
     return (
@@ -105,16 +106,17 @@ export default function CarritoPage() {
 
           {remainingForFreeShipping > 0 ? (
             <p className="rounded-[20px] bg-canvas px-4 py-3 text-xs text-black/60">
-              Agrega {formatMXN(remainingForFreeShipping)} más a tu pedido y el envío es
-              gratis.
+              Te faltan {formatMXN(remainingForFreeShipping)} para el envío gratis. Si tu dirección está fuera de CDMX y
+              zona metropolitana, es gratis desde $3,000.
             </p>
           ) : (
             <p className="rounded-[20px] bg-canvas px-4 py-3 text-xs font-semibold text-black/70">
-              ¡Envío gratis desbloqueado!
+              ¡Envío gratis desbloqueado en CDMX y zona metropolitana!
             </p>
           )}
 
           <PromoCodeField />
+          <VolumeDiscountNotice />
 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between text-black/60">
@@ -122,8 +124,9 @@ export default function CarritoPage() {
               <span>{formatMXN(subtotal)}</span>
             </div>
             {promo && <DiscountRow code={promo.code} amount={discount} />}
+            <VolumeDiscountRow amount={volumeDiscount} />
             <div className="flex justify-between text-black/60">
-              <span>Envío nacional</span>
+              <span>Envío (CDMX y zona metropolitana)</span>
               <span>{shippingCost === 0 ? "Gratis" : formatMXN(shippingCost)}</span>
             </div>
             <div className="flex justify-between pt-3 text-base font-semibold">
@@ -140,7 +143,7 @@ export default function CarritoPage() {
             Continuar al pago
           </Link>
           <p className="text-center text-[11px] text-muted">
-            {SHIPPING_INFO}
+            {SHIPPING_INFO} El costo final se confirma con tu dirección en el siguiente paso.
           </p>
         </div>
       </div>

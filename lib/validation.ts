@@ -50,6 +50,19 @@ const antiSpamFields = {
   turnstileToken: z.string().max(2048).nullish(),
 };
 
+export const MAX_CONSULTA = 1000;
+
+/** Consulta del formulario de /faq. El correo solo se exige a visitantes: con sesión se toma del servidor. */
+export const contactSchema = z.object({
+  ...antiSpamFields,
+  email: z.union([z.literal(""), z.email("Escribe un correo electrónico válido.").trim().toLowerCase()]).optional(),
+  mensaje: z
+    .string("Escribe tu duda.")
+    .trim()
+    .min(10, "Cuéntanos tu duda con al menos 10 caracteres.")
+    .max(MAX_CONSULTA, `La duda no puede tener más de ${MAX_CONSULTA} caracteres.`),
+});
+
 export const loginSchema = credentialsSchema.extend(antiSpamFields);
 
 export const signupSchema = credentialsSchema.extend({

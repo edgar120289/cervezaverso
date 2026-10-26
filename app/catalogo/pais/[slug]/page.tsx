@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import CategoryPage from "@/components/CategoryPage";
 import { getProducts } from "@/lib/catalog";
+import { COUNTRY_CONTENT } from "@/lib/category-content";
 import { getCountryCategory, productsInCountry } from "@/lib/seo-categories";
 
 export async function generateMetadata({ params }: PageProps<"/catalogo/pais/[slug]">): Promise<Metadata> {
@@ -9,7 +10,7 @@ export async function generateMetadata({ params }: PageProps<"/catalogo/pais/[sl
   if (!category) return {};
   return {
     title: `Cerveza de ${category.name}`,
-    description: `Compra cerveza de ${category.name} en Cervezaverso: artesanal e importada, con envío a toda la República Mexicana.`,
+    description: COUNTRY_CONTENT[category.slug]?.meta,
     alternates: { canonical: `/catalogo/pais/${category.slug}` },
   };
 }
@@ -24,6 +25,8 @@ export default async function PaisPage({ params }: PageProps<"/catalogo/pais/[sl
       heading={`Cerveza de ${category.name}`}
       intro={`Cervezas de ${category.name} disponibles en Cervezaverso. Filtra por precio, grado de alcohol o cervecería.`}
       products={products}
+      path={`/catalogo/pais/${category.slug}`}
+      body={COUNTRY_CONTENT[category.slug]?.body}
     />
   );
 }

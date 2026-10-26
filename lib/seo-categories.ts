@@ -94,6 +94,11 @@ export function productsInCountry(products: Product[], category: CountryCategory
   return products.filter((p) => category.aliases.includes(normalize(p.country)));
 }
 
+export function countryCategoryOf(product: Pick<Product, "country">): CountryCategory | undefined {
+  const country = normalize(product.country);
+  return COUNTRY_CATEGORIES.find((c) => c.aliases.includes(country));
+}
+
 export function productsInStyle(products: Product[], category: StyleCategory): Product[] {
   return products.filter((p) => {
     const style = normalize(p.style);

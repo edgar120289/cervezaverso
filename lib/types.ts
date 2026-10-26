@@ -104,6 +104,8 @@ export type PedidoDetalle = Pedido & {
   /** Columnas de la migración 004; ausentes en pedidos anteriores. */
   promo_code?: string | null;
   descuento?: number;
+  /** Columna de la migración 021; ausente en pedidos anteriores. */
+  descuento_volumen?: number;
   direccion: DireccionEnvio | null;
   notas: string | null;
   pedido_items: PedidoItem[];

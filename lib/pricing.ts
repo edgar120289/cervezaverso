@@ -1,8 +1,22 @@
 import type { AppliedPromo, StockStatus } from "@/lib/types";
+import type { ShippingZone } from "@/lib/shipping-zones";
 
+/** Envío gratis desde este subtotal en el resto del país. */
 const FREE_SHIPPING_THRESHOLD = 3000;
+/** Envío gratis desde este subtotal en CDMX y zona metropolitana. */
+const FREE_SHIPPING_THRESHOLD_METRO = 1000;
+/** Descuento por volumen: aplica en compras con subtotal de productos MAYOR a este monto. */
+const VOLUME_DISCOUNT_THRESHOLD = 6000;
+const VOLUME_DISCOUNT_PCT = 10;
+/** Desde este subtotal el carrito avisa cuánto falta para el descuento por volumen. */
+const VOLUME_DISCOUNT_HINT_FROM = 5000;
+
 /** Tarifa base temporal: se sustituirá por la cotización de la paquetería. */
 const FLAT_SHIPPING_COST = 150;
+
+export function freeShippingThreshold(zone: ShippingZone): number {
+  return zone === "metro" ? FREE_SHIPPING_THRESHOLD_METRO : FREE_SHIPPING_THRESHOLD;
+}
 
 export const DEFAULT_MARGIN_PCT = 35;
 /** Tope del margen real: con 100% el divisor sería cero. */
@@ -37,18 +51,22 @@ export const PAYMENT_METHODS: Record<
   mercadopago: {
     label: "Mercado Pago",
     description: "Tarjetas, SPEI y efectivo.",
-    delivery: "Tiempo estimado de entrega: 3 a 6 días hábiles",
+    delivery: "Entrega en 24 a 48 horas en CDMX y zona metropolitana, y en 3 a 6 días hábiles en el resto del país.",
   },
   transferencia: {
     label: "Transferencia Interbancaria (Sin comisiones)",
     description: "Pagas desde tu banca en línea y nos envías el comprobante.",
-    delivery: "Procesamiento prioritario (reduce el tiempo estándar de 3 a 6 días hábiles).",
+    delivery: "Procesamiento prioritario (reduce el tiempo estándar de entrega).",
   },
 };
 
-/** Texto informativo único de envíos y tiempos de entrega. */
+/** Texto informativo único de tiempos de entrega. */
 export const SHIPPING_INFO =
-  "Envío a toda la República Mexicana con tiempo de entrega de 3 a 6 días hábiles. (El tiempo de procesamiento y envío se reduce si el pago es mediante transferencia bancaria)";
+  "Entrega en 24 a 48 horas en CDMX y zona metropolitana, y en 3 a 6 días hábiles por paquetería en el resto del país. (El tiempo de procesamiento y envío se reduce si el pago es mediante transferencia bancaria)";
+
+/** Regla de costo por zona, para mostrarla en fichas, carrito, /envios y Términos. */
+export const SHIPPING_RULE_TEXT =
+  "Envío gratis en CDMX y zona metropolitana desde $1,000 (24 a 48 h). Resto del país: gratis desde $3,000 (3 a 6 días hábiles). Paga con tarjeta, SPEI u OXXO.";
 
 /** `local` ya no se ofrece: se conserva solo para mostrar pedidos anteriores. */
 export const SHIPPING_METHODS: Record<
@@ -57,7 +75,7 @@ export const SHIPPING_METHODS: Record<
 > = {
   nacional: {
     label: "Envío nacional por paquetería",
-    description: `${SHIPPING_INFO} Gratis en compras desde ${formatMXN(FREE_SHIPPING_THRESHOLD)}.`,
+    description: `${SHIPPING_INFO} Gratis desde ${formatMXN(FREE_SHIPPING_THRESHOLD_METRO)} en CDMX y zona metropolitana, y desde ${formatMXN(FREE_SHIPPING_THRESHOLD)} en el resto del país.`,
   },
   local: {
     label: "Envío local (anterior)",
@@ -66,10 +84,11 @@ export const SHIPPING_METHODS: Record<
 };
 
 /**
- * Envío nacional: tarifa base de $150, gratis desde $3,000 de subtotal.
+ * Tarifa base de $150; gratis desde $1,000 de subtotal en CDMX y zona metropolitana
+ * y desde $3,000 en el resto del país.
  */
-export function calculateShippingCost(subtotal: number): number {
-  return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : FLAT_SHIPPING_COST;
+export function calculateShippingCost(subtotal: number, zone: ShippingZone): number {
+  return subtotal >= freeShippingThreshold(zone) ? 0 : FLAT_SHIPPING_COST;
 }
 
 /**
@@ -82,7 +101,22 @@ function calculateDiscount(subtotal: number, promo: AppliedPromo | null): number
   return Math.min(Math.floor(raw), subtotal);
 }
 
-export type OrderTotals = { subtotal: number; discount: number; shippingCost: number; total: number };
+/**
+ * Descuento por volumen sobre el subtotal de productos (nunca sobre el envío). No es acumulable:
+ * si un código ya descuenta algo (`promoDiscount > 0`), no se aplica.
+ */
+export function calculateVolumeDiscount(subtotal: number, promoDiscount: number): number {
+  if (promoDiscount > 0 || subtotal <= VOLUME_DISCOUNT_THRESHOLD) return 0;
+  return Math.floor((subtotal * VOLUME_DISCOUNT_PCT) / 100);
+}
+
+export type OrderTotals = {
+  subtotal: number;
+  discount: number;
+  volumeDiscount: number;
+  shippingCost: number;
+  total: number;
+};
 
 /**
  * Totales del pedido. El envío gratis se mide con el subtotal ANTES del
@@ -92,11 +126,13 @@ export type OrderTotals = { subtotal: number; discount: number; shippingCost: nu
  */
 export function calculateOrderTotals(
   subtotal: number,
-  promo: AppliedPromo | null
+  promo: AppliedPromo | null,
+  zone: ShippingZone
 ): OrderTotals {
   const discount = calculateDiscount(subtotal, promo);
-  const shippingCost = subtotal > 0 ? calculateShippingCost(subtotal) : 0;
-  return { subtotal, discount, shippingCost, total: subtotal - discount + shippingCost };
+  const volumeDiscount = calculateVolumeDiscount(subtotal, discount);
+  const shippingCost = subtotal > 0 ? calculateShippingCost(subtotal, zone) : 0;
+  return { subtotal, discount, volumeDiscount, shippingCost, total: subtotal - discount - volumeDiscount + shippingCost };
 }
 
 /** "10%" o "$500" */
@@ -112,4 +148,4 @@ export function formatMXN(amount: number): string {
   });
 }
 
-export { FREE_SHIPPING_THRESHOLD, FLAT_SHIPPING_COST };
+export { VOLUME_DISCOUNT_THRESHOLD, VOLUME_DISCOUNT_PCT, VOLUME_DISCOUNT_HINT_FROM, FREE_SHIPPING_THRESHOLD, FREE_SHIPPING_THRESHOLD_METRO, FLAT_SHIPPING_COST };
