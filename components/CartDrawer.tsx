@@ -8,6 +8,7 @@ import { useCart } from "@/lib/cart-context";
 import { trackInitiateCheckout } from "@/lib/meta-pixel";
 import { formatMXN, FREE_SHIPPING_THRESHOLD_METRO } from "@/lib/pricing";
 import { DiscountRow } from "./PromoCodeField";
+import { VolumeDiscountNotice, VolumeDiscountRow } from "./VolumeDiscount";
 import BottleFallback from "./BottleFallback";
 
 export default function CartDrawer() {
@@ -20,6 +21,7 @@ export default function CartDrawer() {
     subtotal,
     promo,
     discount,
+    volumeDiscount,
     shippingCost,
     total,
   } = useCart();
@@ -141,12 +143,15 @@ export default function CartDrawer() {
                     </p>
                   )}
 
+                  <VolumeDiscountNotice />
+
                   <div className="space-y-1.5 text-sm">
                     <div className="flex justify-between text-black/60">
                       <span>Subtotal</span>
                       <span>{formatMXN(subtotal)}</span>
                     </div>
                     {promo && <DiscountRow code={promo.code} amount={discount} />}
+                    <VolumeDiscountRow amount={volumeDiscount} />
                     <div className="flex justify-between text-black/60">
                       <span>Envío (CDMX y zona metropolitana)</span>
                       <span>{shippingCost === 0 ? "Gratis" : formatMXN(shippingCost)}</span>

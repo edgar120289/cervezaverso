@@ -111,11 +111,17 @@ export default function TerminosPage() {
           id: "codigos-de-descuento",
           title: "Códigos de descuento",
           body: (
-            <p>
-              Puedes usar un código por pedido. Cada código indica su descuento, su compra mínima y su vigencia, y no
-              se canjea por dinero. Los códigos de monto fijo se aplican sobre el subtotal de productos; si tu compra
-              es menor al monto, la diferencia no se conserva.
-            </p>
+            <>
+              <p>
+                Puedes usar un código por pedido. Cada código indica su descuento, su compra mínima y su vigencia, y no
+                se canjea por dinero. Los códigos de monto fijo se aplican sobre el subtotal de productos; si tu compra
+                es menor al monto, la diferencia no se conserva.
+              </p>
+              <p>
+                Descuento por volumen: en compras mayores a $6,000 en productos te descontamos 10% de forma automática.
+                No es acumulable con códigos, cupones del programa de premios ni otras promociones.
+              </p>
+            </>
           ),
         },
         {

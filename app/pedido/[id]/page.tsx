@@ -172,6 +172,12 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
               <span className="tabular-nums">−{formatMXN(Number(pedido.descuento))}</span>
             </div>
           )}
+          {Number(pedido.descuento_volumen ?? 0) > 0 && (
+            <div className="flex justify-between font-semibold text-accent">
+              <span>Descuento por volumen (10%)</span>
+              <span className="tabular-nums">−{formatMXN(Number(pedido.descuento_volumen))}</span>
+            </div>
+          )}
           <div className="flex justify-between text-black/60">
             <span>{envio.label}</span>
             <span className="tabular-nums">

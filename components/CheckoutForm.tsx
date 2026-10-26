@@ -18,6 +18,7 @@ import { ESTADOS_MX } from "@/lib/estados-mx";
 import { getShippingZone } from "@/lib/shipping-zones";
 import { checkoutSchema, firstIssue, isHoneypotFilled, MAX_NOTAS } from "@/lib/validation";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
+import { VolumeDiscountNotice, VolumeDiscountRow } from "@/components/VolumeDiscount";
 import Honeypot from "@/components/Honeypot";
 import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import FormField from "@/components/FormField";
@@ -87,7 +88,7 @@ export default function CheckoutForm({
   const direccion: DireccionEnvio = guardada ?? nueva;
   // Sin código postal completo se muestra la regla de CDMX; el servidor siempre recalcula con la dirección real.
   const zona = /^\d{5}$/.test(direccion.codigo_postal) ? getShippingZone(direccion) : "metro";
-  const { discount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo, zona);
+  const { discount, volumeDiscount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo, zona);
   const faltaParaGratis = Math.max(0, freeShippingThreshold(zona) - subtotal);
 
   if (!isHydrated || isRedirecting) {
@@ -466,6 +467,7 @@ export default function CheckoutForm({
         </ul>
 
         <PromoCodeField />
+        <VolumeDiscountNotice />
 
         <div className="space-y-2 border-t border-black/5 pt-4 text-sm">
           <div className="flex justify-between text-black/60">
@@ -473,6 +475,7 @@ export default function CheckoutForm({
             <span className="tabular-nums">{formatMXN(subtotal)}</span>
           </div>
           {promo && <DiscountRow code={promo.code} amount={discount} />}
+          <VolumeDiscountRow amount={volumeDiscount} />
           <div className="flex justify-between text-black/60">
             <span>Envío nacional</span>
             <span className="tabular-nums">{costoEnvio === 0 ? "Gratis" : formatMXN(costoEnvio)}</span>

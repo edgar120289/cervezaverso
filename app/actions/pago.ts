@@ -10,6 +10,8 @@ import { crearPreferenciaPedido } from "@/lib/mercadopago-checkout";
 
 export type ReintentoResult = { ok: true; initPoint: string } | { ok: false; error: string };
 
+type ItemPedido = { product_id: string | null; sku: string; nombre: string; precio_unitario: number | string; cantidad: number };
+
 const GENERIC_ERROR = "No pudimos iniciar el pago. Intenta de nuevo en unos minutos.";
 
 /**
@@ -29,9 +31,8 @@ export async function reintentarPago(pedidoId: string): Promise<ReintentoResult>
   const admin = createAdminClient();
   const { data: pedido } = await admin
     .from("pedidos")
-    .select(
-      "id, user_id, estado, metodo_pago, cliente_nombre, cliente_email, cliente_telefono, costo_envio, descuento, total, pedido_items (product_id, sku, nombre, precio_unitario, cantidad)"
-    )
+    // `*`: incluye descuento_volumen (migración 021) cuando existe, sin romper el reintento si aún no se aplica.
+    .select("*, pedido_items (product_id, sku, nombre, precio_unitario, cantidad)")
     .eq("id", id.data)
     .maybeSingle();
   if (!pedido) return { ok: false, error: "Pedido no encontrado." };
@@ -47,7 +48,7 @@ export async function reintentarPago(pedidoId: string): Promise<ReintentoResult>
   if (pedido.estado !== "Pendiente") return { ok: false, error: "Este pedido ya no está pendiente de pago." };
 
   // Los productos pudieron agotarse o desactivarse desde la compra original.
-  const productIds = pedido.pedido_items.map((item) => item.product_id).filter((v): v is string => Boolean(v));
+  const productIds = pedido.pedido_items.map((item: ItemPedido) => item.product_id).filter((v: string | null): v is string => Boolean(v));
   const { data: disponibles } = await admin
     .from("products")
     .select("id")
@@ -65,13 +66,14 @@ export async function reintentarPago(pedidoId: string): Promise<ReintentoResult>
         nombre: pedido.cliente_nombre,
         email: pedido.cliente_email,
         telefono: pedido.cliente_telefono ?? "",
-        lineas: pedido.pedido_items.map((item) => ({
+        lineas: pedido.pedido_items.map((item: ItemPedido) => ({
           sku: item.sku,
           nombre: item.nombre,
           precio_unitario: Number(item.precio_unitario),
           cantidad: item.cantidad,
         })),
         descuento: Number(pedido.descuento ?? 0),
+        descuentoVolumen: Number(pedido.descuento_volumen ?? 0),
         costoEnvio: Number(pedido.costo_envio),
         total: Number(pedido.total),
       },

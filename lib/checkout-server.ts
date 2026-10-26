@@ -18,6 +18,7 @@ export type PedidoRegistrado = {
   lineas: { sku: string; nombre: string; precio_unitario: number; cantidad: number }[];
   subtotal: number;
   descuento: number;
+  descuentoVolumen: number;
   costoEnvio: number;
   total: number;
   promoId: string | null;
@@ -113,7 +114,7 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
     if (promo) await admin.rpc("release_promo_code", { p_id: promo.id });
   };
 
-  const { discount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo, getShippingZone(direccion));
+  const { discount, volumeDiscount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo, getShippingZone(direccion));
   const direccionEnvio: DireccionEnvio = direccion;
 
   const { data: pedido, error: pedidoError } = await admin
@@ -134,6 +135,8 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
       cliente_fecha_nacimiento: fechaNacimiento,
       // Sólo se envían con cupón: sin él, el checkout funciona aunque falte la migración 004.
       ...(promo ? { promo_code: promo.code, descuento: discount } : {}),
+      // Sólo se envía cuando aplica: sin descuento por volumen, el checkout funciona aunque falte la migración 021.
+      ...(volumeDiscount > 0 ? { descuento_volumen: volumeDiscount } : {}),
     })
     .select("id")
     .single();
@@ -164,6 +167,7 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
     lineas: lineas.map(({ sku, nombre, precio_unitario, cantidad }) => ({ sku, nombre, precio_unitario, cantidad })),
     subtotal,
     descuento: promo ? discount : 0,
+    descuentoVolumen: volumeDiscount,
     costoEnvio,
     total,
     promoId: promo?.id ?? null,

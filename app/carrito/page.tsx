@@ -7,10 +7,11 @@ import { useCart } from "@/lib/cart-context";
 import { trackInitiateCheckout } from "@/lib/meta-pixel";
 import { formatMXN, FREE_SHIPPING_THRESHOLD_METRO, SHIPPING_INFO } from "@/lib/pricing";
 import BottleFallback from "@/components/BottleFallback";
+import { VolumeDiscountNotice, VolumeDiscountRow } from "@/components/VolumeDiscount";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
 
 export default function CarritoPage() {
-  const { items, setQuantity, removeItem, subtotal, promo, discount, shippingCost, total } = useCart();
+  const { items, setQuantity, removeItem, subtotal, promo, discount, volumeDiscount, shippingCost, total } = useCart();
   const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD_METRO - subtotal);
 
   if (items.length === 0) {
@@ -115,6 +116,7 @@ export default function CarritoPage() {
           )}
 
           <PromoCodeField />
+          <VolumeDiscountNotice />
 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between text-black/60">
@@ -122,6 +124,7 @@ export default function CarritoPage() {
               <span>{formatMXN(subtotal)}</span>
             </div>
             {promo && <DiscountRow code={promo.code} amount={discount} />}
+            <VolumeDiscountRow amount={volumeDiscount} />
             <div className="flex justify-between text-black/60">
               <span>Envío (CDMX y zona metropolitana)</span>
               <span>{shippingCost === 0 ? "Gratis" : formatMXN(shippingCost)}</span>

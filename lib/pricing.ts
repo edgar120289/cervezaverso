@@ -5,6 +5,12 @@ import type { ShippingZone } from "@/lib/shipping-zones";
 const FREE_SHIPPING_THRESHOLD = 3000;
 /** Envío gratis desde este subtotal en CDMX y zona metropolitana. */
 const FREE_SHIPPING_THRESHOLD_METRO = 1000;
+/** Descuento por volumen: aplica en compras con subtotal de productos MAYOR a este monto. */
+const VOLUME_DISCOUNT_THRESHOLD = 6000;
+const VOLUME_DISCOUNT_PCT = 10;
+/** Desde este subtotal el carrito avisa cuánto falta para el descuento por volumen. */
+const VOLUME_DISCOUNT_HINT_FROM = 5000;
+
 /** Tarifa base temporal: se sustituirá por la cotización de la paquetería. */
 const FLAT_SHIPPING_COST = 150;
 
@@ -95,7 +101,22 @@ function calculateDiscount(subtotal: number, promo: AppliedPromo | null): number
   return Math.min(Math.floor(raw), subtotal);
 }
 
-export type OrderTotals = { subtotal: number; discount: number; shippingCost: number; total: number };
+/**
+ * Descuento por volumen sobre el subtotal de productos (nunca sobre el envío). No es acumulable:
+ * si un código ya descuenta algo (`promoDiscount > 0`), no se aplica.
+ */
+export function calculateVolumeDiscount(subtotal: number, promoDiscount: number): number {
+  if (promoDiscount > 0 || subtotal <= VOLUME_DISCOUNT_THRESHOLD) return 0;
+  return Math.floor((subtotal * VOLUME_DISCOUNT_PCT) / 100);
+}
+
+export type OrderTotals = {
+  subtotal: number;
+  discount: number;
+  volumeDiscount: number;
+  shippingCost: number;
+  total: number;
+};
 
 /**
  * Totales del pedido. El envío gratis se mide con el subtotal ANTES del
@@ -109,8 +130,9 @@ export function calculateOrderTotals(
   zone: ShippingZone
 ): OrderTotals {
   const discount = calculateDiscount(subtotal, promo);
+  const volumeDiscount = calculateVolumeDiscount(subtotal, discount);
   const shippingCost = subtotal > 0 ? calculateShippingCost(subtotal, zone) : 0;
-  return { subtotal, discount, shippingCost, total: subtotal - discount + shippingCost };
+  return { subtotal, discount, volumeDiscount, shippingCost, total: subtotal - discount - volumeDiscount + shippingCost };
 }
 
 /** "10%" o "$500" */
@@ -126,4 +148,4 @@ export function formatMXN(amount: number): string {
   });
 }
 
-export { FREE_SHIPPING_THRESHOLD, FREE_SHIPPING_THRESHOLD_METRO, FLAT_SHIPPING_COST };
+export { VOLUME_DISCOUNT_THRESHOLD, VOLUME_DISCOUNT_PCT, VOLUME_DISCOUNT_HINT_FROM, FREE_SHIPPING_THRESHOLD, FREE_SHIPPING_THRESHOLD_METRO, FLAT_SHIPPING_COST };
