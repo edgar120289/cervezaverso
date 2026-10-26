@@ -6,7 +6,7 @@ import HeroVideo from "./HeroVideo";
 
 /** Portada configurable desde /admin/landing: todo sale de `store_settings.landing_settings`, sin textos ni video propios. */
 export default function Hero({ settings, products }: { settings: HeroSettings; products: Record<string, Product> }) {
-  // El H1 de la portada vive en app/page.tsx; el Hero apagado no pinta nada.
+  // El H1 de la portada vive en FeaturedShop; el Hero apagado no pinta nada.
   if (!settings.is_hero_active) return null;
 
   if (settings.hero_type === "carousel" && settings.hero_banners.length > 0) {

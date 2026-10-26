@@ -8,6 +8,7 @@ import { ProductGridSkeleton } from "@/components/Skeletons";
 import { getSpotlightProducts } from "@/lib/catalog";
 import { getLandingSettings } from "@/lib/hero-settings";
 import { collectSpotlightRefs } from "@/lib/landing";
+import { homeJsonLd, jsonLdString } from "@/lib/structured-data";
 
 /** La portada siempre lee `store_settings` en cada visita: lo guardado en /admin/landing se ve de inmediato. */
 export const dynamic = "force-dynamic";
@@ -18,8 +19,7 @@ export default async function Home() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 pt-4">
-      {/* H1 provisional (solo lectores de pantalla y buscadores) hasta elegir su lugar visible en la portada. */}
-      <h1 className="sr-only">Cerveza artesanal e importada a domicilio en CDMX y todo México</h1>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(homeJsonLd()) }} />
       <Hero settings={settings.hero} products={products} />
       <Suspense fallback={<ProductGridSkeleton />}>
         <FeaturedShop />

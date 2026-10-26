@@ -13,6 +13,8 @@ import SommelierAudio from "@/components/SommelierAudio";
 import ShareButton from "@/components/ShareButton";
 import { SITE } from "@/lib/site";
 import { productSeoDescription } from "@/lib/product-description";
+import { countryCategoryOf } from "@/lib/seo-categories";
+import { jsonLdString } from "@/lib/structured-data";
 import type { StockStatus } from "@/lib/types";
 
 const SCHEMA_AVAILABILITY: Record<StockStatus, string> = {
@@ -99,12 +101,22 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
     },
   };
 
+  const category = countryCategoryOf(product);
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { name: "Inicio", item: SITE.url },
+      { name: "Tienda", item: `${SITE.url}/tienda` },
+      ...(category ? [{ name: `Cerveza de ${category.name}`, item: `${SITE.url}/catalogo/pais/${category.slug}` }] : []),
+      { name: product.name, item: productUrl },
+    ].map((crumb, index) => ({ "@type": "ListItem", position: index + 1, ...crumb })),
+  };
+
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbLd) }} />
       <Link
         href="/tienda"
         className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold text-muted transition-colors hover:bg-black/5 hover:text-black"
