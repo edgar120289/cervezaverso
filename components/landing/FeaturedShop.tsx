@@ -12,7 +12,7 @@ export default async function FeaturedShop() {
       <h1 id="destacadas" className="text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">
         Cerveza artesanal e importada a domicilio en CDMX y todo México
       </h1>
-      <p className="mb-5 mt-1 text-muted">Cervezas destacadas</p>
+      <h2 className="mb-5 mt-1 text-base font-normal text-muted">Cervezas destacadas</h2>
       {products.length > 0 && <ProductGrid products={products} />}
       <div className="mt-8 flex justify-center">
         <Link
