@@ -1,5 +1,5 @@
 /**
- * País tal como llega del catálogo → código de FlagCDN (https://flagcdn.com).
+ * País tal como llega del catálogo → código de bandera (archivos en /public/flags, descargados de FlagCDN).
  * Las claves van en minúsculas, sin acentos ni puntuación, así que "EE.UU.",
  * "U.S.A." y "Estados Unidos" resuelven igual. Escocia, Inglaterra y Gales
  * tienen bandera propia (gb-sct, gb-eng, gb-wls): no son la de Reino Unido.
@@ -106,8 +106,8 @@ function countryFlagCode(country: string): string | null {
   return COUNTRY_CODES[key] ?? COUNTRY_CODES[key.replace(/ /g, "")] ?? null;
 }
 
-/** URL del SVG de la bandera en FlagCDN, o `null` si el país no se reconoce. */
+/** Ruta de la bandera local (PNG de 40 px en /public/flags), o `null` si el país no se reconoce. */
 export function countryFlagUrl(country: string): string | null {
   const code = countryFlagCode(country);
-  return code ? `https://flagcdn.com/${code}.svg` : null;
+  return code ? `/flags/${code}.png` : null;
 }

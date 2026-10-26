@@ -49,6 +49,20 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
+  const { pathname, search } = request.nextUrl;
+
+  // Sin cookies de sesión de Supabase (`sb-…`) no hay token que refrescar y `getUser()` devolvería
+  // `null` de todos modos: se evita la llamada de red. Con cookies (sesión, PKCE de OAuth) sigue igual.
+  const hasSupabaseCookies = request.cookies.getAll().some((cookie) => cookie.name.startsWith("sb-"));
+  if (!hasSupabaseCookies) {
+    if (pathname.startsWith("/cuenta") || isAdminPage(pathname)) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("next", pathname + search);
+      return NextResponse.redirect(loginUrl);
+    }
+    return response;
+  }
+
   const supabase = createServerClient(
     supabaseUrl,
     supabaseAnonKey,
@@ -73,7 +87,6 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname, search } = request.nextUrl;
   // El rol admin se valida en el layout de /admin, en `requireAdmin` y en /api/admin/import.
   if (!user && (pathname.startsWith("/cuenta") || isAdminPage(pathname))) {
     const loginUrl = new URL("/login", request.url);
