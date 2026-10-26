@@ -30,7 +30,7 @@ type CartContextValue = {
   applyPromo: (code: string) => Promise<string | null>;
   removePromo: () => void;
   discount: number;
-  /** Envío nacional estimado (el checkout recalcula según el método elegido). */
+  /** Envío estimado con la regla de CDMX y zona metropolitana; el checkout recalcula según la dirección. */
   shippingCost: number;
   total: number;
   itemCount: number;
@@ -133,7 +133,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [items]
   );
   const { discount, shippingCost, total } = useMemo(
-    () => calculateOrderTotals(subtotal, promo),
+    () => calculateOrderTotals(subtotal, promo, "metro"),
     [subtotal, promo]
   );
   const itemCount = useMemo(

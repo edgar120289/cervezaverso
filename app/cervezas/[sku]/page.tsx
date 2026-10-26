@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Globe2, UtensilsCrossed, Wine } from "lucide-react";
 import { getProductBySku, getSimilarProducts } from "@/lib/catalog";
 import ProductGrid from "@/components/ProductGrid";
-import { calculateShippingCost, formatMXN } from "@/lib/pricing";
+import { calculateShippingCost, formatMXN, SHIPPING_RULE_TEXT } from "@/lib/pricing";
 import AddToCartButton from "@/components/AddToCartButton";
 import HealthNotice from "@/components/HealthNotice";
 import FavoriteButton from "@/components/FavoriteButton";
@@ -79,7 +79,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
       itemCondition: "https://schema.org/NewCondition",
       shippingDetails: {
         "@type": "OfferShippingDetails",
-        shippingRate: { "@type": "MonetaryAmount", value: calculateShippingCost(product.sale_price).toFixed(2), currency: "MXN" },
+        shippingRate: { "@type": "MonetaryAmount", value: calculateShippingCost(product.sale_price, "nacional").toFixed(2), currency: "MXN" },
         shippingDestination: { "@type": "DefinedRegion", addressCountry: "MX" },
         deliveryTime: {
           "@type": "ShippingDeliveryTime",
@@ -156,6 +156,12 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
             </div>
           </div>
           <p className="text-xs text-muted">Precio final en MXN con IVA e IEPS incluidos.</p>
+          <p className="text-xs text-muted">
+            {SHIPPING_RULE_TEXT}{" "}
+            <Link href="/envios" className="font-semibold text-accent hover:underline">
+              Más sobre envíos y pagos
+            </Link>
+          </p>
           <HealthNotice />
         </div>
       </div>

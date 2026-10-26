@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { calculateOrderTotals, formatMXN, type PaymentMethod } from "@/lib/pricing";
 import { findActivePromo } from "@/lib/promo";
+import { getShippingZone } from "@/lib/shipping-zones";
 import { checkoutSchema, firstIssue } from "@/lib/validation";
 import { guardPublicForm } from "@/lib/security/form-guard";
 import { getProfileBirthDate } from "@/lib/profile";
@@ -112,7 +113,7 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
     if (promo) await admin.rpc("release_promo_code", { p_id: promo.id });
   };
 
-  const { discount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo);
+  const { discount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo, getShippingZone(direccion));
   const direccionEnvio: DireccionEnvio = direccion;
 
   const { data: pedido, error: pedidoError } = await admin

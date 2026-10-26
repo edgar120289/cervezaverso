@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
-import { FLAT_SHIPPING_COST, formatMXN, FREE_SHIPPING_THRESHOLD, SHIPPING_INFO } from "@/lib/pricing";
+import { FLAT_SHIPPING_COST, formatMXN, FREE_SHIPPING_THRESHOLD, FREE_SHIPPING_THRESHOLD_METRO, SHIPPING_INFO } from "@/lib/pricing";
 import { CONTACT, HEALTH_NOTICE, LEGAL } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -18,7 +18,8 @@ export default function TerminosPage() {
       eyebrow="Legal"
       title="Términos y condiciones"
       intro={<p>Las reglas claras de nuestra relación: cómo compras, cómo enviamos y qué puedes esperar de nosotros.</p>}
-      updatedAt="29 de septiembre de 2026"
+      updatedAt="26 de octubre de 2026"
+      draft={false}
       sections={[
         {
           id: "proveedor",
@@ -123,9 +124,11 @@ export default function TerminosPage() {
           body: (
             <>
               <p>
-                Envío nacional por paquetería a toda la República: {formatMXN(FLAT_SHIPPING_COST)} en pedidos menores a{" "}
-                {formatMXN(FREE_SHIPPING_THRESHOLD)} y gratis a partir de ese monto. Los pedidos se procesan en un máximo de
-                24 horas y se envían a través de FedEx o DHL.
+                Envío a toda la República. En CDMX y zona metropolitana el envío cuesta {formatMXN(FLAT_SHIPPING_COST)} en
+                pedidos menores a {formatMXN(FREE_SHIPPING_THRESHOLD_METRO)} y es gratis a partir de ese monto. En el resto
+                del país cuesta {formatMXN(FLAT_SHIPPING_COST)} en pedidos menores a {formatMXN(FREE_SHIPPING_THRESHOLD)} y es
+                gratis a partir de ese monto. Los pedidos se procesan en un máximo de 24 horas y se envían a través de
+                FedEx o DHL.
               </p>
               <p>{SHIPPING_INFO}</p>
               <p>

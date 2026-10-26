@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Clock, MapPin } from "lucide-react";
 import ContactChannels from "@/components/ContactChannels";
-import { SHIPPING_INFO } from "@/lib/pricing";
 
 export const metadata: Metadata = {
   title: "Contacto",
@@ -11,8 +10,8 @@ export const metadata: Metadata = {
 
 /** Datos editables: reemplaza los textos de relleno cuando estén definidos. */
 const DETAILS = [
-  { icon: Clock, title: "Horario de atención", body: "Lunes a sábado · horario por confirmar." },
-  { icon: MapPin, title: "Cobertura", body: SHIPPING_INFO },
+  { icon: Clock, title: "Horario de atención", body: "Lunes a domingo, de 9:00 a 21:00." },
+  { icon: MapPin, title: "Cobertura", body: "CDMX y zona metropolitana, 24 a 48 horas; resto del país, 3 a 6 días hábiles." },
 ];
 
 export default function ContactoPage() {

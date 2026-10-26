@@ -9,6 +9,8 @@ type LegalPageProps = {
   /** Fecha visible de "Última actualización" (texto libre, p. ej. "25 de septiembre de 2026"). */
   updatedAt: string;
   sections: LegalSection[];
+  /** Muestra la marca «Borrador · Pendiente de revisión legal». */
+  draft?: boolean;
 };
 
 /**
@@ -16,7 +18,7 @@ type LegalPageProps = {
  * columna de lectura de ~70 caracteres. Todo texto legal se publica como
  * borrador hasta que lo revise un especialista.
  */
-export default function LegalPage({ eyebrow, title, intro, updatedAt, sections }: LegalPageProps) {
+export default function LegalPage({ eyebrow, title, intro, updatedAt, sections, draft = true }: LegalPageProps) {
   return (
     <div className="mx-auto max-w-5xl px-4 pt-6">
       <header className="rounded-[28px] bg-white px-6 py-10 shadow-card sm:px-12 sm:py-14">
@@ -50,9 +52,11 @@ export default function LegalPage({ eyebrow, title, intro, updatedAt, sections }
         </nav>
 
         <article className="rounded-[28px] bg-white px-6 py-8 shadow-card sm:px-12 sm:py-12">
-          <p role="note" className="mb-10 rounded-[20px] bg-canvas px-5 py-4 text-sm font-semibold text-ink">
-            Borrador · Pendiente de revisión legal.
-          </p>
+          {draft && (
+            <p role="note" className="mb-10 rounded-[20px] bg-canvas px-5 py-4 text-sm font-semibold text-ink">
+              Borrador · Pendiente de revisión legal.
+            </p>
+          )}
           <div className="space-y-12">
             {sections.map((section, i) => (
               <section key={section.id} id={section.id} className="scroll-mt-28">
