@@ -18,6 +18,8 @@ export default async function Home() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 pt-4">
+      {/* H1 provisional (solo lectores de pantalla y buscadores) hasta elegir su lugar visible en la portada. */}
+      <h1 className="sr-only">Cerveza artesanal e importada a domicilio en CDMX y todo México</h1>
       <Hero settings={settings.hero} products={products} />
       <Suspense fallback={<ProductGridSkeleton />}>
         <FeaturedShop />

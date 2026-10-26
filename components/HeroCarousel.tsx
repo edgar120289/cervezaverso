@@ -62,7 +62,7 @@ export default function HeroCarousel({ banners, intervalSeconds, products }: Her
           className="absolute inset-0"
         >
           <StyledBanner
-            headingTag="h1"
+            headingTag="div"
             title={active.title}
             subtitle={active.subtitle}
             ctas={active.ctas}
