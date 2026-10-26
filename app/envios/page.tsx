@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Clock, CreditCard, Landmark, Store, Truck } from "lucide-react";
+import { Clock, CreditCard, FileText, IdCard, Percent, Truck, Undo2 } from "lucide-react";
 import { formatMXN, FLAT_SHIPPING_COST, FREE_SHIPPING_THRESHOLD, FREE_SHIPPING_THRESHOLD_METRO } from "@/lib/pricing";
 import { CONTACT, LEGAL } from "@/lib/site";
 
@@ -16,59 +16,90 @@ const linkClass = "font-semibold text-accent hover:underline";
 const SECTIONS = [
   {
     icon: Truck,
-    title: "CDMX y zona metropolitana",
+    title: "Envíos",
     body: (
       <>
         <p>
-          Envío gratis en pedidos desde {formatMXN(FREE_SHIPPING_THRESHOLD_METRO)}. En pedidos menores, el envío cuesta{" "}
-          {formatMXN(FLAT_SHIPPING_COST)}.
+          <strong className="text-ink">CDMX y zona metropolitana:</strong> gratis desde{" "}
+          {formatMXN(FREE_SHIPPING_THRESHOLD_METRO)}; {formatMXN(FLAT_SHIPPING_COST)} en pedidos menores. Tiempo de
+          entrega: 24 a 48 horas.
         </p>
-        <p>Entrega en 24 a 48 horas.</p>
+        <p>
+          <strong className="text-ink">Resto de la República:</strong> gratis desde {formatMXN(FREE_SHIPPING_THRESHOLD)};{" "}
+          {formatMXN(FLAT_SHIPPING_COST)} en pedidos menores. Tiempo de entrega: 3 a 6 días hábiles, por paquetería.
+        </p>
+        <p>
+          Procesamos los pedidos en un máximo de 24 horas; si pagas por transferencia, el proceso es más rápido. No
+          tenemos tienda física ni recolección en el local: todos los pedidos se entregan a domicilio.
+        </p>
       </>
     ),
   },
   {
-    icon: Truck,
-    title: "Resto de la República",
+    icon: Percent,
+    title: "Descuento por volumen",
     body: (
-      <>
-        <p>
-          Envío gratis en pedidos desde {formatMXN(FREE_SHIPPING_THRESHOLD)}. En pedidos menores, el envío cuesta{" "}
-          {formatMXN(FLAT_SHIPPING_COST)}.
-        </p>
-        <p>Entrega en 3 a 6 días hábiles por paquetería.</p>
-      </>
+      <p>
+        En compras mayores a $6,000 en productos te descontamos 10% automáticamente en el carrito. No es acumulable con
+        códigos, cupones del programa de premios ni otras promociones.
+      </p>
     ),
   },
   {
     icon: CreditCard,
-    title: "Mercado Pago",
-    body: <p>Paga con tarjeta de crédito o débito, SPEI o efectivo en OXXO.</p>,
+    title: "Formas de pago",
+    body: (
+      <p>
+        Mercado Pago (tarjeta de crédito o débito, SPEI y efectivo en OXXO) o transferencia bancaria. Los pagos en
+        línea se procesan en la página segura de Mercado Pago: nunca vemos ni guardamos los datos de tu tarjeta.
+      </p>
+    ),
   },
   {
-    icon: Landmark,
-    title: "Transferencia bancaria",
-    body: <p>Los datos para depositar aparecen al finalizar tu compra. Con este método procesamos tu pedido de forma prioritaria.</p>,
+    icon: FileText,
+    title: "Facturación",
+    body: (
+      <p>
+        Solicita tu factura dentro del mismo mes de tu compra a{" "}
+        <a href={`mailto:${LEGAL.emailFacturas}`} className={linkClass}>
+          {LEGAL.emailFacturas}
+        </a>
+        .
+      </p>
+    ),
   },
   {
-    icon: Store,
-    title: "Venta solo en línea",
-    body: <p>Somos una tienda 100% en línea: no hay atención al público ni recolección en tienda.</p>,
+    icon: IdCard,
+    title: "Venta solo a mayores de 18 años",
+    body: <p>Al recibir tu pedido te pediremos una identificación oficial.</p>,
+  },
+  {
+    icon: Undo2,
+    title: "Cambios y devoluciones",
+    body: (
+      <p>
+        Consulta la sección 07 de los{" "}
+        <Link href="/terminos#devoluciones" className={linkClass}>
+          Términos y condiciones
+        </Link>
+        .
+      </p>
+    ),
   },
   {
     icon: Clock,
-    title: "Atención",
+    title: "¿Dudas?",
     body: (
       <p>
-        Lunes a domingo, de 9:00 a 21:00, por WhatsApp al{" "}
+        WhatsApp{" "}
         <a href={CONTACT.whatsappUrl} className={linkClass}>
           {CONTACT.whatsappLabel}
         </a>{" "}
-        o en{" "}
+        ·{" "}
         <a href={`mailto:${CONTACT.email}`} className={linkClass}>
           {CONTACT.email}
-        </a>
-        . Facturación: {LEGAL.emailFacturas}.
+        </a>{" "}
+        · Lunes a domingo, de 9:00 a 21:00.
       </p>
     ),
   },
@@ -82,13 +113,6 @@ export default function EnviosPage() {
         <h1 className="mt-3 max-w-2xl text-4xl font-semibold leading-[1.05] tracking-[-0.045em] sm:text-5xl">
           Envíos y pagos
         </h1>
-        <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted">
-          Cuánto cuesta el envío, cuándo llega tu pedido y cómo puedes pagarlo. Más detalle en nuestros{" "}
-          <Link href="/terminos#envios" className={linkClass}>
-            Términos y condiciones
-          </Link>
-          .
-        </p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2">

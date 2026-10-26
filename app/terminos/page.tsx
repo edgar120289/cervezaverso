@@ -127,8 +127,7 @@ export default function TerminosPage() {
                 Envío a toda la República. En CDMX y zona metropolitana el envío cuesta {formatMXN(FLAT_SHIPPING_COST)} en
                 pedidos menores a {formatMXN(FREE_SHIPPING_THRESHOLD_METRO)} y es gratis a partir de ese monto. En el resto
                 del país cuesta {formatMXN(FLAT_SHIPPING_COST)} en pedidos menores a {formatMXN(FREE_SHIPPING_THRESHOLD)} y es
-                gratis a partir de ese monto. Los pedidos se procesan en un máximo de 24 horas y se envían a través de
-                FedEx o DHL.
+                gratis a partir de ese monto. Los pedidos se procesan en un máximo de 24 horas y se envían por paquetería.
               </p>
               <p>{SHIPPING_INFO}</p>
               <p>
