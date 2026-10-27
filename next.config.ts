@@ -23,7 +23,7 @@ const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} ${TURNSTILE} ${GA_SCRIPT} ${META}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: ${GA_SCRIPT} https://*.google-analytics.com ${META_COLLECT}`,
+  `img-src 'self' data: blob: ${supabaseOrigin ?? ""} ${GA_SCRIPT} https://*.google-analytics.com ${META_COLLECT}`,
   "font-src 'self'",
   `media-src 'self' ${supabaseOrigin ?? ""}`,
   `connect-src 'self' ${supabaseOrigin ?? ""} ${GA_COLLECT} ${META_COLLECT} ${META}`,
