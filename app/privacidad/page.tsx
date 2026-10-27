@@ -19,6 +19,7 @@ export default function PrivacidadPage() {
       title="Aviso de privacidad"
       intro={<p>Qué datos recabamos, para qué los usamos y cómo puedes ejercer tus derechos sobre ellos.</p>}
       updatedAt="29 de septiembre de 2026"
+      draft={false}
       sections={[
         {
           id: "responsable",
