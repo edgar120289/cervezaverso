@@ -70,6 +70,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
     "@type": "Product",
     name: googleTitle(product),
     sku: schemaSku,
+    ...(product.gtin && { gtin: product.gtin }),
     url: productUrl,
     ...(images.length > 0 && { image: images }),
     description: productSeoDescription(product),

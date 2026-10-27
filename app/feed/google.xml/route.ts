@@ -22,8 +22,8 @@ function xml(value: string): string {
 const hasImage = (p: Product) => p.image_urls.length > 0 || Boolean(p.image_url);
 
 /**
- * Feed RSS 2.0 de Google Merchant Center con las cervezas activas y con existencia. No hay campo de
- * código de barras en la base de datos, así que todo producto va con `identifier_exists` = `no`. Sin foto
+ * Feed RSS 2.0 de Google Merchant Center con las cervezas activas y con existencia. Con código de barras
+ * (`gtin`) se publica; sin él, `identifier_exists` = `no`. Sin foto
  * no se publica: Merchant Center rechaza los productos sin `image_link`.
  */
 export async function GET() {
@@ -44,7 +44,7 @@ export async function GET() {
         "      <g:availability>in_stock</g:availability>",
         `      <g:price>${p.sale_price.toFixed(2)} MXN</g:price>`,
         brand ? `      <g:brand>${xml(brand)}</g:brand>` : null,
-        "      <g:identifier_exists>no</g:identifier_exists>",
+        p.gtin ? `      <g:gtin>${xml(p.gtin)}</g:gtin>` : "      <g:identifier_exists>no</g:identifier_exists>",
         "      <g:condition>new</g:condition>",
         `      <g:google_product_category>${xml(googleCategory(p))}</g:google_product_category>`,
         `      <g:product_type>${xml(googleProductType(p))}</g:product_type>`,
