@@ -161,6 +161,8 @@ export default function TerminosPage() {
               <p>
                 También puedes devolver productos sellados y en su empaque original dentro de los 5 días hábiles
                 siguientes a la entrega. Por seguridad alimentaria no aceptamos devoluciones de productos abiertos.
+                Si devuelves un producto que no llegó dañado, el costo del envío de la devolución corre por tu cuenta;
+                si llegó dañado, equivocado o incompleto, Cervezaverso cubre ese costo.
                 En caso de producto dañado o error de envío, Cervezaverso resolverá el incidente en un plazo máximo de 8
                 días (mediante el envío de un reemplazo o reembolso del dinero), asumiendo la responsabilidad directa
                 con el cliente. Una vez aprobado, el reembolso se procesará en un plazo de 5 a 15 días hábiles,
