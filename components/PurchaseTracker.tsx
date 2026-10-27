@@ -1,44 +1,56 @@
 "use client";
 
 import { useEffect } from "react";
-import { trackPurchase, type PurchaseOrder } from "@/lib/meta-pixel";
+import { gaPurchase, type GooglePurchase } from "@/lib/google-tag";
+import { trackPurchase as metaPurchase } from "@/lib/meta-pixel";
 
 const STORAGE_KEY = "cv-purchase-tracked";
 const RETRY_MS = 500;
 const MAX_TRIES = 20;
 
-function alreadyTracked(id: string): boolean {
+type Channel = "google" | "meta";
+
+function alreadyTracked(channel: Channel, id: string): boolean {
   try {
-    return window.localStorage.getItem(`${STORAGE_KEY}:${id}`) === "1";
+    return window.localStorage.getItem(`${STORAGE_KEY}:${channel}:${id}`) === "1";
   } catch {
     return false;
   }
 }
 
-function markTracked(id: string) {
+function markTracked(channel: Channel, id: string) {
   try {
-    window.localStorage.setItem(`${STORAGE_KEY}:${id}`, "1");
+    window.localStorage.setItem(`${STORAGE_KEY}:${channel}:${id}`, "1");
   } catch {
-    // Sin almacenamiento: puede repetirse al recargar, Meta deduplica por eventID.
+    // Sin almacenamiento puede repetirse al recargar; GA4 y Meta deduplican por id de pedido.
   }
 }
 
 /**
- * Dispara Purchase una sola vez por pedido ya cobrado. El pixel carga después de la hidratación
- * y solo con consentimiento, así que se reintenta unos segundos; sin consentimiento no hace nada.
+ * Dispara la compra (GA4 `purchase`, conversión de Google Ads y Meta `Purchase`) una sola vez por
+ * pedido ya cobrado y por canal. Las etiquetas cargan después de la hidratación, así que se
+ * reintenta unos segundos; el Meta Pixel solo existe con consentimiento y Google respeta el suyo.
  */
-export default function PurchaseTracker({ order }: { order: PurchaseOrder }) {
+export default function PurchaseTracker({ order }: { order: GooglePurchase }) {
   useEffect(() => {
-    if (alreadyTracked(order.id)) return;
+    const channels: [Channel, (order: GooglePurchase) => boolean][] = [
+      ["google", gaPurchase],
+      ["meta", metaPurchase],
+    ];
+    const pending = channels.filter(([channel]) => !alreadyTracked(channel, order.id));
+    if (pending.length === 0) return;
+
     let tries = 0;
     const timer = window.setInterval(() => {
       tries += 1;
-      if (trackPurchase(order)) {
-        markTracked(order.id);
-        window.clearInterval(timer);
-      } else if (tries >= MAX_TRIES) {
-        window.clearInterval(timer);
+      for (let i = pending.length - 1; i >= 0; i--) {
+        const [channel, send] = pending[i];
+        if (send(order)) {
+          markTracked(channel, order.id);
+          pending.splice(i, 1);
+        }
       }
+      if (pending.length === 0 || tries >= MAX_TRIES) window.clearInterval(timer);
     }, RETRY_MS);
     return () => window.clearInterval(timer);
   }, [order]);

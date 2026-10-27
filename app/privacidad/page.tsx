@@ -72,7 +72,7 @@ export default function PrivacidadPage() {
               </ul>
               <p>Y, sólo con tu consentimiento, para esta finalidad adicional:</p>
               <ul className="list-disc space-y-2 pl-5">
-                <li>Medir de forma agregada cómo se usa la tienda para mejorarla (Google Analytics).</li>
+                <li>Medir de forma agregada cómo se usa la tienda para mejorarla (Google Analytics) y de la publicidad (Google Ads).</li>
               </ul>
               <p>
                 Hoy no enviamos publicidad. Si algún día lo hacemos, te pediremos permiso con una casilla que tú
@@ -92,7 +92,7 @@ export default function PrivacidadPage() {
                 Para operar la tienda nos apoyamos en proveedores que tratan datos por nuestra cuenta y bajo nuestras
                 instrucciones: Supabase (base de datos y cuentas), Vercel (alojamiento del sitio), Cloudflare
                 (verificación anti-bots), Mercado Pago (pagos), la paquetería que entrega tu pedido y, si lo aceptas,
-                Google (analítica).
+                Google (analítica y publicidad).
               </p>
               <p>
                 No vendemos tus datos. Sólo los compartiríamos con autoridades cuando una ley o una orden judicial lo
@@ -139,9 +139,13 @@ export default function PrivacidadPage() {
                 mayoría de edad y tu elección de cookies. Sin ellas la tienda no funciona.
               </p>
               <p>
-                <strong>Analítica (sólo si la aceptas):</strong> Google Analytics usa cookies (<code>_ga</code>) para
-                contar visitas de forma agregada. No se cargan hasta que aceptas y se eliminan si después las
-                rechazas.
+                <strong>Analítica y publicidad de Google (sólo si las aceptas):</strong> usamos la etiqueta de Google
+                (Google Analytics 4 y Google Ads) con el Modo de consentimiento: las cookies (<code>_ga</code>,{" "}
+                <code>_gcl_*</code>) y el uso de tus datos para anuncios permanecen denegados hasta que aceptas todas
+                las cookies. Mientras tanto, la etiqueta puede enviar a Google señales sin cookies (como tu dirección
+                IP y el tipo de navegador) para medir visitas y compras de forma agregada. Si eliges &ldquo;Solo
+                esenciales&rdquo; o retiras tu consentimiento después, esos permisos se mantienen denegados y las
+                cookies se eliminan.
               </p>
               <p>
                 <strong>Publicidad (sólo si aceptas todas las cookies):</strong> este sitio utiliza el Meta Pixel de

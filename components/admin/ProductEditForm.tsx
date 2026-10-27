@@ -28,6 +28,7 @@ type FormState = {
   sku: string;
   name: string;
   brewery: string;
+  gtin: string;
   country: string;
   style: string;
   abv: string;
@@ -66,6 +67,7 @@ export default function ProductEditForm({
     sku: product.sku,
     name: product.name,
     brewery: product.brewery ?? "",
+    gtin: product.gtin ?? "",
     country: product.country,
     style: product.style,
     abv: String(product.abv),
@@ -156,6 +158,7 @@ export default function ProductEditForm({
         sku: form.sku,
         name: form.name,
         brewery: form.brewery,
+        gtin: form.gtin,
         country: form.country,
         style: form.style,
         abv: parseFieldNumber(form.abv),
@@ -223,6 +226,19 @@ export default function ProductEditForm({
           </Field>
           <Field label="Cervecería">
             <input value={form.brewery} onChange={update("brewery")} className={inputClass} />
+          </Field>
+          <Field
+            label="Código de barras (GTIN)"
+            hint="Opcional. EAN/UPC de 8, 12, 13 o 14 dígitos: lo usa Google Merchant Center. Déjalo vacío si no tiene."
+          >
+            <input
+              value={form.gtin}
+              onChange={update("gtin")}
+              inputMode="numeric"
+              maxLength={14}
+              pattern="\d{8}|\d{12,14}"
+              className={inputClass}
+            />
           </Field>
           <Field label="País">
             <input value={form.country} onChange={update("country")} className={inputClass} required />

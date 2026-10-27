@@ -5,6 +5,8 @@ export type Product = {
   sku: string;
   name: string;
   brewery: string;
+  /** Código de barras (GTIN/EAN/UPC); nulo en las que no lo traen. */
+  gtin: string | null;
   country: string;
   style: string;
   abv: number;

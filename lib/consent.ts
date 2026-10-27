@@ -1,7 +1,7 @@
 /** Mayoría de edad y consentimiento de cookies. Sólo cliente. */
 export type CookieConsent = "all" | "essential";
 
-const CONSENT_KEY = "cervezaverso:cookie-consent";
+export const CONSENT_KEY ="cervezaverso:cookie-consent";
 const AGE_KEY = "cervezaverso:age-gate-accepted";
 /** En sessionStorage: "Soy menor" bloquea el sitio hasta cerrar el navegador. */
 const MINOR_KEY = "cervezaverso:minor-blocked";

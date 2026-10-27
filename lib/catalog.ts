@@ -15,7 +15,7 @@ import { isProductId } from "@/lib/landing-style";
  */
 
 export const PRODUCT_COLUMNS =
-  "id, sku, name, brewery, country, style, abv, volume_ml, cost_price, sale_price, stock_status, badges, description_ai, pairing_ai, notas_origen, notas_perfil, notas_maridaje, image_url, image_urls, created_at";
+  "id, sku, name, brewery, gtin, country, style, abv, volume_ml, cost_price, sale_price, stock_status, badges, description_ai, pairing_ai, notas_origen, notas_perfil, notas_maridaje, image_url, image_urls, created_at";
 
 let client: SupabaseClient | null | undefined;
 
@@ -36,6 +36,7 @@ function getClient(): SupabaseClient | null {
 export function toProduct(row: Record<string, unknown>): Product {
   return {
     ...(row as unknown as Product),
+    gtin: typeof row.gtin === "string" ? row.gtin : null,
     abv: Number(row.abv),
     volume_ml: Number(row.volume_ml),
     cost_price: Number(row.cost_price),

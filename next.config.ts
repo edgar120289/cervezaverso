@@ -11,6 +11,9 @@ const GA_SCRIPT = "https://www.googletagmanager.com";
 const META = "https://connect.facebook.net";
 const META_COLLECT = "https://www.facebook.com";
 const GA_COLLECT = "https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com";
+const ADS_SCRIPT = "https://www.googleadservices.com https://googleads.g.doubleclick.net";
+const ADS_COLLECT =
+  "https://www.googleadservices.com https://www.google.com https://www.google.com.mx https://pagead2.googlesyndication.com https://*.doubleclick.net";
 
 /**
  * CSP sin nonce: un nonce obligaría a renderizar cada página en cada visita
@@ -21,12 +24,12 @@ const GA_COLLECT = "https://*.google-analytics.com https://*.analytics.google.co
  */
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} ${TURNSTILE} ${GA_SCRIPT} ${META}`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""} ${TURNSTILE} ${GA_SCRIPT} ${ADS_SCRIPT} ${META}`,
   "style-src 'self' 'unsafe-inline'",
-  `img-src 'self' data: blob: ${supabaseOrigin ?? ""} ${GA_SCRIPT} https://*.google-analytics.com ${META_COLLECT}`,
+  `img-src 'self' data: blob: ${supabaseOrigin ?? ""} ${GA_SCRIPT} https://*.google-analytics.com ${ADS_COLLECT} ${META_COLLECT}`,
   "font-src 'self'",
   `media-src 'self' ${supabaseOrigin ?? ""}`,
-  `connect-src 'self' ${supabaseOrigin ?? ""} ${GA_COLLECT} ${META_COLLECT} ${META}`,
+  `connect-src 'self' ${supabaseOrigin ?? ""} ${GA_COLLECT} ${ADS_COLLECT} ${META_COLLECT} ${META}`,
   `frame-src ${TURNSTILE}`,
   "object-src 'none'",
   "base-uri 'self'",

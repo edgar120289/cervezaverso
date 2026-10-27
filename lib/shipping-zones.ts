@@ -33,6 +33,9 @@ export const MUNICIPIOS_CONURBADOS: readonly Municipio[] = [
   { nombre: "Tizayuca", estado: "Hidalgo", rangos: [[43800, 43899]] },
 ];
 
+/** Rangos de CP de «CDMX y zona metropolitana», para describir la cobertura en datos estructurados. */
+export const METRO_POSTAL_RANGES: readonly CpRange[] = [CDMX_RANGE, ...MUNICIPIOS_CONURBADOS.flatMap((m) => m.rangos)];
+
 function inRange(cp: number, [from, to]: CpRange): boolean {
   return cp >= from && cp <= to;
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ESTADOS_MX } from "@/lib/estados-mx";
+import { isValidGtin } from "@/lib/gtin";
 import { DEFAULT_MARGIN_PCT, MAX_MARGIN_PCT } from "@/lib/pricing";
 
 /**
@@ -151,6 +152,12 @@ export const productUpdateSchema = z.object({
     .regex(/^[A-Za-z0-9][A-Za-z0-9._-]{2,49}$/, "El SKU debe tener de 3 a 50 caracteres: letras, números, punto, guion o guion bajo."),
   name: trimmed(160, "Escribe el nombre de la cerveza."),
   brewery: optionalText(160),
+  gtin: z
+    .string()
+    .trim()
+    .nullish()
+    .transform((value) => value || null)
+    .refine((value) => value === null || isValidGtin(value), "El código de barras no es válido: usa 8, 12, 13 o 14 dígitos con su dígito verificador."),
   country: trimmed(80, "Escribe el país."),
   style: trimmed(120, "Escribe el estilo."),
   abv: z.number("El ABV debe ser un número.").min(0, "El ABV no puede ser negativo.").max(99.99),

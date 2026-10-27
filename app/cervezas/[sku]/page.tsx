@@ -4,8 +4,9 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Globe2, UtensilsCrossed, Wine } from "lucide-react";
 import { getProductBySku, getSimilarProducts } from "@/lib/catalog";
 import ProductGrid from "@/components/ProductGrid";
-import { calculateShippingCost, formatMXN, SHIPPING_RULE_TEXT } from "@/lib/pricing";
+import { formatMXN, SHIPPING_RULE_TEXT } from "@/lib/pricing";
 import AddToCartButton from "@/components/AddToCartButton";
+import ViewItemTracker from "@/components/ViewItemTracker";
 import HealthNotice from "@/components/HealthNotice";
 import FavoriteButton from "@/components/FavoriteButton";
 import ProductGallery from "@/components/ProductGallery";
@@ -14,7 +15,8 @@ import ShareButton from "@/components/ShareButton";
 import { SITE } from "@/lib/site";
 import { productSeoDescription } from "@/lib/product-description";
 import { countryCategoryOf } from "@/lib/seo-categories";
-import { jsonLdString } from "@/lib/structured-data";
+import { jsonLdString, shippingDetailsJsonLd } from "@/lib/structured-data";
+import { googleBrand, googleTitle } from "@/lib/merchant-feed";
 import type { StockStatus } from "@/lib/types";
 
 const SCHEMA_AVAILABILITY: Record<StockStatus, string> = {
@@ -66,12 +68,13 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: product.name,
+    name: googleTitle(product),
     sku: schemaSku,
+    ...(product.gtin && { gtin: product.gtin }),
     url: productUrl,
     ...(images.length > 0 && { image: images }),
     description: productSeoDescription(product),
-    brand: { "@type": "Brand", name: SITE.name },
+    ...(googleBrand(product) && { brand: { "@type": "Brand", name: googleBrand(product) } }),
     offers: {
       "@type": "Offer",
       url: productUrl,
@@ -79,16 +82,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
       priceCurrency: "MXN",
       availability: SCHEMA_AVAILABILITY[product.stock_status],
       itemCondition: "https://schema.org/NewCondition",
-      shippingDetails: {
-        "@type": "OfferShippingDetails",
-        shippingRate: { "@type": "MonetaryAmount", value: calculateShippingCost(product.sale_price, "nacional").toFixed(2), currency: "MXN" },
-        shippingDestination: { "@type": "DefinedRegion", addressCountry: "MX" },
-        deliveryTime: {
-          "@type": "ShippingDeliveryTime",
-          handlingTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 2, unitCode: "DAY" },
-          transitTime: { "@type": "QuantitativeValue", minValue: 3, maxValue: 6, unitCode: "DAY" },
-        },
-      },
+      shippingDetails: shippingDetailsJsonLd(product.sale_price),
       // Debe coincidir con la sección "Cambios, devoluciones y cancelaciones" de /terminos.
       hasMerchantReturnPolicy: {
         "@type": "MerchantReturnPolicy",
@@ -115,6 +109,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
 
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6">
+      <ViewItemTracker product={product} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbLd) }} />
       <Link

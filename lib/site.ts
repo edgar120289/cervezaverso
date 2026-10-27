@@ -1,7 +1,7 @@
 /** Datos globales del sitio para SEO (metadata, sitemap, robots). */
 export const SITE = {
   name: "Cervezaverso",
-  url: (process.env.NEXT_PUBLIC_SITE_URL || "https://cervezaverso.com").replace(/\/$/, ""),
+  url: (process.env.NEXT_PUBLIC_SITE_URL || "https://www.cervezaverso.com").replace(/\/$/, ""),
   /** Título por defecto: no repite la descripción. */
   title: "Cervezaverso | Tienda de Cervezas del Mundo",
   description:

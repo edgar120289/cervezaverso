@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import type { Product } from "@/lib/types";
 import { useCart } from "@/lib/cart-context";
-import { trackAddToCart } from "@/lib/meta-pixel";
+import { trackAddToCart } from "@/lib/analytics";
 
 export default function AddToCartButton({ product }: { product: Product }) {
   const { addItem, openDrawer } = useCart();
