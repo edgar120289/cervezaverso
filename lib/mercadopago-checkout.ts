@@ -10,6 +10,7 @@ export type PedidoParaPago = {
   telefono: string;
   lineas: { sku: string; nombre: string; precio_unitario: number; cantidad: number }[];
   descuento: number;
+  descuentoVolumen: number;
   costoEnvio: number;
   total: number;
 };
@@ -24,7 +25,7 @@ export async function crearPreferenciaPedido(pedido: PedidoParaPago, idempotency
 
   // Mercado Pago no admite montos negativos: con descuento, el pedido va en un solo renglón por el total.
   const items =
-    pedido.descuento > 0
+    pedido.descuento + pedido.descuentoVolumen > 0
       ? [
           {
             id: pedido.pedidoId,

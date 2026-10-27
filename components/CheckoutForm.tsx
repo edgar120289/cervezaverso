@@ -8,15 +8,17 @@ import { useCart } from "@/lib/cart-context";
 import {
   calculateOrderTotals,
   calculateShippingCost,
+  freeShippingThreshold,
   formatMXN,
-  FREE_SHIPPING_THRESHOLD,
   PAYMENT_METHODS,
   SHIPPING_METHODS,
   type PaymentMethod,
 } from "@/lib/pricing";
 import { ESTADOS_MX } from "@/lib/estados-mx";
+import { getShippingZone } from "@/lib/shipping-zones";
 import { checkoutSchema, firstIssue, isHoneypotFilled, MAX_NOTAS } from "@/lib/validation";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
+import { VolumeDiscountNotice, VolumeDiscountRow } from "@/components/VolumeDiscount";
 import Honeypot from "@/components/Honeypot";
 import Turnstile, { TURNSTILE_ENABLED } from "@/components/Turnstile";
 import FormField from "@/components/FormField";
@@ -84,8 +86,10 @@ export default function CheckoutForm({
 
   const guardada = direcciones.find((d) => d.id === seleccion);
   const direccion: DireccionEnvio = guardada ?? nueva;
-  const { discount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo);
-  const faltaParaGratis = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  // Sin código postal completo se muestra la regla de CDMX; el servidor siempre recalcula con la dirección real.
+  const zona = /^\d{5}$/.test(direccion.codigo_postal) ? getShippingZone(direccion) : "metro";
+  const { discount, volumeDiscount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo, zona);
+  const faltaParaGratis = Math.max(0, freeShippingThreshold(zona) - subtotal);
 
   if (!isHydrated || isRedirecting) {
     return <div className="h-96 animate-pulse rounded-[28px] bg-white shadow-card" />;
@@ -385,13 +389,13 @@ export default function CheckoutForm({
                     <p className="text-sm text-muted">{SHIPPING_METHODS.nacional.description}</p>
                   </div>
                 </div>
-                <ShippingPrice amount={calculateShippingCost(subtotal)} />
+                <ShippingPrice amount={calculateShippingCost(subtotal, zona)} />
               </div>
             </OptionCard>
           </div>
           {faltaParaGratis > 0 && (
             <p className="mt-3 rounded-[20px] bg-canvas px-4 py-3 text-xs text-black/60">
-              Agrega {formatMXN(faltaParaGratis)} más y tu envío nacional es gratis.
+              Te faltan {formatMXN(faltaParaGratis)} para el envío gratis.
             </p>
           )}
         </section>
@@ -463,6 +467,7 @@ export default function CheckoutForm({
         </ul>
 
         <PromoCodeField />
+        <VolumeDiscountNotice />
 
         <div className="space-y-2 border-t border-black/5 pt-4 text-sm">
           <div className="flex justify-between text-black/60">
@@ -470,6 +475,7 @@ export default function CheckoutForm({
             <span className="tabular-nums">{formatMXN(subtotal)}</span>
           </div>
           {promo && <DiscountRow code={promo.code} amount={discount} />}
+          <VolumeDiscountRow amount={volumeDiscount} />
           <div className="flex justify-between text-black/60">
             <span>Envío nacional</span>
             <span className="tabular-nums">{costoEnvio === 0 ? "Gratis" : formatMXN(costoEnvio)}</span>

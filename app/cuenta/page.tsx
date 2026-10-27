@@ -12,6 +12,7 @@ import SignOutButton from "@/components/SignOutButton";
 import LoyaltyProgress, { type Recompensa } from "@/components/LoyaltyProgress";
 import AvatarUpload from "@/components/AvatarUpload";
 import TribeSelector from "@/components/TribeSelector";
+import RewardsInfo from "@/components/RewardsInfo";
 import { toTribuId } from "@/lib/tribus";
 import type { Direccion, EstadoPedido } from "@/lib/types";
 
@@ -95,10 +96,14 @@ export default async function CuentaPage() {
           recompensas={recompensas}
           nivelesSecretos={perfilRes.data?.niveles_secretos ?? false}
         />
+        <RewardsInfo />
       </section>
 
       <section aria-labelledby="mi-tribu" className="space-y-4">
         <SectionHeading id="mi-tribu" icon={<Users size={20} />} title="¿De qué Team eres?" count={0} />
+        <p className="text-sm text-muted">
+          Selecciona de qué team eres para que conozcamos un poco más sobre tus gustos personales.
+        </p>
         <AvatarUpload userId={user.id} current={perfilRes.data?.avatar_url ?? null} />
         <TribeSelector current={tribuActual} />
       </section>

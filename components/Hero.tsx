@@ -4,12 +4,10 @@ import type { Product } from "@/lib/types";
 import HeroCarousel from "./HeroCarousel";
 import HeroVideo from "./HeroVideo";
 
-const SR_TITLE = "Cervezaverso, tienda de cerveza artesanal e importada";
-
 /** Portada configurable desde /admin/landing: todo sale de `store_settings.landing_settings`, sin textos ni video propios. */
 export default function Hero({ settings, products }: { settings: HeroSettings; products: Record<string, Product> }) {
-  // Apagado, la página conserva su H1 para lectores de pantalla y buscadores.
-  if (!settings.is_hero_active) return <h1 className="sr-only">{SR_TITLE}</h1>;
+  // El H1 de la portada vive en FeaturedShop; el Hero apagado no pinta nada.
+  if (!settings.is_hero_active) return null;
 
   if (settings.hero_type === "carousel" && settings.hero_banners.length > 0) {
     return (
@@ -29,7 +27,7 @@ export default function Hero({ settings, products }: { settings: HeroSettings; p
     settings.hero_video_ctas.length === 0 &&
     !spotlightRef(style);
   // Activo pero sin nada configurado: no se pinta una caja vacía.
-  if (isEmpty) return <h1 className="sr-only">{SR_TITLE}</h1>;
+  if (isEmpty) return null;
 
   const ref = spotlightRef(style);
   return (

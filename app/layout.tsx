@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart-context";
 import { AccountProvider } from "@/lib/account-context";
+import AnnouncementBar from "@/components/AnnouncementBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
@@ -73,6 +74,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 logoImages={capasCirculares}
                 logoFrame={`/${MEDIA_DIRS.marcoCircular}`}
               />
+              <AnnouncementBar />
               <Header logoImages={tarros} />
               <main
                 id="contenido"

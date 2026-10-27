@@ -57,7 +57,7 @@ export async function notificarEstadoPedido(pedidoId: string, estado: string): P
   if (!esEstadoConCorreo(estado)) return;
   const { data, error } = await createAdminClient()
     .from("pedidos")
-    .select("id, cliente_nombre, cliente_email, total")
+    .select("*")
     .eq("id", pedidoId)
     .maybeSingle();
   if (error || !data) {
@@ -68,6 +68,7 @@ export async function notificarEstadoPedido(pedidoId: string, estado: string): P
     nombre: data.cliente_nombre,
     folio: folio(data.id),
     total: formatMXN(Number(data.total)),
+    descuentoVolumen: Number(data.descuento_volumen ?? 0) > 0 ? formatMXN(Number(data.descuento_volumen)) : undefined,
     pedidoUrl: `${SITE.url}/pedido/${data.id}`,
   });
   await sendEmail({ to: data.cliente_email, ...mensaje });

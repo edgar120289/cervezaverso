@@ -14,6 +14,8 @@ const SOCIAL_LINKS = [
 const FOOTER_LINKS = [
   { href: "/", label: "Inicio" },
   { href: "/tienda", label: "Tienda" },
+  { href: "/envios", label: "Envíos y pagos" },
+  { href: "/faq", label: "Preguntas Frecuentes" },
   { href: "/contacto", label: "Contacto" },
   { href: "/terminos", label: "Términos y condiciones" },
   { href: "/privacidad", label: "Aviso de privacidad" },
