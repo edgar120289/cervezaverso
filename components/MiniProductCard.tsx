@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { formatMXN } from "@/lib/pricing";
 import { useCart } from "@/lib/cart-context";
-import { trackAddToCart } from "@/lib/meta-pixel";
+import { trackAddToCart } from "@/lib/analytics";
 import ProductImage from "./ProductImage";
 
 /** Tarjeta compacta para las recomendaciones de Graciela: miniatura, nombre, estilo y precio. */

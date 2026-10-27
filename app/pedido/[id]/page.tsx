@@ -70,7 +70,13 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
               order={{
                 id: pedido.id,
                 total: Number(pedido.total),
-                items: pedido.pedido_items.map((item) => ({ sku: item.sku, cantidad: item.cantidad })),
+                shipping: Number(pedido.costo_envio),
+                items: pedido.pedido_items.map((item) => ({
+                  sku: item.sku,
+                  nombre: item.nombre,
+                  precio: Number(item.precio_unitario),
+                  cantidad: item.cantidad,
+                })),
               }}
             />
           )}

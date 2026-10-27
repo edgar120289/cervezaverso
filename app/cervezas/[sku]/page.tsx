@@ -6,6 +6,7 @@ import { getProductBySku, getSimilarProducts } from "@/lib/catalog";
 import ProductGrid from "@/components/ProductGrid";
 import { calculateShippingCost, formatMXN, SHIPPING_RULE_TEXT } from "@/lib/pricing";
 import AddToCartButton from "@/components/AddToCartButton";
+import ViewItemTracker from "@/components/ViewItemTracker";
 import HealthNotice from "@/components/HealthNotice";
 import FavoriteButton from "@/components/FavoriteButton";
 import ProductGallery from "@/components/ProductGallery";
@@ -115,6 +116,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
 
   return (
     <div className="mx-auto max-w-6xl px-4 pt-6">
+      <ViewItemTracker product={product} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(breadcrumbLd) }} />
       <Link
