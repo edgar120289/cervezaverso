@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
   : undefined;
-const supabaseHostname = supabaseOrigin ? new URL(supabaseOrigin).hostname : undefined;
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -51,12 +50,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
-  images: {
-    qualities: [75, 100],
-    remotePatterns: supabaseHostname
-      ? [{ protocol: "https", hostname: supabaseHostname, pathname: "/storage/v1/object/**" }]
-      : [],
-  },
+  // Sin optimización de Vercel: la cuenta gratuita agotó sus transformaciones. Las imágenes se sirven
+  // tal cual (los productos ya se suben en WebP) y ninguna pasa por /_next/image.
+  images: { unoptimized: true },
   headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
