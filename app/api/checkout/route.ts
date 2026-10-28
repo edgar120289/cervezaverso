@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { registrarPedido, liberarPromo } from "@/lib/checkout-server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { crearPreferenciaPedido } from "@/lib/mercadopago-checkout";
+import { notificarAdminPedido } from "@/lib/lealtad-server";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,7 @@ export async function POST(request: Request) {
 
   // Transferencia: no hay pasarela; el pedido queda Pendiente hasta que el administrador confirme el depósito.
   if (pedido.metodoPago === "transferencia") {
+    await notificarAdminPedido(pedido.pedidoId, "transferencia");
     return NextResponse.json({ pedidoId: pedido.pedidoId, redirectUrl: `/pedido/${pedido.pedidoId}?pago=transferencia` });
   }
 

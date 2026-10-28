@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { mpPayment } from "@/lib/mercadopago";
 import { isValidMercadoPagoSignature } from "@/lib/mercadopago-signature";
 import { sendMetaPurchase } from "@/lib/meta-capi";
-import { notificarEstadoPedido, procesarPedidoPagado } from "@/lib/lealtad-server";
+import { notificarAdminPedido, notificarEstadoPedido, procesarPedidoPagado } from "@/lib/lealtad-server";
 
 export const dynamic = "force-dynamic";
 
@@ -73,6 +73,7 @@ export async function POST(request: Request) {
       if (actualizado?.length) {
         await procesarPedidoPagado(pedido.id);
         await notificarEstadoPedido(pedido.id, "Pagado");
+        await notificarAdminPedido(pedido.id, "pagado");
         await sendMetaPurchase({
           orderId: pedido.id,
           total: Number(pedido.total),
@@ -83,12 +84,14 @@ export async function POST(request: Request) {
     } else if (ESTADOS_COBRADOS.includes(pedido.estado)) {
       if (pedido.mp_payment_id && pedido.mp_payment_id !== dataId) {
         console.error("[mp-webhook] Segundo pago aprobado para un pedido ya cobrado:", pedido.id, dataId);
+        await notificarAdminPedido(pedido.id, "pago_duplicado", dataId);
       } else {
         // Reintento tras un fallo a medias: la acreditación de botellas es idempotente.
         await procesarPedidoPagado(pedido.id);
       }
     } else {
       console.error("[mp-webhook] Pago aprobado de un pedido cancelado; requiere reembolso manual:", pedido.id, dataId);
+      await notificarAdminPedido(pedido.id, "pagado_cancelado", dataId);
     }
     return NextResponse.json({ ok: true });
   } catch (err) {
