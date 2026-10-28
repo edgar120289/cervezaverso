@@ -40,14 +40,13 @@ function inRange(cp: number, [from, to]: CpRange): boolean {
   return cp >= from && cp <= to;
 }
 
-/** `metro` = CDMX y zona metropolitana; `nacional` = resto del país (o dirección incompleta). */
-export function getShippingZone(address: { estado: string; codigo_postal: string } | null | undefined): ShippingZone {
-  if (!address) return "nacional";
+/**
+ * `metro` = CP dentro de CDMX o de los municipios conurbados; `nacional` = todo lo demás (o CP inválido).
+ * La zona sale SOLO del código postal: el estado que escriba el cliente no cuenta (el esquema de
+ * dirección ya rechaza un CP que no corresponde al estado).
+ */
+export function getShippingZone(address: { codigo_postal: string } | null | undefined): ShippingZone {
+  if (!address || !/^\d{5}$/.test(address.codigo_postal)) return "nacional";
   const cp = Number(address.codigo_postal);
-  if (!Number.isInteger(cp)) return "nacional";
-  if (address.estado === "Ciudad de México" || inRange(cp, CDMX_RANGE)) return "metro";
-  const conurbado = MUNICIPIOS_CONURBADOS.some(
-    (m) => m.estado === address.estado && m.rangos.some((range) => inRange(cp, range)),
-  );
-  return conurbado ? "metro" : "nacional";
+  return METRO_POSTAL_RANGES.some((range) => inRange(cp, range)) ? "metro" : "nacional";
 }
