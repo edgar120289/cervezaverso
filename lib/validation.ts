@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ESTADOS_MX } from "@/lib/estados-mx";
 import { isValidGtin } from "@/lib/gtin";
+import { codigoPostalCorrespondeAEstado } from "@/lib/postal-estados";
 import { DEFAULT_MARGIN_PCT, MAX_MARGIN_PCT } from "@/lib/pricing";
 
 /**
@@ -79,25 +80,31 @@ export const recoverSchema = z.object({
 
 const trimmed = (max: number, message: string) => z.string().trim().min(1, message).max(max);
 
-const direccionSchema = z.object({
-  nombre_completo: trimmed(120, "Escribe el nombre de quien recibe."),
-  telefono: z
-    .string()
-    .trim()
-    .transform((value) => value.replace(/[^\d+]/g, ""))
-    .pipe(z.string().regex(/^\+?\d{10,13}$/, "Escribe un teléfono de 10 dígitos.")),
-  calle: trimmed(160, "Escribe la calle y el número."),
-  colonia: trimmed(120, "Escribe la colonia."),
-  ciudad: trimmed(120, "Escribe la ciudad o alcaldía."),
-  estado: z.enum(ESTADOS_MX, "Elige un estado."),
-  codigo_postal: z.string().trim().regex(/^\d{5}$/, "El código postal debe tener 5 dígitos."),
-  referencias: z
-    .string()
-    .trim()
-    .max(300)
-    .optional()
-    .transform((value) => value || null),
-});
+export const direccionSchema = z
+  .object({
+    nombre_completo: trimmed(120, "Escribe el nombre de quien recibe."),
+    telefono: z
+      .string()
+      .trim()
+      .transform((value) => value.replace(/[^\d+]/g, ""))
+      .pipe(z.string().regex(/^\+?\d{10,13}$/, "Escribe un teléfono de 10 dígitos.")),
+    calle: trimmed(160, "Escribe la calle y el número."),
+    colonia: trimmed(120, "Escribe la colonia."),
+    ciudad: trimmed(120, "Escribe la ciudad o alcaldía."),
+    estado: z.enum(ESTADOS_MX, "Elige un estado."),
+    codigo_postal: z.string().trim().regex(/^\d{5}$/, "El código postal debe tener 5 dígitos."),
+    referencias: z
+      .string()
+      .trim()
+      .max(300)
+      .optional()
+      .transform((value) => value || null),
+  })
+  .superRefine((direccion, ctx) => {
+    if (!codigoPostalCorrespondeAEstado(direccion.codigo_postal, direccion.estado)) {
+      ctx.addIssue({ code: "custom", path: ["codigo_postal"], message: "El código postal no corresponde al estado seleccionado." });
+    }
+  });
 
 /** Códigos de promoción: se guardan en mayúsculas (A-Z, 0-9, guion y guion bajo). */
 export const promoCodeSchema = z
