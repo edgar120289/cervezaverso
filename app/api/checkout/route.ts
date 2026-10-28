@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { registrarPedido, liberarPromo } from "@/lib/checkout-server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { crearPreferenciaPedido } from "@/lib/mercadopago-checkout";
+import { crearPreferenciaPedido, guardarPreferencia } from "@/lib/mercadopago-checkout";
 import { notificarAdminPedido } from "@/lib/lealtad-server";
 
 export const dynamic = "force-dynamic";
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   const admin = createAdminClient();
   try {
     const preference = await crearPreferenciaPedido(pedido, pedido.pedidoId);
-    await admin.from("pedidos").update({ mp_preference_id: preference.id }).eq("id", pedido.pedidoId);
+    await guardarPreferencia(admin, pedido.pedidoId, preference);
     return NextResponse.json({ pedidoId: pedido.pedidoId, initPoint: preference.initPoint });
   } catch (err) {
     console.error("[checkout] Error al crear la preferencia de Mercado Pago:", err);

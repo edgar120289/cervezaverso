@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getClientIp } from "@/lib/security/form-guard";
 import { isWithinRateLimit } from "@/lib/security/rate-limit";
-import { crearPreferenciaPedido } from "@/lib/mercadopago-checkout";
+import { crearPreferenciaPedido, guardarPreferencia } from "@/lib/mercadopago-checkout";
 
 export type ReintentoResult = { ok: true; initPoint: string } | { ok: false; error: string };
 
@@ -79,7 +79,7 @@ export async function reintentarPago(pedidoId: string): Promise<ReintentoResult>
       },
       randomUUID()
     );
-    await admin.from("pedidos").update({ mp_preference_id: preference.id }).eq("id", pedido.id).eq("estado", "Pendiente");
+    await guardarPreferencia(admin, pedido.id, preference);
     return { ok: true, initPoint: preference.initPoint };
   } catch (err) {
     console.error("[pago] Error al crear la preferencia de reintento:", err);
