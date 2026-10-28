@@ -11,6 +11,7 @@ import {
   type MonasterioRow,
 } from "@/lib/monasterio";
 import type { StockStatus } from "@/lib/types";
+import type { CatalogFormat } from "@/lib/catalog-plan";
 
 /**
  * Lectura del archivo de carga masiva (.xlsx o .csv).
@@ -42,7 +43,7 @@ const HEADER_ALIASES: Record<string, Field> = {
 
 const LOW_STOCK_MAX_UNITS = 5;
 
-export type CatalogParseResult = { rows: MonasterioRow[]; skipped: number; errors: string[] };
+export type CatalogParseResult = { rows: MonasterioRow[]; skipped: number; errors: string[]; format: CatalogFormat };
 
 function normalizeHeader(value: string): string {
   return value
@@ -227,7 +228,7 @@ function parseTable(table: string[][]): CatalogParseResult {
     });
   }
 
-  return { rows, skipped, errors };
+  return { rows, skipped, errors, format: "plantilla" };
 }
 
 /** Lee un .xlsx o .csv subido desde el panel. */
@@ -241,7 +242,7 @@ export async function parseCatalogFile(file: File): Promise<CatalogParseResult> 
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.load(data);
   if (workbook.getWorksheet(SHEET_NAME)) {
-    return { ...(await parseMonasterio(data)), errors: [] };
+    return { ...(await parseMonasterio(data)), errors: [], format: "monasterio" };
   }
   return parseTable(await xlsxToTable(data));
 }

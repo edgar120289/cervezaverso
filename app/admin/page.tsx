@@ -8,7 +8,7 @@ export default async function AdminInventarioPage() {
   // Se cargan todos y la búsqueda, el filtro y el orden se resuelven en el cliente (respuesta inmediata).
   const { data, error } = await supabase
     .from("products")
-    .select("id, sku, name, brewery, country, style, abv, cost_price, sale_price, stock_status, image_url, is_active, is_featured, created_at")
+    .select("id, sku, name, brewery, country, style, abv, cost_price, sale_price, stock_status, image_url, is_active, is_featured, created_at, retirado, pendiente, notas_perfil")
     .order("name", { ascending: true });
   const products = (data ?? []) as AdminProductRow[];
 

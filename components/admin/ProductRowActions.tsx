@@ -3,13 +3,15 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2, Pencil, Trash2 } from "lucide-react";
-import { cambiarActivoProducto, eliminarProducto } from "@/app/actions/admin-productos";
+import { Archive, ArchiveRestore, Eye, EyeOff, Loader2, Pencil, Trash2 } from "lucide-react";
+import { cambiarActivoProducto, cambiarRetiradoProducto, eliminarProducto } from "@/app/actions/admin-productos";
 
 type ProductRowActionsProps = {
   id: string;
   name: string;
   isActive: boolean;
+  /** Retirada: la carga masiva no la reactiva. */
+  isRetired: boolean;
   /**
    * `card` reparte los botones a todo el ancho de la tarjeta;
    * `header` omite "Editar" (ya se está en la edición) y manda a /admin tras borrar.
@@ -18,7 +20,7 @@ type ProductRowActionsProps = {
 };
 
 /** Editar, activar/desactivar (ocultar sin borrar) y borrar: todo a un toque. */
-export default function ProductRowActions({ id, name, isActive, layout }: ProductRowActionsProps) {
+export default function ProductRowActions({ id, name, isActive, isRetired, layout }: ProductRowActionsProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +36,11 @@ export default function ProductRowActions({ id, name, isActive, layout }: Produc
 
   function handleToggle() {
     run(() => cambiarActivoProducto(id, !isActive));
+  }
+
+  function handleRetire() {
+    if (!isRetired && !window.confirm(`¿Retirar “${name}” del catálogo? Queda oculta y la carga masiva ya no la vuelve a activar.`)) return;
+    run(() => cambiarRetiradoProducto(id, !isRetired));
   }
 
   function handleDelete() {
@@ -73,6 +80,18 @@ export default function ProductRowActions({ id, name, isActive, layout }: Produc
         >
           {isPending ? <Loader2 size={14} className="animate-spin" aria-hidden /> : isActive ? <EyeOff size={14} aria-hidden /> : <Eye size={14} aria-hidden />}
           {toggleLabel}
+        </button>
+        <button
+          type="button"
+          onClick={handleRetire}
+          disabled={isPending}
+          aria-pressed={isRetired}
+          aria-label={isRetired ? `Quitar el retiro de ${name}` : `Retirar ${name}`}
+          title={isRetired ? "Quitar retiro" : "Retirar"}
+          className={`${base} ${grow} ${isRetired ? "bg-red-900 text-white hover:brightness-110" : "bg-canvas hover:bg-black hover:text-white"}`}
+        >
+          {isRetired ? <ArchiveRestore size={14} aria-hidden /> : <Archive size={14} aria-hidden />}
+          {isRetired ? "Quitar retiro" : "Retirar"}
         </button>
         <button
           type="button"

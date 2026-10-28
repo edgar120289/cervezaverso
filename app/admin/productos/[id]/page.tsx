@@ -29,7 +29,13 @@ export default async function EditProductPage({ params }: PageProps<"/admin/prod
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <BackButton fallbackHref="/admin">Volver a productos</BackButton>
-        <ProductRowActions id={product.id} name={product.name} isActive={data.is_active !== false} layout="header" />
+        <ProductRowActions
+          id={product.id}
+          name={product.name}
+          isActive={data.is_active !== false}
+          isRetired={data.retirado === true}
+          layout="header"
+        />
       </div>
       <ProductEditForm
         product={product}

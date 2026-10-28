@@ -98,7 +98,10 @@ export async function actualizarGaleriaProducto(id: string, urls: string[]): Pro
   return { ok: true };
 }
 
-/** Oculta o muestra una cerveza en la tienda sin borrar sus datos (RLS filtra los inactivos). */
+/**
+ * Oculta o muestra una cerveza en la tienda sin borrar sus datos (RLS filtra los inactivos).
+ * Activarla a mano también la saca de «Pendientes» y de «Retiradas»: es una decisión del admin.
+ */
 export async function cambiarActivoProducto(id: string, isActive: boolean): Promise<AdminActionResult> {
   const parsed = z.object({ id: productIdSchema, isActive: z.boolean() }).safeParse({ id, isActive });
   if (!parsed.success) return { ok: false, error: "Solicitud inválida." };
@@ -106,7 +109,28 @@ export async function cambiarActivoProducto(id: string, isActive: boolean): Prom
   const supabase = await requireAdmin();
   const { data, error } = await supabase
     .from("products")
-    .update({ is_active: parsed.data.isActive })
+    .update(parsed.data.isActive ? { is_active: true, pendiente: false, retirado: false } : { is_active: false })
+    .eq("id", parsed.data.id)
+    .select("id");
+  if (error) return { ok: false, error: error.message };
+  if (!data?.length) return { ok: false, error: "No se pudo actualizar: el producto no existe o no tienes permiso." };
+
+  refresh();
+  return { ok: true };
+}
+
+/**
+ * Retira una cerveza del catálogo a propósito: queda inactiva y la carga masiva ya no la
+ * reactiva ni le cambia precio o datos. Quitar el retiro la deja inactiva; se activa a mano.
+ */
+export async function cambiarRetiradoProducto(id: string, retirado: boolean): Promise<AdminActionResult> {
+  const parsed = z.object({ id: productIdSchema, retirado: z.boolean() }).safeParse({ id, retirado });
+  if (!parsed.success) return { ok: false, error: "Solicitud inválida." };
+
+  const supabase = await requireAdmin();
+  const { data, error } = await supabase
+    .from("products")
+    .update(parsed.data.retirado ? { retirado: true, is_active: false, pendiente: false } : { retirado: false })
     .eq("id", parsed.data.id)
     .select("id");
   if (error) return { ok: false, error: error.message };

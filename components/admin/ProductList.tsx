@@ -34,16 +34,27 @@ export type AdminProductRow = {
   is_active: boolean;
   is_featured: boolean;
   created_at: string;
+  retirado: boolean;
+  pendiente: boolean;
+  notas_perfil: string | null;
 };
 
 const STATUS_OPTIONS: { id: StatusFilter; label: string }[] = [
   { id: "all", label: "Todas" },
   { id: "active", label: "Solo activas" },
   { id: "inactive", label: "Solo inactivas" },
+  { id: "pending", label: "Pendientes" },
+  { id: "retired", label: "Retiradas" },
 ];
 
 /** El interruptor rápido recorre los tres estados: todas → solo activas → solo inactivas → todas. */
-const NEXT_STATUS: Record<StatusFilter, StatusFilter> = { all: "active", active: "inactive", inactive: "all" };
+const NEXT_STATUS: Record<StatusFilter, StatusFilter> = {
+  all: "active",
+  active: "inactive",
+  inactive: "all",
+  pending: "all",
+  retired: "all",
+};
 
 const TOGGLE_CLASS =
   "flex h-12 min-w-0 flex-1 basis-[calc(50%-0.5rem)] items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold shadow-card transition-colors lg:w-40 lg:flex-none lg:basis-auto";
@@ -81,12 +92,27 @@ const COMPARATORS: Record<SortId, (a: AdminProductRow, b: AdminProductRow) => nu
   newest: (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at) || byName(a, b),
 };
 
-function InactiveBadge() {
+function StatusBadge({ product }: { product: AdminProductRow }) {
+  if (product.is_active) return null;
+  const [label, tone] = product.retirado
+    ? ["Retirada", "bg-red-900 text-white"]
+    : product.pendiente
+      ? ["Pendiente", "bg-amber-400 text-black"]
+      : ["Inactiva", "bg-black/10 text-black/70"];
   return (
-    <span className="ml-2 inline-block rounded-full bg-black/10 px-2 py-0.5 align-middle text-[11px] font-semibold text-black/70">
-      Inactiva
+    <span className={`ml-2 inline-block rounded-full px-2 py-0.5 align-middle text-[11px] font-semibold ${tone}`}>
+      {label}
     </span>
   );
+}
+
+/** Lo que le falta a una pendiente antes de publicarla. */
+function missingForPending(product: AdminProductRow): string[] {
+  const missing: string[] = [];
+  if (!product.image_url) missing.push("foto");
+  if (!product.brewery?.trim()) missing.push("cervecería");
+  if (!product.notas_perfil?.trim()) missing.push("notas de cata");
+  return missing;
 }
 
 /** Inventario: búsqueda en tiempo real (nombre o SKU), orden y «Filtros avanzados» (estado, precio, ABV, país y cervecería). */
@@ -117,6 +143,8 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
       .filter((product) => {
         if (status === "active" && !product.is_active) return false;
         if (status === "inactive" && product.is_active) return false;
+        if (status === "pending" && !(product.pendiente && !product.is_active)) return false;
+        if (status === "retired" && !product.retirado) return false;
         if (featuredOnly && !product.is_featured) return false;
         if (!matchesFilters(product, filters)) return false;
         const haystack = normalize(`${product.name} ${product.sku}`);
@@ -290,7 +318,7 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold leading-snug">
                       {product.name}
-                      {!product.is_active && <InactiveBadge />}
+                      <StatusBadge product={product} />
                     </p>
                     <p className="truncate text-xs text-muted">
                       {product.country} · {product.style}
@@ -298,6 +326,9 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
                     <p className="truncate text-xs text-muted">
                       {product.sku} · {STOCK_STATUS_LABEL[product.stock_status]}
                     </p>
+                    {product.pendiente && !product.is_active && missingForPending(product).length > 0 && (
+                      <p className="text-xs font-semibold text-amber-700">Falta: {missingForPending(product).join(", ")}</p>
+                    )}
                   </div>
                 </div>
                 <FeaturedToggle id={product.id} name={product.name} isFeatured={product.is_featured} />
@@ -308,7 +339,13 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
                 </span>
                 <span className="font-semibold tabular-nums">{formatMXN(Number(product.sale_price))}</span>
               </div>
-              <ProductRowActions id={product.id} name={product.name} isActive={product.is_active} layout="card" />
+              <ProductRowActions
+                id={product.id}
+                name={product.name}
+                isActive={product.is_active}
+                isRetired={product.retirado}
+                layout="card"
+              />
             </li>
           ))}
         </ul>

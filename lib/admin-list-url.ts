@@ -1,6 +1,6 @@
 import { ABV_RANGES, EMPTY_FILTERS, type CatalogFilters } from "@/lib/catalog-filters";
 
-export const STATUS_IDS = ["all", "active", "inactive"] as const;
+export const STATUS_IDS = ["all", "active", "inactive", "pending", "retired"] as const;
 export const SORT_IDS = [
   "name-asc",
   "name-desc",

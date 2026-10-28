@@ -4,11 +4,11 @@ import { calculateSalePrice } from "@/lib/pricing";
 import type { StockStatus } from "@/lib/types";
 
 /**
- * Ingesta de la lista "LISTA MONASTERIO" (MASTER PROMPT V2 · Bloque 2.2).
- * Lo usan tanto la API del panel (`/api/admin/import`) como el script de
- * consola (`scripts/import-monasterio.ts`), así la regla de precio vive en un
- * solo lugar: `calculateSalePrice` → Math.floor((costo / 0.65) / 5) * 5
- * (o el margen personalizado del producto, si el admin lo cambió).
+ * Lectura de la lista "LISTA MONASTERIO" (MASTER PROMPT V2 · Bloque 2.2).
+ * Lo usan la API del panel (`/api/admin/import`) y el script de consola
+ * (`scripts/import-monasterio.ts`); qué se escribe en la base lo decide
+ * `lib/catalog-plan.ts`. Regla de precio en un solo lugar: `calculateSalePrice`
+ * → Math.floor((costo / 0.65) / 5) * 5 (o el margen personalizado del producto).
  */
 
 export const SHEET_NAME = "LISTA MONASTERIO";
@@ -51,13 +51,6 @@ export type MonasterioRow = {
   sale_price: number;
   stock_status: StockStatus;
   is_active: boolean;
-};
-
-export type ImportResult = {
-  inserted: number;
-  updated: number;
-  skipped: number;
-  errors: string[];
 };
 
 export class MonasterioFormatError extends Error {}
@@ -237,49 +230,4 @@ export async function findExistingProduct(
     .limit(1);
   if (byName.error) throw byName.error;
   return byName.data?.[0] ?? null;
-}
-
-/**
- * Inserta o actualiza cada fila en `products` (UPSERT por sku, o por nombre + volumen).
- * Al actualizar solo se escriben los campos de la lista (precio, disponibilidad y activo,
- * estilo, país, ABV, volumen): descripciones, fichas del Sommelier, imagen,
- * insignias y margen personalizado quedan intactos. Requiere un cliente con service_role.
- */
-export async function upsertMonasterio(
-  admin: SupabaseClient,
-  rows: MonasterioRow[],
-  skipped = 0
-): Promise<ImportResult> {
-  const result: ImportResult = { inserted: 0, updated: 0, skipped, errors: [] };
-
-  for (const { rowNumber, ...payload } of rows) {
-    try {
-      const existing = await findExistingProduct(admin, payload);
-
-      if (existing) {
-        // El sku del producto existente no cambia; el margen personalizado se respeta.
-        const { sku: _sku, ...fields } = payload;
-        void _sku;
-        const margin = Number(existing.margin_pct);
-        const update = Number.isFinite(margin)
-          ? { ...fields, sale_price: calculateSalePrice(payload.cost_price, margin) }
-          : fields;
-        const { error } = await admin.from("products").update(update).eq("id", existing.id);
-        if (error) throw error;
-        result.updated++;
-      } else {
-        // `payload.sku` es solo la clave heredada para encontrar duplicados; el SKU nuevo se genera al insertar.
-        const { sku: _legacySku, ...fields } = payload;
-        void _legacySku;
-        const error = await insertNewProduct(admin, fields);
-        if (error) throw error;
-        result.inserted++;
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : (err as { message?: string })?.message;
-      result.errors.push(`Fila ${rowNumber} (${payload.name}): ${message ?? "error desconocido"}`);
-    }
-  }
-
-  return result;
 }
