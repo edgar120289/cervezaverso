@@ -101,3 +101,87 @@ export function estadoPedidoEmail(estado: EstadoConCorreo, { nombre, folio, tota
   const text = `Hola ${nombre}, ${copy.message}\nPedido #${folio}${descuentoTexto} · Total: ${total}\nVer pedido: ${pedidoUrl}\n\n${HEALTH_NOTICE}`;
   return { subject, html, text };
 }
+
+/** Por qué se avisa al dueño de un pedido. */
+export type MotivoAvisoAdmin = "pagado" | "transferencia" | "pagado_cancelado" | "pago_duplicado";
+
+const AVISO_ADMIN: Record<MotivoAvisoAdmin, { subject: string; title: string; message: string; alerta: boolean }> = {
+  pagado: {
+    subject: "Nuevo pedido pagado",
+    title: "Nuevo pedido pagado",
+    message: "Mercado Pago confirmó el pago. Prepáralo para entregar a tiempo.",
+    alerta: false,
+  },
+  transferencia: {
+    subject: "Nuevo pedido por transferencia",
+    title: "Pedido por transferencia",
+    message: "El cliente pagará por transferencia. Cuando veas el depósito, márcalo como Pagado en el panel.",
+    alerta: false,
+  },
+  pagado_cancelado: {
+    subject: "ATENCIÓN: pago de un pedido cancelado",
+    title: "Cobro de un pedido cancelado",
+    message: "Mercado Pago aprobó un pago de este pedido, pero está Cancelado. Reactívalo y entrégalo, o reembolsa el pago desde Mercado Pago.",
+    alerta: true,
+  },
+  pago_duplicado: {
+    subject: "ATENCIÓN: segundo pago de un pedido",
+    title: "Segundo pago del mismo pedido",
+    message: "Mercado Pago aprobó otro pago de un pedido que ya estaba cobrado. Revisa en Mercado Pago y reembolsa el duplicado.",
+    alerta: true,
+  },
+};
+
+export type AvisoAdminInput = {
+  folio: string;
+  cliente: string;
+  email: string;
+  telefono: string;
+  total: string;
+  metodoPago: string;
+  envio: string;
+  direccion: string;
+  lineas: string[];
+  adminUrl: string;
+  /** Id del pago en Mercado Pago, en los avisos de anomalías. */
+  pagoId?: string;
+};
+
+/** Aviso interno al dueño de la tienda: pedido nuevo o anomalía de cobro. */
+export function avisoPedidoAdminEmail(motivo: MotivoAvisoAdmin, data: AvisoAdminInput) {
+  const copy = AVISO_ADMIN[motivo];
+  const subject = `${copy.subject} · #${data.folio} · ${data.total}`;
+  const filas: [string, string][] = [
+    ["Pedido", `#${data.folio}`],
+    ["Cliente", data.cliente],
+    ["Correo", data.email],
+    ["Teléfono", data.telefono],
+    ["Total", data.total],
+    ["Pago", data.metodoPago],
+    ["Envío", data.envio],
+    ["Dirección", data.direccion],
+    ...(data.pagoId ? ([["Pago de Mercado Pago", data.pagoId]] as [string, string][]) : []),
+  ];
+  const html = emailLayout({
+    title: copy.title,
+    bodyHtml: `
+      <p style="margin:0 0 16px;font-size:16px;line-height:1.6;${copy.alerta ? "color:#b42318;font-weight:600;" : ""}">${esc(copy.message)}</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin:0 0 16px;font-size:14px;line-height:1.6;">
+        ${filas.map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;color:${MUTED};vertical-align:top;white-space:nowrap;">${esc(k)}</td><td style="padding:4px 0;">${esc(v)}</td></tr>`).join("")}
+      </table>
+      <p style="margin:0 0 8px;font-size:14px;color:${MUTED};">Cervezas</p>
+      <p style="margin:0 0 24px;padding:16px;border-radius:20px;background:${CANVAS};font-size:14px;line-height:1.8;">${data.lineas.map(esc).join("<br>")}</p>
+      <a href="${esc(data.adminUrl)}" style="display:inline-block;padding:14px 28px;border-radius:9999px;background:${ACCENT};color:#fff;font-weight:600;text-decoration:none;">Abrir en el panel</a>`,
+  });
+  const text = [
+    copy.message,
+    "",
+    ...filas.map(([k, v]) => `${k}: ${v}`),
+    "",
+    "Cervezas:",
+    ...data.lineas,
+    "",
+    `Panel: ${data.adminUrl}`,
+  ].join("\n");
+  return { subject, html, text };
+}

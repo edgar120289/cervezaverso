@@ -2,10 +2,18 @@ import "server-only";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email/resend";
-import { esEstadoConCorreo, estadoPedidoEmail, premioDesbloqueadoEmail } from "@/lib/email/templates";
-import { formatMXN } from "@/lib/pricing";
-import { folio } from "@/lib/pedidos";
-import { SITE } from "@/lib/site";
+import {
+  avisoPedidoAdminEmail,
+  esEstadoConCorreo,
+  estadoPedidoEmail,
+  premioDesbloqueadoEmail,
+  type MotivoAvisoAdmin,
+} from "@/lib/email/templates";
+import { formatMXN, PAYMENT_METHODS, type PaymentMethod } from "@/lib/pricing";
+import { folio, PEDIDO_DETALLE_COLUMNS } from "@/lib/pedidos";
+import { getShippingZone } from "@/lib/shipping-zones";
+import { CONTACT, SITE } from "@/lib/site";
+import type { PedidoDetalle } from "@/lib/types";
 
 const resultadoSchema = z.object({
   status: z.enum(["acreditado", "ya_acreditado", "no_pagado", "no_encontrado", "sin_cuenta"]),
@@ -72,4 +80,44 @@ export async function notificarEstadoPedido(pedidoId: string, estado: string): P
     pedidoUrl: `${SITE.url}/pedido/${data.id}`,
   });
   await sendEmail({ to: data.cliente_email, ...mensaje });
+}
+
+/**
+ * Avisa al dueño (CONTACT.email) de un pedido que necesita su atención: pagado, por transferencia,
+ * o una anomalía de cobro. Nunca lanza: un aviso caído no debe romper el webhook ni el checkout.
+ */
+export async function notificarAdminPedido(pedidoId: string, motivo: MotivoAvisoAdmin, pagoId?: string): Promise<void> {
+  try {
+    const { data, error } = await createAdminClient()
+      .from("pedidos")
+      .select(PEDIDO_DETALLE_COLUMNS)
+      .eq("id", pedidoId)
+      .maybeSingle();
+    if (error || !data) {
+      console.error("[aviso-admin] No se pudo leer el pedido:", error?.message ?? "sin datos");
+      return;
+    }
+    const pedido = data as unknown as PedidoDetalle & { metodo_pago?: PaymentMethod | null };
+    const d = pedido.direccion;
+    const zona = getShippingZone(d) === "metro" ? "CDMX y zona metropolitana (24 a 48 h)" : "Resto del país (3 a 6 días hábiles)";
+    const costoEnvio = Number(pedido.costo_envio ?? 0);
+    const mensaje = avisoPedidoAdminEmail(motivo, {
+      folio: folio(pedido.id),
+      cliente: pedido.cliente_nombre,
+      email: pedido.cliente_email,
+      telefono: pedido.cliente_telefono ?? "",
+      total: formatMXN(Number(pedido.total)),
+      metodoPago: PAYMENT_METHODS[pedido.metodo_pago ?? "mercadopago"]?.label ?? String(pedido.metodo_pago),
+      envio: `${zona} · ${costoEnvio > 0 ? formatMXN(costoEnvio) : "gratis"}`,
+      direccion: d
+        ? [d.calle, d.colonia, `${d.ciudad}, ${d.estado}`, `CP ${d.codigo_postal}`, d.referencias].filter(Boolean).join(" · ")
+        : "Sin dirección",
+      lineas: (pedido.pedido_items ?? []).map((i) => `${i.cantidad} × ${i.nombre} (${formatMXN(Number(i.importe))})`),
+      adminUrl: `${SITE.url}/admin/pedidos/${pedido.id}`,
+      pagoId,
+    });
+    await sendEmail({ to: CONTACT.email, ...mensaje, replyTo: pedido.cliente_email });
+  } catch (err) {
+    console.error("[aviso-admin] Error al avisar del pedido:", err instanceof Error ? err.message : err);
+  }
 }
