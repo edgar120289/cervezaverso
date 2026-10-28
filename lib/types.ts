@@ -11,7 +11,6 @@ export type Product = {
   style: string;
   abv: number;
   volume_ml: number;
-  cost_price: number;
   sale_price: number;
   stock_status: StockStatus;
   badges: string[];
@@ -26,6 +25,9 @@ export type Product = {
   image_urls: string[];
   created_at: string;
 };
+
+/** Producto con los datos privados del proveedor; solo existe dentro de /admin. */
+export type AdminProduct = Product & { cost_price: number };
 
 export type DiscountType = "percent" | "fixed";
 

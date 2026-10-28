@@ -12,10 +12,13 @@ import { isProductId } from "@/lib/landing-style";
  * el catálogo no depende de la sesión del visitante. `connection()` hace que la
  * consulta ocurra en cada request (precios y stock siempre al día) y permite
  * que la UI muestre skeletons vía <Suspense> mientras Supabase responde.
+ *
+ * `cost_price`, `margin_pct` y `proveedor` son privados: la migración 024 revoca su SELECT a
+ * anon y authenticated, así que aquí nunca se piden. Solo /admin los lee, con service role.
  */
 
 export const PRODUCT_COLUMNS =
-  "id, sku, name, brewery, gtin, country, style, abv, volume_ml, cost_price, sale_price, stock_status, badges, description_ai, pairing_ai, notas_origen, notas_perfil, notas_maridaje, image_url, image_urls, created_at";
+  "id, sku, name, brewery, gtin, country, style, abv, volume_ml, sale_price, stock_status, badges, description_ai, pairing_ai, notas_origen, notas_perfil, notas_maridaje, image_url, image_urls, created_at";
 
 let client: SupabaseClient | null | undefined;
 
@@ -39,7 +42,6 @@ export function toProduct(row: Record<string, unknown>): Product {
     gtin: typeof row.gtin === "string" ? row.gtin : null,
     abv: Number(row.abv),
     volume_ml: Number(row.volume_ml),
-    cost_price: Number(row.cost_price),
     sale_price: Number(row.sale_price),
     badges: Array.isArray(row.badges) ? (row.badges as string[]) : [],
     image_urls: Array.isArray(row.image_urls) ? (row.image_urls as string[]) : [],

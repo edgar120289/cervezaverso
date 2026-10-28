@@ -3,6 +3,7 @@
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { findExistingProduct, insertNewProduct, slugify } from "@/lib/monasterio";
 import { calculateSalePrice } from "@/lib/pricing";
 import {
@@ -193,7 +194,8 @@ export async function crearProducto(input: ProductCreate): Promise<AdminActionRe
   const parsed = productCreateSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: firstIssue(parsed.error) };
 
-  const supabase = await requireAdmin();
+  await requireAdmin();
+  const supabase = createAdminClient();
   const fields = parsed.data;
   const sale_price = calculateSalePrice(fields.cost_price, fields.margin_pct);
   const sku = slugify(fields.country, fields.name, String(fields.volume_ml));

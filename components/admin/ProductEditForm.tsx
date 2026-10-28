@@ -6,7 +6,7 @@ import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
 import { actualizarProducto } from "@/app/actions/admin-productos";
 import { calculateSalePrice, DEFAULT_MARGIN_PCT, formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
 import ProductGallery from "./ProductGallery";
-import type { Product, StockStatus } from "@/lib/types";
+import type { AdminProduct, StockStatus } from "@/lib/types";
 import { parseFieldNumber } from "@/lib/parse-number";
 
 const inputClass =
@@ -58,7 +58,7 @@ export default function ProductEditForm({
   initialMargin,
   initialImages,
 }: {
-  product: Product;
+  product: AdminProduct;
   initialMargin: number;
   initialImages: string[];
 }) {

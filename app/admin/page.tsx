@@ -1,9 +1,12 @@
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/admin-auth";
+import { createAdminClient } from "@/lib/supabase/admin";
 import ManualProductDialog from "@/components/admin/ManualProductDialog";
 import ProductList, { type AdminProductRow } from "@/components/admin/ProductList";
 
 export default async function AdminInventarioPage() {
-  const supabase = await createClient();
+  // El costo no es legible con la sesión (migración 024): se lee con service role tras validar al admin.
+  await requireAdmin();
+  const supabase = createAdminClient();
 
   // Se cargan todos y la búsqueda, el filtro y el orden se resuelven en el cliente (respuesta inmediata).
   const { data, error } = await supabase

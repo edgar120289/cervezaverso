@@ -217,14 +217,13 @@ export async function findExistingProduct(
   client: SupabaseClient,
   row: Pick<MonasterioRow, "sku" | "name" | "volume_ml">
 ) {
-  // `*` (y no "id, margin_pct") para que funcione aunque la migración 003 aún no se haya aplicado.
-  const bySku = await client.from("products").select("*").eq("sku", row.sku).maybeSingle();
+  const bySku = await client.from("products").select("id").eq("sku", row.sku).maybeSingle();
   if (bySku.error) throw bySku.error;
   if (bySku.data) return bySku.data;
 
   const byName = await client
     .from("products")
-    .select("*")
+    .select("id")
     .ilike("name", row.name.replace(/[\\%_]/g, "\\$&"))
     .eq("volume_ml", row.volume_ml)
     .limit(1);

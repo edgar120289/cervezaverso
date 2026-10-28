@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
-import { toProduct } from "@/lib/catalog";
+import { requireAdmin } from "@/lib/admin-auth";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { PRODUCT_COLUMNS, toProduct } from "@/lib/catalog";
 import { DEFAULT_MARGIN_PCT } from "@/lib/pricing";
 import ProductRowActions from "@/components/admin/ProductRowActions";
 import BackButton from "@/components/admin/BackButton";
@@ -14,12 +15,16 @@ export default async function EditProductPage({ params }: PageProps<"/admin/prod
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
 
-  const supabase = await createClient();
-  // `*` para no fallar si la migración 003 (margin_pct) aún no se aplicó.
-  const { data } = await supabase.from("products").select("*").eq("id", id).maybeSingle();
+  // Costo, margen y proveedor no son legibles con la sesión (migración 024): se leen con service role tras validar al admin.
+  await requireAdmin(`/admin/productos/${id}`);
+  const { data } = await createAdminClient()
+    .from("products")
+    .select(`${PRODUCT_COLUMNS}, cost_price, margin_pct, is_active, retirado`)
+    .eq("id", id)
+    .maybeSingle();
   if (!data) notFound();
 
-  const product = toProduct(data);
+  const product = { ...toProduct(data), cost_price: Number(data.cost_price) };
   const margin = Number(data.margin_pct);
   const gallery = Array.isArray(data.image_urls) ? (data.image_urls as string[]) : [];
   // Productos anteriores a la migración 006 conservan su imagen única como portada.
