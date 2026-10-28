@@ -1,5 +1,8 @@
 -- Cervezaverso — Seguridad: el costo del proveedor deja de ser público.
--- Ejecutar completo en el SQL Editor de Supabase ANTES de desplegar la rama (es idempotente).
+-- Ejecutar completo en el SQL Editor de Supabase DESPUÉS de desplegar el código de esta rama
+-- (es idempotente). Si se corre antes, la tienda de producción falla: el código anterior pide
+-- cost_price en PRODUCT_COLUMNS con la llave anónima y esa lectura queda prohibida.
+-- Orden: 1) desplegar el código (funciona con o sin la 024); 2) correr esta migración.
 --
 -- Hasta hoy anon y authenticated tenían SELECT en toda la tabla `products`, así que la API REST
 -- con la llave anónima devolvía cost_price, margin_pct y proveedor. Ahora esas tres columnas
