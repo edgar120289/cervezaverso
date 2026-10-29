@@ -164,3 +164,16 @@ export const byShowcase = (a: Product, b: Product) =>
 export function sortProducts(products: Product[], sort: SortId): Product[] {
   return [...products].sort(sort === "default" ? byShowcase : COMPARATORS[sort]);
 }
+
+/** Tarjetas que se agregan con cada «Ver más». */
+export const PAGE_SIZE = 24;
+/** Parámetro de la URL con cuántas tarjetas se ven (`?ver=48`). */
+export const VISIBLE_PARAM = "ver";
+const MAX_VISIBLE = 1000;
+
+/** `?ver=` → cantidad visible: entero de al menos una página y con tope; cualquier otra cosa = una página. */
+export function parseVisibleCount(value: string | null): number {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < PAGE_SIZE) return PAGE_SIZE;
+  return Math.min(parsed, MAX_VISIBLE);
+}

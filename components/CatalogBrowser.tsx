@@ -8,8 +8,11 @@ import {
   activeFilterCount,
   EMPTY_FILTERS,
   matchesFilters,
+  PAGE_SIZE,
+  parseVisibleCount,
   SEARCH_PARAM,
   SORT_OPTIONS,
+  VISIBLE_PARAM,
   sortProducts,
   type CatalogFilters,
   type SortId,
@@ -20,11 +23,14 @@ import ProductCard from "./ProductCard";
 
 /** Catálogo con buscador y filtros en tiempo real (País, Precio, ABV y Marca). */
 export default function CatalogBrowser({ products }: { products: Product[] }) {
-  const urlQuery = useSearchParams().get(SEARCH_PARAM) ?? "";
+  const searchParams = useSearchParams();
+  const urlQuery = searchParams.get(SEARCH_PARAM) ?? "";
   const [filters, setFilters] = useState<CatalogFilters>(() => ({ ...EMPTY_FILTERS, query: urlQuery }));
   const [appliedUrlQuery, setAppliedUrlQuery] = useState(urlQuery);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sort, setSort] = useState<SortId>("default");
+  // Cuántas tarjetas se ven (`?ver=48`): «atrás» desde una ficha vuelve al mismo punto.
+  const [visible, setVisible] = useState(() => parseVisibleCount(searchParams.get(VISIBLE_PARAM)));
 
   // Búsqueda nueva desde el header (`/tienda?q=`): se aplica durante el render, sin efecto de más.
   if (urlQuery !== appliedUrlQuery) {
@@ -44,6 +50,26 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
     () => sortProducts(products.filter((product) => matchesFilters(product, deferredFilters)), sort),
     [products, deferredFilters, sort]
   );
+  // Cualquier cambio de búsqueda, filtros u orden vuelve a la primera página.
+  const resetKey = JSON.stringify([deferredFilters, sort]);
+  const [appliedResetKey, setAppliedResetKey] = useState(resetKey);
+  if (resetKey !== appliedResetKey) {
+    setAppliedResetKey(resetKey);
+    setVisible(PAGE_SIZE);
+  }
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (visible > PAGE_SIZE) url.searchParams.set(VISIBLE_PARAM, String(visible));
+    else url.searchParams.delete(VISIBLE_PARAM);
+    const next = url.pathname + url.search + url.hash;
+    if (next !== window.location.pathname + window.location.search + window.location.hash) {
+      window.history.replaceState(window.history.state, "", next);
+    }
+  }, [visible]);
+
+  const shown = results.slice(0, visible);
+  const remaining = results.length - shown.length;
   const activeCount = activeFilterCount(filters);
   const hasAnyFilter = activeCount > 0 || filters.query.trim() !== "";
 
@@ -143,11 +169,24 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {results.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {shown.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+          {remaining > 0 && (
+            <div className="flex justify-center pt-4">
+              <button
+                type="button"
+                onClick={() => setVisible((current) => current + PAGE_SIZE)}
+                className="min-h-12 rounded-full bg-white px-7 text-sm font-semibold shadow-card transition-transform hover:bg-black hover:text-white active:scale-[0.98]"
+              >
+                Ver más ({remaining} {remaining === 1 ? "restante" : "restantes"})
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
