@@ -4,6 +4,7 @@ import { ChevronDown, Mail, MessageCircle } from "lucide-react";
 import FaqContactForm from "@/components/FaqContactForm";
 import { FAQ_ITEMS } from "@/lib/faq";
 import { CONTACT, SOMMELIER_MASCOT, SOMMELIER_NAME } from "@/lib/site";
+import { optimizedBrandSrc } from "@/lib/media-paths";
 
 export const metadata: Metadata = {
   title: "Preguntas frecuentes",
@@ -31,7 +32,7 @@ export default function FaqPage() {
       />
       <header className="grid items-center gap-6 rounded-[28px] bg-white px-6 py-10 shadow-card sm:grid-cols-[auto_1fr] sm:gap-10 sm:px-12 sm:py-14">
         <div className="relative mx-auto h-32 w-32 sm:h-40 sm:w-40">
-          <Image src={SOMMELIER_MASCOT} alt="" fill sizes="160px" className="object-contain" />
+          <Image src={optimizedBrandSrc(SOMMELIER_MASCOT, 160)} alt="" fill sizes="160px" className="object-contain" />
         </div>
         <div className="text-center sm:text-left">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Ayuda</p>
