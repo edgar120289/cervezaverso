@@ -48,3 +48,13 @@ export function codigoPostalCorrespondeAEstado(codigoPostal: string, estado: Est
   const prefijo = Number(codigoPostal.slice(0, 2));
   return PREFIJOS_POR_ESTADO[estado].some(([from, to]) => prefijo >= from && prefijo <= to);
 }
+
+/** Estado que corresponde a un CP de 5 dígitos, o `null` si el CP es inválido o su prefijo no se usa. */
+export function estadoDeCodigoPostal(codigoPostal: string): Estado | null {
+  if (!/^\d{5}$/.test(codigoPostal)) return null;
+  const prefijo = Number(codigoPostal.slice(0, 2));
+  const entrada = Object.entries(PREFIJOS_POR_ESTADO).find(([, rangos]) =>
+    rangos.some(([from, to]) => prefijo >= from && prefijo <= to),
+  );
+  return (entrada?.[0] as Estado | undefined) ?? null;
+}

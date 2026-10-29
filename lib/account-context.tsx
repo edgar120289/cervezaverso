@@ -18,6 +18,8 @@ type AccountContextValue = {
   user: User | null;
   /** Rol de `public.users`; sólo decide qué enlaces ve el header (el servidor vuelve a validar). */
   role: UserRole | null;
+  /** CP de la dirección predeterminada (o la más reciente) del cliente con sesión; sirve para estimar el envío. */
+  defaultPostalCode: string | null;
   isFavorite: (productId: string) => boolean;
   /** Sin sesión, manda a /login y regresa a la página actual después. */
   toggleFavorite: (productId: string) => Promise<void>;
@@ -40,6 +42,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   );
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<UserRole | null>(null);
+  const [defaultPostalCode, setDefaultPostalCode] = useState<string | null>(null);
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
@@ -49,13 +52,22 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       setUser(currentUser);
       if (!currentUser) {
         setRole(null);
+        setDefaultPostalCode(null);
         setFavoriteIds(new Set());
         return;
       }
-      const [{ data }, { data: profile }] = await Promise.all([
+      const [{ data }, { data: profile }, { data: direccion }] = await Promise.all([
         supabase!.from("favorites").select("product_id"),
         supabase!.from("users").select("role").eq("id", currentUser.id).maybeSingle(),
+        supabase!
+          .from("direcciones")
+          .select("codigo_postal")
+          .order("predeterminada", { ascending: false })
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
       ]);
+      setDefaultPostalCode(typeof direccion?.codigo_postal === "string" ? direccion.codigo_postal : null);
       setRole(profile?.role === "admin" ? "admin" : "client");
       setFavoriteIds(new Set((data ?? []).map((row) => row.product_id as string)));
     }
@@ -98,8 +110,8 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   }, [supabase, router]);
 
   const value = useMemo(
-    () => ({ user, role, isFavorite, toggleFavorite, signOut }),
-    [user, role, isFavorite, toggleFavorite, signOut]
+    () => ({ user, role, defaultPostalCode, isFavorite, toggleFavorite, signOut }),
+    [user, role, defaultPostalCode, isFavorite, toggleFavorite, signOut]
   );
 
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>;
