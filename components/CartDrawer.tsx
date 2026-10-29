@@ -10,6 +10,7 @@ import { formatMXN, FREE_SHIPPING_THRESHOLD_METRO } from "@/lib/pricing";
 import { DiscountRow } from "./PromoCodeField";
 import { VolumeDiscountNotice, VolumeDiscountRow } from "./VolumeDiscount";
 import BottleFallback from "./BottleFallback";
+import { normalCase } from "@/lib/text-case";
 
 export default function CartDrawer() {
   const {
@@ -84,7 +85,7 @@ export default function CartDrawer() {
                         {product.image_url ? (
                           <Image
                             src={product.image_url}
-                            alt={product.name}
+                            alt={normalCase(product.name)}
                             fill
                             sizes="64px"
                             className="object-cover"
@@ -98,10 +99,10 @@ export default function CartDrawer() {
 
                       <div className="flex flex-1 flex-col justify-between">
                         <div className="flex items-start justify-between gap-2">
-                          <p className="text-sm font-semibold leading-tight">{product.name}</p>
+                          <p className="text-sm font-semibold leading-tight">{normalCase(product.name)}</p>
                           <button
                             onClick={() => removeItem(product.id)}
-                            aria-label={`Quitar ${product.name}`}
+                            aria-label={`Quitar ${normalCase(product.name)}`}
                             className="text-muted hover:text-black/60"
                           >
                             <X size={14} />

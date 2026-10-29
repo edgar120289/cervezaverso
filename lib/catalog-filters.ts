@@ -125,7 +125,7 @@ export function activeFilterCount(filters: CatalogFilters): number {
 }
 
 export const SORT_OPTIONS = [
-  // `default` conserva el orden del servidor; solo sirve de estado inicial y de «quitar orden».
+  // `default` es el orden de vitrina (`byShowcase`); sirve de estado inicial y de «quitar orden».
   { id: "default", label: "Ordenar" },
   { id: "price-asc", label: "Precio: menor a mayor" },
   { id: "price-desc", label: "Precio: mayor a menor" },
@@ -151,7 +151,16 @@ const COMPARATORS: Record<Exclude<SortId, "default">, (a: Product, b: Product) =
   "abv-desc": (a, b) => (filterableAbv(b) ?? -1) - (filterableAbv(a) ?? -1) || byName(a, b),
 };
 
-/** Ordena sin mutar; `default` conserva el orden del servidor (disponibilidad y nombre). */
+const STOCK_RANK: Record<Product["stock_status"], number> = { in_stock: 0, low_stock: 1, preorder: 2, out_of_stock: 3 };
+
+/** Orden inicial: destacadas, luego con foto, luego sin foto; en cada grupo, disponibles antes que pocas piezas y por nombre. */
+export const byShowcase = (a: Product, b: Product) =>
+  Number(Boolean(b.is_featured)) - Number(Boolean(a.is_featured)) ||
+  Number(Boolean(b.image_url)) - Number(Boolean(a.image_url)) ||
+  STOCK_RANK[a.stock_status] - STOCK_RANK[b.stock_status] ||
+  byName(a, b);
+
+/** Ordena sin mutar; `default` es el orden de vitrina (`byShowcase`). */
 export function sortProducts(products: Product[], sort: SortId): Product[] {
-  return sort === "default" ? products : [...products].sort(COMPARATORS[sort]);
+  return [...products].sort(sort === "default" ? byShowcase : COMPARATORS[sort]);
 }

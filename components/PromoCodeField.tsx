@@ -6,7 +6,7 @@ import { useCart } from "@/lib/cart-context";
 import { formatMXN, formatPromoValue } from "@/lib/pricing";
 
 /**
- * "¿Tienes un código o tarjeta de regalo?". No es un <form> anidado: en el
+ * "¿Tienes un código de descuento?". No es un <form> anidado: en el
  * checkout vive dentro del formulario del pedido, así que Enter se intercepta.
  */
 export default function PromoCodeField() {
@@ -70,8 +70,8 @@ export default function PromoCodeField() {
         onClick={() => setIsOpen(true)}
         className="flex w-full items-center gap-2 rounded-[20px] border border-dashed border-black/15 px-4 py-3 text-left text-sm font-semibold text-black/60 transition-colors hover:border-accent/40 hover:text-black"
       >
-        <Gift size={16} className="shrink-0" />
-        ¿Tienes un código o tarjeta de regalo?
+        <TicketPercent size={16} className="shrink-0" />
+        ¿Tienes un código de descuento?
       </button>
     );
   }
@@ -79,7 +79,7 @@ export default function PromoCodeField() {
   return (
     <div className="space-y-2">
       <label htmlFor="promo-code" className="block px-1 text-sm font-semibold">
-        ¿Tienes un código o tarjeta de regalo?
+        ¿Tienes un código de descuento?
       </label>
       <div className="flex gap-2">
         <input

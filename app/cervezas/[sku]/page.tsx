@@ -18,6 +18,7 @@ import { countryCategoryOf } from "@/lib/seo-categories";
 import { jsonLdString, shippingDetailsJsonLd } from "@/lib/structured-data";
 import { googleBrand, googleTitle } from "@/lib/merchant-feed";
 import type { StockStatus } from "@/lib/types";
+import { normalCase } from "@/lib/text-case";
 
 const SCHEMA_AVAILABILITY: Record<StockStatus, string> = {
   in_stock: "https://schema.org/InStock",
@@ -31,11 +32,11 @@ export async function generateMetadata({ params }: PageProps<"/cervezas/[sku]">)
   const product = await getProductBySku(decodeURIComponent(sku));
   if (!product) return {};
 
-  const description = `${product.style} de ${product.country}, ${product.abv}% ABV. ${product.notas_perfil ?? product.description_ai ?? ""}`.trim();
+  const description = `${normalCase(product.style)} de ${normalCase(product.country)}, ${product.abv}% ABV. ${product.notas_perfil ?? product.description_ai ?? ""}`.trim();
   return {
-    title: product.name,
+    title: googleTitle(product),
     description,
-    openGraph: { title: product.name, description: product.description_ai ?? description, images: product.image_url ? [product.image_url] : undefined },
+    openGraph: { title: `${googleTitle(product)} · Cervezaverso`, description: product.description_ai ?? description, images: product.image_url ? [product.image_url] : undefined },
     alternates: { canonical: `/cervezas/${encodeURIComponent(product.sku)}` },
   };
 }
@@ -54,7 +55,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
       title: "Origen",
       body:
         product.notas_origen ??
-        [product.brewery, product.country].filter(Boolean).join(" · "),
+        [product.brewery && normalCase(product.brewery), normalCase(product.country)].filter(Boolean).join(" · "),
     },
     { icon: Wine, title: "Perfil de Cata", body: product.notas_perfil ?? product.description_ai },
     { icon: UtensilsCrossed, title: "Maridaje Perfecto", body: product.notas_maridaje ?? product.pairing_ai },
@@ -103,7 +104,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
       { name: "Inicio", item: SITE.url },
       { name: "Tienda", item: `${SITE.url}/tienda` },
       ...(category ? [{ name: `Cerveza de ${category.name}`, item: `${SITE.url}/catalogo/pais/${category.slug}` }] : []),
-      { name: product.name, item: productUrl },
+      { name: normalCase(product.name), item: productUrl },
     ].map((crumb, index) => ({ "@type": "ListItem", position: index + 1, ...crumb })),
   };
 
@@ -124,19 +125,19 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
         <div className="rounded-[28px] bg-white p-4 shadow-card">
           <ProductGallery
             images={product.image_urls.length > 0 ? product.image_urls : product.image_url ? [product.image_url] : []}
-            alt={`${product.name}, ${product.style}`}
+            alt={`${normalCase(product.name)}, ${normalCase(product.style)}`}
           />
         </div>
 
         <div className="flex flex-col justify-center gap-5 rounded-[28px] bg-white p-6 shadow-card sm:p-8">
           <div>
             <p className="text-sm font-semibold text-muted">
-              {product.style} · {product.country}
+              {normalCase(product.style)} · {normalCase(product.country)}
             </p>
             <h1 className="mt-1 text-4xl font-semibold leading-[1.05] tracking-[-0.045em]">
-              {product.name}
+              {normalCase(product.name)}
             </h1>
-            {product.brewery && <p className="mt-1 text-muted">{product.brewery}</p>}
+            {product.brewery && <p className="mt-1 text-muted">{normalCase(product.brewery)}</p>}
           </div>
 
           <dl className="flex flex-wrap gap-2 text-sm">
@@ -155,10 +156,10 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
             <span className="text-3xl font-semibold tracking-[-0.04em]">{formatMXN(product.sale_price)}</span>
             <div className="flex w-full items-center gap-3 sm:w-auto">
               <AddToCartButton product={product} />
-              <FavoriteButton productId={product.id} productName={product.name} size="lg" />
+              <FavoriteButton productId={product.id} productName={normalCase(product.name)} size="lg" />
               <ShareButton
-                title={product.name}
-                text={product.description_ai ?? `${product.style} de ${product.country} en Cervezaverso`}
+                title={normalCase(product.name)}
+                text={product.description_ai ?? `${normalCase(product.style)} de ${normalCase(product.country)} en Cervezaverso`}
               />
             </div>
           </div>

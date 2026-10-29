@@ -9,6 +9,7 @@ import { formatMXN, FREE_SHIPPING_THRESHOLD_METRO, SHIPPING_INFO } from "@/lib/p
 import BottleFallback from "@/components/BottleFallback";
 import { VolumeDiscountNotice, VolumeDiscountRow } from "@/components/VolumeDiscount";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
+import { normalCase } from "@/lib/text-case";
 
 export default function CarritoPage() {
   const { items, setQuantity, removeItem, subtotal, promo, discount, volumeDiscount, shippingCost, total } = useCart();
@@ -47,7 +48,7 @@ export default function CarritoPage() {
                 {product.image_url ? (
                   <Image
                     src={product.image_url}
-                    alt={product.name}
+                    alt={normalCase(product.name)}
                     fill
                     sizes="96px"
                     className="object-cover"
@@ -62,14 +63,14 @@ export default function CarritoPage() {
               <div className="flex flex-1 flex-col justify-between">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="font-semibold">{product.name}</p>
+                    <p className="font-semibold">{normalCase(product.name)}</p>
                     <p className="text-xs text-muted">
-                      {product.style} · {product.country}
+                      {normalCase(product.style)} · {normalCase(product.country)}
                     </p>
                   </div>
                   <button
                     onClick={() => removeItem(product.id)}
-                    aria-label={`Quitar ${product.name}`}
+                    aria-label={`Quitar ${normalCase(product.name)}`}
                     className="text-muted hover:text-black/60"
                   >
                     <X size={16} />

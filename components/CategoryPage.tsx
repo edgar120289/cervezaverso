@@ -6,6 +6,7 @@ import { ProductGridSkeleton } from "@/components/Skeletons";
 import { categorySectionTitle } from "@/lib/category-content";
 import { SITE } from "@/lib/site";
 import type { Product } from "@/lib/types";
+import { normalCase } from "@/lib/text-case";
 
 /** Página SEO de una categoría (país o estilo): H1 propio y el mismo catálogo con filtros ya acotado. */
 export default function CategoryPage({
@@ -44,7 +45,7 @@ export default function CategoryPage({
         "@type": "ListItem",
         position: index + 1,
         url: `${SITE.url}/cervezas/${encodeURIComponent(product.sku)}`,
-        name: product.name,
+        name: normalCase(product.name),
       })),
     },
   ];
