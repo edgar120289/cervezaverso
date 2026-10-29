@@ -14,6 +14,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { formatMXN, PAYMENT_METHODS, SHIPPING_INFO, SHIPPING_METHODS } from "@/lib/pricing";
 import { ESTADO_BADGE, folio, formatFecha, PEDIDO_DETALLE_COLUMNS } from "@/lib/pedidos";
 import type { PedidoDetalle } from "@/lib/types";
+import { normalCase } from "@/lib/text-case";
 
 /** Estados en los que el pago ya está confirmado (el webhook o el admin lo marcaron). */
 const PEDIDO_COBRADO = new Set(["Pagado", "Enviado", "Entregado"]);
@@ -157,7 +158,7 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
           {pedido.pedido_items.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-4 py-3 text-sm">
               <div className="min-w-0">
-                <p className="font-semibold">{item.nombre}</p>
+                <p className="font-semibold">{normalCase(item.nombre)}</p>
                 <p className="text-muted tabular-nums">
                   {item.cantidad} × {formatMXN(Number(item.precio_unitario))}
                 </p>

@@ -24,6 +24,8 @@ export type Product = {
   /** Galería ordenada; la primera es la portada (`image_url`). */
   image_urls: string[];
   created_at: string;
+  /** Destacada por el admin; solo se usa para el orden inicial de la tienda. */
+  is_featured?: boolean;
 };
 
 /** Producto con los datos privados del proveedor; solo existe dentro de /admin. */

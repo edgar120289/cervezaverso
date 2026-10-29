@@ -26,6 +26,7 @@ import BankTransferCard from "@/components/BankTransferCard";
 import HealthNotice from "@/components/HealthNotice";
 import PrivacyNotice from "@/components/PrivacyNotice";
 import type { Direccion, DireccionEnvio } from "@/lib/types";
+import { normalCase } from "@/lib/text-case";
 
 const NUEVA = "nueva";
 
@@ -459,7 +460,7 @@ export default function CheckoutForm({
           {items.map(({ product, quantity }) => (
             <li key={product.id} className="flex justify-between gap-3 text-sm">
               <span className="min-w-0 text-black/70">
-                <span className="font-semibold tabular-nums text-black">{quantity}×</span> {product.name}
+                <span className="font-semibold tabular-nums text-black">{quantity}×</span> {normalCase(product.name)}
               </span>
               <span className="shrink-0 tabular-nums">{formatMXN(product.sale_price * quantity)}</span>
             </li>

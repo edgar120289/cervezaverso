@@ -18,7 +18,7 @@ import { isProductId } from "@/lib/landing-style";
  */
 
 export const PRODUCT_COLUMNS =
-  "id, sku, name, brewery, gtin, country, style, abv, volume_ml, sale_price, stock_status, badges, description_ai, pairing_ai, notas_origen, notas_perfil, notas_maridaje, image_url, image_urls, created_at";
+  "id, sku, name, brewery, gtin, country, style, abv, volume_ml, sale_price, stock_status, badges, description_ai, pairing_ai, notas_origen, notas_perfil, notas_maridaje, image_url, image_urls, is_featured, created_at";
 
 let client: SupabaseClient | null | undefined;
 

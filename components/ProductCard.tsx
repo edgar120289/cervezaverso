@@ -10,6 +10,7 @@ import { trackAddToCart } from "@/lib/analytics";
 import CountryFlag from "./CountryFlag";
 import ProductImage from "./ProductImage";
 import FavoriteButton from "./FavoriteButton";
+import { normalCase } from "@/lib/text-case";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
@@ -28,7 +29,7 @@ export default function ProductCard({ product }: { product: Product }) {
       >
         <ProductImage
           src={product.image_url}
-          alt={product.name}
+          alt={normalCase(product.name)}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
 
@@ -62,10 +63,10 @@ export default function ProductCard({ product }: { product: Product }) {
       </Link>
 
       <div className="flex flex-1 flex-col gap-2 px-1 pt-4">
-        <p className="text-xs text-muted">{product.style}</p>
+        <p className="text-xs text-muted">{normalCase(product.style)}</p>
         <h3 className="line-clamp-2 text-base font-semibold leading-snug tracking-[-0.03em]">
           <Link href={`/cervezas/${product.sku}`} className="hover:text-black/70">
-            {product.name}
+            {normalCase(product.name)}
           </Link>
         </h3>
 
@@ -85,12 +86,12 @@ export default function ProductCard({ product }: { product: Product }) {
 
           <p className="flex items-center gap-1.5 text-sm font-bold text-black">
             <CountryFlag country={product.country} />
-            {product.country}
+            {normalCase(product.country)}
           </p>
 
           <span className="text-xl font-bold">{formatMXN(product.sale_price)} MXN</span>
           <div className="flex items-center gap-2">
-            <FavoriteButton productId={product.id} productName={product.name} />
+            <FavoriteButton productId={product.id} productName={normalCase(product.name)} />
             <button
               type="button"
               disabled={isOutOfStock}
@@ -98,7 +99,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 addItem(product);
                 trackAddToCart(product);
               }}
-              aria-label={`Agregar ${product.name} al carrito`}
+              aria-label={`Agregar ${normalCase(product.name)} al carrito`}
               className="flex h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-pill bg-accent px-4 text-sm font-semibold text-white shadow-accent transition-transform active:scale-95 disabled:cursor-not-allowed disabled:bg-black/10 disabled:text-muted disabled:shadow-none"
             >
               <Plus size={16} strokeWidth={2.5} aria-hidden />

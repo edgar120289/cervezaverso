@@ -7,6 +7,7 @@ import { formatMXN } from "@/lib/pricing";
 import { useCart } from "@/lib/cart-context";
 import { trackAddToCart } from "@/lib/analytics";
 import ProductImage from "./ProductImage";
+import { normalCase } from "@/lib/text-case";
 
 /** Tarjeta compacta para las recomendaciones de Graciela: miniatura, nombre, estilo y precio. */
 export default function MiniProductCard({ product, onSelect }: { product: Product; onSelect: () => void }) {
@@ -21,13 +22,13 @@ export default function MiniProductCard({ product, onSelect }: { product: Produc
         className="flex min-w-0 flex-1 items-center gap-3"
       >
         <span className="group relative block h-20 w-16 shrink-0 overflow-hidden rounded-[14px] bg-white">
-          <ProductImage src={product.image_url} alt={product.name} sizes="64px" />
+          <ProductImage src={product.image_url} alt={normalCase(product.name)} sizes="64px" />
         </span>
         <span className="min-w-0">
           <span className="block line-clamp-2 text-sm font-semibold leading-snug tracking-[-0.02em]">
-            {product.name}
+            {normalCase(product.name)}
           </span>
-          <span className="block truncate text-xs text-muted">{product.style}</span>
+          <span className="block truncate text-xs text-muted">{normalCase(product.style)}</span>
           <span className="mt-1 block text-sm font-semibold">{formatMXN(product.sale_price)}</span>
         </span>
       </Link>

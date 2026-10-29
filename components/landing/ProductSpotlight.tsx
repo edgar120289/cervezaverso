@@ -3,6 +3,7 @@ import AddToCartButton from "@/components/AddToCartButton";
 import ProductImage from "@/components/ProductImage";
 import { formatMXN } from "@/lib/pricing";
 import type { Product } from "@/lib/types";
+import { normalCase } from "@/lib/text-case";
 
 /** Tarjeta de "Cerveza destacada": foto, cervecería, nombre, precio, etiqueta editable y botón de compra. */
 export default function ProductSpotlight({ product, badge }: { product: Product; badge: string }) {
@@ -20,11 +21,11 @@ export default function ProductSpotlight({ product, badge }: { product: Product;
         href={`/cervezas/${product.sku}`}
         className="group relative block min-h-24 flex-1 overflow-hidden rounded-2xl bg-white"
       >
-        <ProductImage src={product.image_url} alt={product.name} sizes="(min-width: 1024px) 384px, 90vw" />
+        <ProductImage src={product.image_url} alt={normalCase(product.name)} sizes="(min-width: 1024px) 384px, 90vw" />
       </Link>
       <div className="shrink-0">
         <p className="text-xs font-semibold uppercase tracking-wide text-muted">{product.brewery}</p>
-        <h3 className="line-clamp-2 text-lg font-semibold tracking-tight">{product.name}</h3>
+        <h3 className="line-clamp-2 text-lg font-semibold tracking-tight">{normalCase(product.name)}</h3>
         <p className="mt-1 text-xl font-bold">{formatMXN(product.sale_price)} MXN</p>
       </div>
       <div className="shrink-0 [&>button]:w-full">
