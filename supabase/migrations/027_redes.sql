@@ -28,6 +28,8 @@ create index if not exists redes_publicaciones_pendientes_idx
 alter table public.redes_publicaciones enable row level security;
 revoke all on public.redes_publicaciones from anon;
 grant select, insert, update, delete on public.redes_publicaciones to authenticated;
+-- La 026 quitó los privilegios por defecto: el service role (cron que publica) necesita su grant explícito.
+grant select, insert, update, delete on public.redes_publicaciones to service_role;
 
 drop policy if exists "redes: solo admins" on public.redes_publicaciones;
 create policy "redes: solo admins" on public.redes_publicaciones

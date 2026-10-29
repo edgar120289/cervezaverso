@@ -60,7 +60,7 @@ export async function GET() {
     }
 
     const estado = errores.length === 0 ? "publicada" : "error";
-    await admin
+    const { error: guardarError } = await admin
       .from("redes_publicaciones")
       .update({
         ...cambios,
@@ -70,6 +70,8 @@ export async function GET() {
         updated_at: new Date().toISOString(),
       })
       .eq("id", fila.id);
+    // Si no se guarda, la fila queda «publicando» y a los 30 min se reintentaría: hay que verlo en logs.
+    if (guardarError) console.error("[redes] No se guardó el resultado de", fila.titulo, guardarError.message, cambios);
     if (errores.length > 0) console.error("[redes]", fila.titulo, errores.join(" · "));
     resultados.push({ id: fila.id, estado, ...(errores.length ? { error: errores.join(" · ") } : {}) });
   }
