@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useSommelier } from "@/components/SommelierProvider";
 import { SOMMELIER_MASCOT, SOMMELIER_NAME } from "@/lib/site";
+import { optimizedBrandSrc } from "@/lib/media-paths";
 
 /** Banner promocional del Sommelier: abre el quiz directamente. */
 export default function SommelierIntro() {
@@ -13,7 +14,7 @@ export default function SommelierIntro() {
       className="grid items-center gap-8 rounded-[28px] bg-white p-8 shadow-card sm:grid-cols-[auto_1fr] sm:gap-14 sm:p-12"
     >
       <div className="relative mx-auto h-40 w-40 sm:h-52 sm:w-52">
-        <Image src={SOMMELIER_MASCOT} alt="" fill sizes="208px" className="object-contain" />
+        <Image src={optimizedBrandSrc(SOMMELIER_MASCOT, 208)} alt="" fill sizes="208px" className="object-contain" />
       </div>
       <div className="text-center sm:text-left">
         <h2 id="sommelier-intro" className="text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">

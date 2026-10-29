@@ -11,6 +11,7 @@ import HeaderSearch from "./HeaderSearch";
 import MobileMenu from "./MobileMenu";
 import MobileSearchBar, { MOBILE_SEARCH_ID } from "./MobileSearchBar";
 import { useCart } from "@/lib/cart-context";
+import { MEDIA_DIRS, optimizedBrandSrc } from "@/lib/media-paths";
 
 const MAIN_LINKS = [
   { href: "/tienda", label: "Tienda" },
@@ -39,11 +40,10 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
             className="relative block h-9 aspect-[574/320] overflow-hidden sm:h-11"
           >
             <Image
-              src="/img/cervezaverso-logos-v2/marcos/marco-horizontal.png"
+              src={optimizedBrandSrc(`/${MEDIA_DIRS.marcoHorizontal}`, 480)}
               alt="Cervezaverso"
               fill
               priority
-              quality={100}
               sizes="(min-width: 640px) 127px, 104px"
               className="object-cover object-[88.5%_50%]"
             />

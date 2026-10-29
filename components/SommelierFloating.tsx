@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { SOMMELIER_MASCOT } from "@/lib/site";
+import { optimizedBrandSrc } from "@/lib/media-paths";
 import { useSommelier } from "./SommelierProvider";
 
 const MESSAGES = ["¿Qué cerveza elegir?", "Yo te ayudo a elegir cerveza"];
@@ -52,7 +53,7 @@ export default function SommelierFloating() {
         </AnimatePresence>
       </span>
       <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-white shadow-card ring-2 ring-accent transition-transform hover:scale-105 active:scale-95">
-        <Image src={SOMMELIER_MASCOT} alt="" fill sizes="64px" className="object-contain p-1.5" />
+        <Image src={optimizedBrandSrc(SOMMELIER_MASCOT, 64)} alt="" fill sizes="64px" className="object-contain p-1.5" />
       </span>
     </button>
   );
