@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ArrowUpDown, ChevronDown, Search, SlidersHorizontal, X } from "lucide-react";
 import type { Product } from "@/lib/types";
@@ -9,36 +9,41 @@ import {
   EMPTY_FILTERS,
   matchesFilters,
   PAGE_SIZE,
-  parseVisibleCount,
   SEARCH_PARAM,
   SORT_OPTIONS,
-  VISIBLE_PARAM,
   sortProducts,
   type CatalogFilters,
   type SortId,
 } from "@/lib/catalog-filters";
+import { parseCatalogState, serializeCatalogState } from "@/lib/catalog-url";
 import { activeFilterChips, FilterDrawer, FilterPanel } from "./CatalogFilterPanel";
 import CategoriesMenu from "./CategoriesMenu";
 import ProductCard from "./ProductCard";
 
 /** Catálogo con buscador y filtros en tiempo real (País, Precio, ABV y Marca). */
 export default function CatalogBrowser({ products }: { products: Product[] }) {
+  // La URL es la memoria del catálogo: se lee al montar (incluye «atrás» y enlaces compartidos) y cada cambio
+  // se refleja con replaceState. Los países y cervecerías de la URL que no existan en el catálogo se descartan.
   const searchParams = useSearchParams();
   const urlQuery = searchParams.get(SEARCH_PARAM) ?? "";
-  const [filters, setFilters] = useState<CatalogFilters>(() => ({ ...EMPTY_FILTERS, query: urlQuery }));
-  const [appliedUrlQuery, setAppliedUrlQuery] = useState(urlQuery);
+  const [initial] = useState(() =>
+    parseCatalogState(searchParams, {
+      countries: new Set(products.map((product) => product.country.trim())),
+      breweries: new Set(products.map((product) => product.brewery?.trim()).filter(Boolean) as string[]),
+    })
+  );
+  const [filters, setFilters] = useState<CatalogFilters>(initial.filters);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [sort, setSort] = useState<SortId>("default");
-  // Cuántas tarjetas se ven (`?ver=48`): «atrás» desde una ficha vuelve al mismo punto.
-  const [visible, setVisible] = useState(() => parseVisibleCount(searchParams.get(VISIBLE_PARAM)));
+  const [sort, setSort] = useState<SortId>(initial.sort);
+  const [visible, setVisible] = useState(initial.visible);
+  // Última búsqueda que escribió esta página en la URL: distingue nuestras escrituras de una búsqueda nueva del header.
+  const writtenQuery = useRef<string | null>(null);
 
-  // Búsqueda nueva desde el header (`/tienda?q=`): se aplica durante el render, sin efecto de más.
-  if (urlQuery !== appliedUrlQuery) {
-    setAppliedUrlQuery(urlQuery);
-    setFilters((current) => ({ ...current, query: urlQuery }));
-  }
-
+  // Búsqueda nueva desde el header (`/tienda?q=`): se aplica al texto y lleva el scroll al catálogo.
   useEffect(() => {
+    if (urlQuery === writtenQuery.current) return;
+    writtenQuery.current = urlQuery;
+    setFilters((current) => (current.query === urlQuery ? current : { ...current, query: urlQuery }));
     if (!urlQuery) return;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     document.getElementById("catalogo")?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
@@ -58,14 +63,28 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
     setVisible(PAGE_SIZE);
   }
 
+  // replaceState (no push) deja una sola entrada de historial; con espera para no saturarlo al teclear.
   useEffect(() => {
-    const url = new URL(window.location.href);
-    if (visible > PAGE_SIZE) url.searchParams.set(VISIBLE_PARAM, String(visible));
-    else url.searchParams.delete(VISIBLE_PARAM);
-    const next = url.pathname + url.search + url.hash;
-    if (next !== window.location.pathname + window.location.search + window.location.hash) {
-      window.history.replaceState(window.history.state, "", next);
-    }
+    const timer = window.setTimeout(() => {
+      const query = serializeCatalogState({ filters, sort, visible });
+      writtenQuery.current = filters.query.trim();
+      if (query === window.location.search.replace(/^\?/, "")) return;
+      window.history.replaceState(
+        window.history.state,
+        "",
+        `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`
+      );
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [filters, sort, visible]);
+
+  // Tras «Ver más» el foco pasa a la primera tarjeta nueva, para teclado y lectores de pantalla.
+  const gridRef = useRef<HTMLDivElement>(null);
+  const focusIndex = useRef<number | null>(null);
+  useEffect(() => {
+    if (focusIndex.current === null) return;
+    gridRef.current?.children[focusIndex.current]?.querySelector("a")?.focus();
+    focusIndex.current = null;
   }, [visible]);
 
   const shown = results.slice(0, visible);
@@ -170,7 +189,7 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div ref={gridRef} className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
             {shown.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -179,7 +198,10 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
             <div className="flex justify-center pt-4">
               <button
                 type="button"
-                onClick={() => setVisible((current) => current + PAGE_SIZE)}
+                onClick={() => {
+                  focusIndex.current = shown.length;
+                  setVisible((current) => current + PAGE_SIZE);
+                }}
                 className="min-h-12 rounded-full bg-white px-7 text-sm font-semibold shadow-card transition-transform hover:bg-black hover:text-white active:scale-[0.98]"
               >
                 Ver más ({remaining} {remaining === 1 ? "restante" : "restantes"})
