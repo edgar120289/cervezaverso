@@ -4,6 +4,7 @@ import ContactSection from "@/components/landing/ContactSection";
 import FeaturedShop from "@/components/landing/FeaturedShop";
 import LandingModules from "@/components/landing/LandingModules";
 import SommelierIntro from "@/components/landing/SommelierIntro";
+import TrustStrip from "@/components/landing/TrustStrip";
 import { ProductGridSkeleton } from "@/components/Skeletons";
 import { getSpotlightProducts } from "@/lib/catalog";
 import { getLandingSettings } from "@/lib/hero-settings";
@@ -21,6 +22,11 @@ export default async function Home() {
     <div className="mx-auto max-w-6xl space-y-8 px-4 pt-4">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(homeJsonLd()) }} />
       <Hero settings={settings.hero} products={products} />
+      <div className="-mt-3">
+        <Suspense fallback={<div className="h-16 rounded-[28px] bg-white shadow-card md:h-[5.5rem]" />}>
+          <TrustStrip />
+        </Suspense>
+      </div>
       <Suspense fallback={<ProductGridSkeleton />}>
         <FeaturedShop />
       </Suspense>
