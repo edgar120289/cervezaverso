@@ -6,6 +6,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { findExistingProduct, insertNewProduct, slugify } from "@/lib/monasterio";
 import { calculateSalePrice } from "@/lib/pricing";
+import { productThumbPath } from "@/lib/product-images";
 import {
   firstIssue,
   MAX_PRODUCT_IMAGES,
@@ -45,6 +46,11 @@ const productIdSchema = z.uuid();
 /** Prefijo de las URLs públicas de nuestro bucket: sólo se aceptan imágenes de ahí. */
 function bucketPublicPrefix() {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${PRODUCT_IMAGE_BUCKET}/`;
+}
+
+/** Cada foto del bucket lleva junto su miniatura; borrar una inexistente no da error. */
+function withThumbPaths(paths: string[]): string[] {
+  return paths.flatMap((path) => [path, productThumbPath(path)]);
 }
 
 const galleryUpdateSchema = z.object({
@@ -91,7 +97,9 @@ export async function actualizarGaleriaProducto(id: string, urls: string[]): Pro
     .map((url) => decodeURIComponent(url.slice(prefix.length)));
   if (removedPaths.length > 0) {
     // Limpieza best-effort: si falla, la galería ya quedó bien y sólo sobra un archivo.
-    const { error: removeError } = await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(removedPaths);
+    const { error: removeError } = await supabase.storage
+      .from(PRODUCT_IMAGE_BUCKET)
+      .remove(withThumbPaths(removedPaths));
     if (removeError) console.error("[admin] No se pudieron borrar imágenes del bucket:", removeError.message);
   }
 
@@ -181,7 +189,7 @@ export async function eliminarProducto(id: string): Promise<AdminActionResult> {
     .filter((url) => url.startsWith(prefix))
     .map((url) => decodeURIComponent(url.slice(prefix.length)));
   if (paths.length > 0) {
-    const { error: removeError } = await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(paths);
+    const { error: removeError } = await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(withThumbPaths(paths));
     if (removeError) console.error("[admin] No se pudieron borrar imágenes del bucket:", removeError.message);
   }
 

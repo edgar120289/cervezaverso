@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import ProductImage from "@/components/ProductImage";
 import Link from "next/link";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
@@ -46,11 +46,11 @@ export default function CarritoPage() {
             >
               <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-[20px] bg-white">
                 {product.image_url ? (
-                  <Image
+                  <ProductImage
                     src={product.image_url}
                     alt={normalCase(product.name)}
-                    fill
                     sizes="96px"
+                    thumb
                     className="object-cover"
                   />
                 ) : (

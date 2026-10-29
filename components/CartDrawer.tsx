@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import ProductImage from "./ProductImage";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
@@ -83,11 +83,11 @@ export default function CartDrawer() {
                     >
                       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[20px] bg-white">
                         {product.image_url ? (
-                          <Image
+                          <ProductImage
                             src={product.image_url}
                             alt={normalCase(product.name)}
-                            fill
                             sizes="64px"
+                            thumb
                             className="object-cover"
                           />
                         ) : (

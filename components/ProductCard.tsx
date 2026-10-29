@@ -30,6 +30,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <ProductImage
           src={product.image_url}
           alt={normalCase(product.name)}
+          thumb
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
 

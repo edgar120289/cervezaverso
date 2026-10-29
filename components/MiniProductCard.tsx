@@ -22,7 +22,7 @@ export default function MiniProductCard({ product, onSelect }: { product: Produc
         className="flex min-w-0 flex-1 items-center gap-3"
       >
         <span className="group relative block h-20 w-16 shrink-0 overflow-hidden rounded-[14px] bg-white">
-          <ProductImage src={product.image_url} alt={normalCase(product.name)} sizes="64px" />
+          <ProductImage src={product.image_url} alt={normalCase(product.name)} sizes="64px" thumb />
         </span>
         <span className="min-w-0">
           <span className="block line-clamp-2 text-sm font-semibold leading-snug tracking-[-0.02em]">
