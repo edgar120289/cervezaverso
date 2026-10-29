@@ -3,7 +3,7 @@
  * Uso: npx tsx scripts/test-fuzzy-search.ts
  */
 import assert from "node:assert/strict";
-import type { FilterableProduct } from "@/lib/catalog-filters";
+import { EMPTY_FILTERS, matchesFilters, type FilterableProduct } from "@/lib/catalog-filters";
 import { buildVocabulary, correctQuery, editDistance, fuzzyIncludes } from "@/lib/fuzzy-search";
 
 const p = (name: string, style: string, brewery: string, country: string): FilterableProduct => ({
@@ -24,6 +24,8 @@ const catalogo = [
   p("SCHLENKERLA RAUCHBIER MÄRZEN", "MÄRZEN", "Schlenkerla", "ALEMANIA"),
   p("FULLER'S LONDON PRIDE", "BITTER", "Fuller's", "INGLATERRA"),
   p("INSURGENTE LA LUPULOSA", "IPA", "Wendlandt", "MÉXICO"),
+  p("MODERN TIMES ORDERVILLE", "HAZY IPA CON TORONJA", "Modern Times", "USA"),
+  p("CZECHVAR", "CZECH PREMIUM LAGER", "Budějovický", "REP. CHECA"),
 ];
 const vocabulario = buildVocabulary(catalogo);
 const corrige = (q: string) => correctQuery(q, catalogo, vocabulario);
@@ -38,9 +40,10 @@ assert.equal(corrige("shoferhofer"), "schöfferhofer");
 assert.equal(corrige("hefeweisen"), "hefeweizen");
 assert.equal(corrige("delirum"), "delirium");
 assert.equal(corrige("guiness"), "guinness");
-assert.equal(corrige("estaut"), "stout");
+assert.equal(corrige("estout"), "stout");
 assert.equal(corrige("lagrimaz negras"), "lágrimas negras");
-assert.equal(corrige("schofer"), "schöfferhofer"); // a medio escribir
+assert.equal(corrige("schofferhofr"), "schöfferhofer");
+assert.equal(corrige("schöferh"), "schöfferhofer"); // a medio escribir
 assert.equal(corrige("londn pride"), "london pride");
 
 // Lo que ya se encuentra no se toca (acentos y mayúsculas ya se ignoraban).
@@ -54,11 +57,24 @@ assert.equal(corrige(""), null);
 assert.equal(corrige("xyz"), null);
 assert.equal(corrige("tequila"), null);
 assert.equal(corrige("ipx"), null);
+// Palabras reales que no vendemos no se cambian por otras.
+assert.equal(corrige("corona"), null);
+assert.equal(corrige("modelo"), null);
+assert.equal(corrige("chela"), null);
+
+// Español → nombres de estilo del catálogo, y «cerveza» no filtra.
+const busca = (q: string) => catalogo.filter((x) => matchesFilters(x, { ...EMPTY_FILTERS, query: q })).map((x) => x.name);
+assert.deepEqual(busca("trigo"), ["SCHÖFFERHOFER NATURTRÜB", "SCHÖFFERHOFER SANDÍA MENTA"]);
+assert.deepEqual(busca("cerveza oscura"), ["GUINNESS DRAUGHT", "RÁMURI LÁGRIMAS NEGRAS"]);
+assert.deepEqual(busca("oscuras"), ["GUINNESS DRAUGHT", "RÁMURI LÁGRIMAS NEGRAS"]);
+assert.deepEqual(busca("rubia"), ["CZECHVAR"]);
+assert.deepEqual(busca("negras"), ["GUINNESS DRAUGHT", "RÁMURI LÁGRIMAS NEGRAS"]);
+assert.equal(busca("chela").length, catalogo.length);
 
 // Buscador de la lista de cervecerías del panel de filtros.
 assert.equal(fuzzyIncludes("wendladt", "Wendlandt"), true);
 assert.equal(fuzzyIncludes("ramuri", "Rámuri"), true);
-assert.equal(fuzzyIncludes("guines", "Guinness"), true);
+assert.equal(fuzzyIncludes("guinnes", "Guinness"), true);
 assert.equal(fuzzyIncludes("asahi", "Guinness"), false);
 
 console.log("OK: búsqueda tolerante a errores de dedo verificada.");

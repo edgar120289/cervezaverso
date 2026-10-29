@@ -59,6 +59,52 @@ export function filterableAbv(product: FilterableProduct): number | null {
   return NON_ALCOHOLIC.test(normalize(`${product.name} ${product.style}`)) ? 0 : null;
 }
 
+/**
+ * Palabras en español que el catálogo escribe con el nombre del estilo (casi siempre en inglés o alemán):
+ * «trigo» encuentra Weizen, Witbier y Wheat; «oscura», Stout, Porter y Dunkel.
+ * La palabra también cuenta tal cual («Lágrimas Negras» sigue saliendo con «negra»).
+ */
+const SEARCH_SYNONYMS: Record<string, string[]> = {
+  trigo: ["weizen", "weiss", "wheat", "witbier", "wit", "blanche", "hefe"],
+  oscura: ["stout", "porter", "dunkel", "schwarz", "dark", "black", "negra"],
+  negra: ["stout", "porter", "dunkel", "schwarz", "dark", "black"],
+  rubia: ["lager", "pils", "helles", "blonde", "blond", "golden"],
+  clara: ["lager", "pils", "helles", "blonde", "blond", "golden"],
+  roja: ["red", "amber", "ambar", "rouge", "rossa"],
+  ambar: ["amber", "red"],
+  ahumada: ["rauch", "smoke", "smoked"],
+  agria: ["sour", "gose", "lambic", "kriek", "berliner", "geuze", "gueuze"],
+  acida: ["sour", "gose", "lambic", "kriek", "berliner", "geuze", "gueuze"],
+  afrutada: ["fruit", "fruta", "kriek", "framboise", "frambuesa", "mango", "cereza"],
+  frutal: ["fruit", "fruta", "kriek", "framboise", "frambuesa", "mango", "cereza"],
+  amarga: ["ipa", "bitter"],
+  belga: ["belgian", "belgica"],
+  alemana: ["german", "alemania"],
+  mexicana: ["mexican", "mexico"],
+  artesanal: [],
+};
+
+/** Palabras que no filtran nada: «cerveza oscura» busca solo «oscura». */
+const SEARCH_STOPWORDS = new Set([
+  "cerveza", "cervezas", "chela", "chelas", "cheve", "cheves", "birra", "beer",
+  "de", "del", "la", "las", "el", "los", "con", "tipo", "estilo", "una", "un",
+]);
+
+/** Quita el plural para buscar sinónimos: «oscuras» → «oscura», «rojas» → «roja». */
+function synonymKey(word: string): string {
+  if (SEARCH_SYNONYMS[word]) return word;
+  const singular = word.replace(/(es|s)$/, "");
+  if (SEARCH_SYNONYMS[singular]) return singular;
+  return word.replace(/s$/, "");
+}
+
+/** ¿La palabra buscada (ya normalizada) aparece en el texto, directo o por sinónimo? */
+export function wordMatches(word: string, haystack: string): boolean {
+  if (!word || SEARCH_STOPWORDS.has(word) || haystack.includes(word)) return true;
+  const alternatives = SEARCH_SYNONYMS[synonymKey(word)];
+  return Boolean(alternatives && (alternatives.length === 0 || alternatives.some((alt) => haystack.includes(alt))));
+}
+
 /** Texto donde busca el catálogo: nombre, cervecería, estilo y país, sin acentos ni mayúsculas. */
 export function searchHaystack(product: FilterableProduct): string {
   return normalize([product.name, product.brewery, product.style, product.country].filter(Boolean).join(" "));
@@ -76,7 +122,7 @@ export function matchesFilters(product: FilterableProduct, filters: CatalogFilte
   if (filters.query) {
     const haystack = searchHaystack(product);
     // Cada palabra buscada debe aparecer en algún campo, en cualquier orden.
-    if (!normalize(filters.query).split(/\s+/).every((word) => haystack.includes(word))) return false;
+    if (!normalize(filters.query).split(/\s+/).every((word) => wordMatches(word, haystack))) return false;
   }
 
   for (const facet of ["countries", "breweries"] as const) {

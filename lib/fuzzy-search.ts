@@ -6,12 +6,15 @@
  * la palabra del catálogo más parecida y se propone la búsqueda corregida («schöfferhofer», «hefeweizen»).
  * Todo corre en el navegador sobre el catálogo ya cargado; no hay llamadas al servidor.
  */
-import { normalize, searchHaystack, type FilterableProduct } from "@/lib/catalog-filters";
+import { normalize, searchHaystack, wordMatches, type FilterableProduct } from "@/lib/catalog-filters";
 
-/** Errores de dedo permitidos según el largo de la palabra: las cortas no se corrigen (ipa, ale). */
+/**
+ * Errores de dedo permitidos según el largo de la palabra: las cortas no se corrigen (ipa, ale) y
+ * hasta 7 letras solo 1, para no cambiar palabras reales por otras («corona» no es «toronja»).
+ */
 export function maxTypos(length: number): number {
   if (length < 4) return 0;
-  if (length < 6) return 1;
+  if (length < 8) return 1;
   return 2;
 }
 
@@ -110,7 +113,7 @@ export function correctQuery(query: string, products: FilterableProduct[], vocab
   const corrected: string[] = [];
   for (const part of parts) {
     const key = normalize(part);
-    if (haystacks.some((haystack) => haystack.includes(key))) {
+    if (haystacks.some((haystack) => wordMatches(key, haystack))) {
       corrected.push(part);
       continue;
     }
