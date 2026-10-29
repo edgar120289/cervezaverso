@@ -38,14 +38,47 @@ export type ExistingProduct = {
   pendiente: boolean;
   margin_pct: number | string | null;
   proveedor: string | null;
+  brewery?: string | null;
 };
 
 export const EXISTING_PRODUCT_COLUMNS =
-  "id, sku, name, volume_ml, country, style, abv, cost_price, sale_price, stock_status, is_active, retirado, pendiente, margin_pct, proveedor";
+  "id, sku, name, volume_ml, country, style, abv, cost_price, sale_price, stock_status, is_active, retirado, pendiente, margin_pct, proveedor, brewery";
 
 type InfoField = "country" | "style" | "abv";
 
-export type PlannedNew = Omit<MonasterioRow, "sku" | "is_active">;
+export type PlannedNew = Omit<MonasterioRow, "sku" | "is_active"> & { brewery?: string };
+
+/** Sin acentos, en minúsculas y solo letras y números separados por un espacio. */
+const plain = (text: string) =>
+  text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+const GENERIC_BREWERY_WORDS = /\b(brewery|brewing|brewing company|company|co|brauerei|brouwerij|brasserie|birrificio|cerveceria|beer)\b/g;
+
+/**
+ * Cervecería de una cerveza nueva, deducida del catálogo (la lista de Monasterio no la trae):
+ * 1) el nombre empieza con una cervecería conocida («MONKEY WAVES …» → Monkey Waves) o
+ * 2) la primera palabra del nombre siempre ha sido de la misma cervecería en el catálogo («JABALÍ …» → Primus).
+ * Si no hay certeza, queda vacía y la cerveza aparece en «Incompletas».
+ */
+export function breweryGuesser(existing: Pick<ExistingProduct, "name" | "brewery">[]): (name: string) => string | undefined {
+  const known = new Map<string, string>();
+  const byFirstWord = new Map<string, Set<string>>();
+  for (const product of existing) {
+    const brewery = product.brewery?.trim();
+    if (!brewery) continue;
+    const key = plain(brewery).replace(GENERIC_BREWERY_WORDS, " ").replace(/\s+/g, " ").trim();
+    if (key.length >= 3 && !known.has(key)) known.set(key, brewery);
+    const first = plain(product.name).split(" ")[0];
+    if (first && first.length >= 3) byFirstWord.set(first, (byFirstWord.get(first) ?? new Set()).add(brewery));
+  }
+  const keys = [...known.keys()].sort((a, b) => b.length - a.length);
+  return (name) => {
+    const target = plain(name);
+    const hit = keys.find((key) => target === key || target.startsWith(`${key} `));
+    if (hit) return known.get(hit);
+    const candidates = byFirstWord.get(target.split(" ")[0]);
+    return candidates?.size === 1 ? [...candidates][0] : undefined;
+  };
+}
 
 export type PlannedUpdate = {
   rowNumber: number;
@@ -170,6 +203,7 @@ export function buildCatalogPlan(
   parseErrors: string[] = []
 ): CatalogPlan {
   const find = indexExisting(existing);
+  const guessBrewery = breweryGuesser(existing);
   const news: PlannedNew[] = [];
   const updates = new Map<string, PlannedUpdate>();
   const ignored: PlannedIgnored[] = [];
@@ -201,7 +235,8 @@ export function buildCatalogPlan(
     const { sku: _sku, is_active: _active, ...fields } = row;
     void _sku;
     void _active;
-    news.push(fields);
+    const brewery = guessBrewery(row.name);
+    news.push(brewery ? { ...fields, brewery } : fields);
   }
 
   const missing: PlannedMissing[] =

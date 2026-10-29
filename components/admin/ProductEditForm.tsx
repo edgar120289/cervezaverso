@@ -123,7 +123,14 @@ export default function ProductEditForm({
       const res = await fetch("/api/generate-description", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, style: form.style, country: form.country }),
+        body: JSON.stringify({
+          name: form.name,
+          style: form.style,
+          country: form.country,
+          brewery: form.brewery,
+          abv: Number(form.abv) > 0 ? Number(form.abv) : null,
+          volume_ml: Number.isInteger(Number(form.volume_ml)) && Number(form.volume_ml) > 0 ? Number(form.volume_ml) : null,
+        }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error ?? "No se pudo generar la descripción.");

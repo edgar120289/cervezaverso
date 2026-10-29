@@ -1,6 +1,7 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { refresh, revalidateTag } from "next/cache";
+import { ANNOUNCEMENT_TAG } from "@/lib/announcement-server";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getSpotlightProducts } from "@/lib/catalog";
 import type { Product } from "@/lib/types";
@@ -22,6 +23,10 @@ export async function guardarLanding(input: LandingSettings): Promise<Appearance
   const supabase = await requireAdmin("/admin/landing");
   const parsed = landingSettingsSchema.safeParse({
     ...input,
+    announcement: input.announcement && {
+      ...input.announcement,
+      messages: (input.announcement.messages ?? []).filter((message) => message.trim()),
+    },
     hero: {
       ...input.hero,
       hero_video_url: input.hero?.hero_video_url?.trim() ? input.hero.hero_video_url : null,
@@ -66,6 +71,8 @@ export async function guardarLanding(input: LandingSettings): Promise<Appearance
     if (removeError) console.error("[admin] No se pudieron borrar imágenes del bucket:", removeError.message);
   }
 
+  // La barra de arriba vive en caché (layout estático): se renueva de inmediato al guardar.
+  revalidateTag(ANNOUNCEMENT_TAG, { expire: 0 });
   refresh();
   return { ok: true };
 }

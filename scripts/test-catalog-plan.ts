@@ -3,7 +3,7 @@
  * Uso: npx tsx scripts/test-catalog-plan.ts
  */
 import assert from "node:assert/strict";
-import { buildCatalogPlan, isReactivation, type ExistingProduct } from "@/lib/catalog-plan";
+import { breweryGuesser, buildCatalogPlan, isReactivation, type ExistingProduct } from "@/lib/catalog-plan";
 import type { MonasterioRow } from "@/lib/monasterio";
 
 const base: Omit<ExistingProduct, "id" | "sku" | "name"> = {
@@ -105,5 +105,22 @@ assert.equal(plan.tagProvider.includes("a"), false);
 
 // 11. La huella cambia si cambia el plan.
 assert.notEqual(plan.fingerprint, buildCatalogPlan(rows.filter((r) => r.name !== "MARGEN"), existing, "monasterio").fingerprint);
+
+// Cervecería deducida para las nuevas (la lista de Monasterio no la trae).
+{
+  const guess = breweryGuesser([
+    { name: "MONKEY WAVES ESLABÓN POR ESLABÓN", brewery: "Monkey Waves" },
+    { name: "JABALÍ BOCK", brewery: "Primus" },
+    { name: "JABALÍ IPA", brewery: "Primus" },
+    { name: "BELCHING BEAVER PEANUT BUTTER", brewery: "Belching Beaver Brewery" },
+    { name: "BIRRA MORETTI", brewery: "Birra Moretti" },
+    { name: "BIRRA BALADIN NORA", brewery: "Baladin" },
+  ]);
+  assert.equal(guess("MONKEY WAVES NUEVA HAZY"), "Monkey Waves");
+  assert.equal(guess("JABALÍ STOUT"), "Primus");
+  assert.equal(guess("BELCHING BEAVER DEFT JAB"), "Belching Beaver Brewery");
+  assert.equal(guess("BIRRA BALADIN ISAAC"), undefined); // «BIRRA» es de dos cervecerías: sin certeza
+  assert.equal(guess("CERVEZA DESCONOCIDA"), undefined);
+}
 
 console.log("OK: 11 reglas de la carga masiva verificadas.");

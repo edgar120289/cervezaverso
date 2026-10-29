@@ -327,6 +327,7 @@ export default function CatalogImporter() {
                     <span className="text-muted">
                       {" "}· {n.country}
                       {volume(n.volume_ml)}
+                      {n.brewery ? ` · ${n.brewery}` : " · sin cervecería"}
                     </span>
                   </span>
                   <span className="shrink-0 tabular-nums">{formatMXN(n.sale_price)}</span>

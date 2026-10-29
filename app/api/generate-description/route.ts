@@ -1,145 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAIFetchError, SchemaType, type ObjectSchema } from "@google/generative-ai";
 import { z } from "zod";
-import { generateWithFallback } from "@/lib/gemini";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { generateSommelierNotes, overusedPairings, SommelierAIError } from "@/lib/sommelier-ai";
 import { firstIssue } from "@/lib/validation";
 
-const SYSTEM_PROMPT = `Eres el Sommelier Digital de Cervezaverso, una tienda mexicana de cerveza artesanal nacional e importada.
-Escribes para gente curiosa que disfruta la cerveza pero no es experta: tu tono es cálido, cautivador y educativo,
-como un buen amigo que sabe mucho y lo cuenta con gusto. Evitas los tecnicismos aburridos (nada de IBU, EBC,
-densidades ni jerga de cervecero); si mencionas un concepto, lo explicas con palabras cotidianas.
-
-Escribe siempre en español de México, en segunda persona cuando invites a probar, sin emojis ni markdown.
-Nunca inventes datos concretos que no puedas saber (premios, fechas exactas, nombres de maestros cerveceros);
-si no conoces la cervecería, habla de la tradición del estilo y del país.
-
-Además de las tres secciones, devuelve tres campos cortos para el catálogo:
-- "cerveceria": nombre de la marca o cervecería fabricante, deducido del nombre de la cerveza (solo el nombre, sin "Cervecería" ni explicaciones). Si no puedes deducirla con certeza, devuelve una cadena vacía; nunca inventes una.
-- "descripcion": gancho comercial punchy para og:description al compartir en WhatsApp y redes. MÁXIMO ESTRICTO de 100 caracteres (10 a 15 palabras), una sola frase, sin comillas ni punto y coma. Cuenta los caracteres antes de responder.
-- "maridaje_resumen": maridaje en una sola línea. MÁXIMO ESTRICTO de 60 caracteres, por ejemplo "Ideal para carnes rojas y postres oscuros". Cuenta los caracteres antes de responder.
-
-Devuelve tres secciones:
-- "origen" — El Origen: historia breve del estilo y de la tradición cervecera del país, y qué hace especial a esta cerveza. 2 a 3 frases.
-- "perfil" — Perfil Sensorial: notas de cata en orden visual (color, espuma), olfativa (aromas) y gustativa (sabor, cuerpo, final). 3 a 4 frases evocadoras.
-- "maridaje" — El Maridaje Perfecto: entrega exactamente 3 opciones de maridaje muy distintas entre sí, y por qué combinan (3 a 4 frases):
-  1) una botana o snack básico comercial,
-  2) un platillo cotidiano o comida rápida (por ejemplo tacos o pizza),
-  3) un platillo de restaurante más elaborado.
-  Reglas estrictas: PROHIBIDO usar sugerencias repetitivas como "pato" a menos que sea estrictamente necesario.
-  Varía las proteínas y el estilo culinario (mexicana, asiática, americana) según el país de origen de la cerveza,
-  y elige opciones distintas en cada ficha.`;
-
-const RESPONSE_SCHEMA: ObjectSchema = {
-  type: SchemaType.OBJECT,
-  properties: {
-    origen: { type: SchemaType.STRING, description: "El Origen: historia breve." },
-    perfil: { type: SchemaType.STRING, description: "Perfil Sensorial: notas visuales, olfativas y gustativas." },
-    maridaje: { type: SchemaType.STRING, description: "El Maridaje Perfecto." },
-    cerveceria: { type: SchemaType.STRING, description: "Marca o cervecería fabricante; vacío si no se puede deducir." },
-    descripcion: { type: SchemaType.STRING, description: "Gancho comercial de MÁXIMO 100 caracteres (10 a 15 palabras)." },
-    maridaje_resumen: { type: SchemaType.STRING, description: "Maridaje en una línea de MÁXIMO 60 caracteres." },
-  },
-  required: ["origen", "perfil", "maridaje", "cerveceria", "descripcion", "maridaje_resumen"],
-};
+export const maxDuration = 60;
 
 const requestSchema = z.object({
   name: z.string().trim().min(1, "Falta el nombre de la cerveza.").max(160),
   style: z.string().trim().min(1, "Falta el estilo de la cerveza.").max(120),
   country: z.string().trim().min(1, "Falta el país de la cerveza.").max(80),
+  brewery: z.string().trim().max(160).optional(),
+  abv: z.number().min(0).max(99.99).nullable().optional(),
+  volume_ml: z.number().int().min(0).max(100000).nullable().optional(),
 });
-
-const responseSchema = z.object({
-  origen: z.string().trim().min(1),
-  perfil: z.string().trim().min(1),
-  maridaje: z.string().trim().min(1),
-  cerveceria: z.string().trim().max(120),
-  descripcion: z.string().trim().min(1).transform((s) => clip(s, 100)),
-  maridaje_resumen: z.string().trim().min(1).transform((s) => clip(s, 60)),
-});
-
-/** Red de seguridad: si la IA se pasa del límite, corta en la última palabra completa. */
-function clip(text: string, max: number): string {
-  if (text.length <= max) return text;
-  const cut = text.slice(0, max);
-  const lastSpace = cut.lastIndexOf(" ");
-  return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:.]+$/, "");
-}
-
-type GeneratedDescription = z.infer<typeof responseSchema>;
 
 /**
- * Sommelier Digital: genera El Origen, Perfil Sensorial, El Maridaje Perfecto y
- * los campos de catálogo (cervecería, descripción y maridaje corto) a partir del nombre, estilo y país. No guarda nada: el admin revisa el texto
- * en el panel y lo guarda con "Guardar cambios".
+ * Sommelier Digital para la edición de un producto: genera la ficha y la devuelve sin guardar.
+ * El admin la revisa en el panel y la guarda con "Guardar cambios".
  */
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "No autenticado." }, { status: 401 });
-  }
+  if (!user) return NextResponse.json({ error: "No autenticado." }, { status: 401 });
   const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
-  if (profile?.role !== "admin") {
-    return NextResponse.json({ error: "No autorizado." }, { status: 403 });
-  }
-
-  if (!process.env.GEMINI_API_KEY) {
-    return NextResponse.json(
-      { error: "Falta GEMINI_API_KEY en .env.local (reinicia `npm run dev` después de agregarla)." },
-      { status: 500 }
-    );
-  }
+  if (profile?.role !== "admin") return NextResponse.json({ error: "No autorizado." }, { status: 403 });
 
   const parsed = requestSchema.safeParse(await req.json().catch(() => null));
-  if (!parsed.success) {
-    return NextResponse.json({ error: firstIssue(parsed.error) }, { status: 400 });
-  }
-  const { name, style, country } = parsed.data;
+  if (!parsed.success) return NextResponse.json({ error: firstIssue(parsed.error) }, { status: 400 });
 
   try {
-    const completion = await generateWithFallback(
-      "generate-description",
-      process.env.GEMINI_API_KEY,
-      {
-        systemInstruction: SYSTEM_PROMPT,
-        generationConfig: {
-          temperature: 1.1,
-          responseMimeType: "application/json",
-          responseSchema: RESPONSE_SCHEMA,
-        },
-      },
-      `Cerveza: ${name}
-Estilo: ${style}
-País: ${country}`
-    );
-
-    if (completion.response.promptFeedback?.blockReason) {
-      return NextResponse.json({ error: "La IA no quiso generar esta ficha. Intenta de nuevo." }, { status: 502 });
-    }
-    const result = responseSchema.safeParse(JSON.parse(completion.response.text() || "null"));
-    if (!result.success) {
-      return NextResponse.json({ error: "La IA devolvió una respuesta incompleta. Intenta de nuevo." }, { status: 502 });
-    }
-
-    return NextResponse.json(result.data satisfies GeneratedDescription);
+    const avoid = await overusedPairings(createAdminClient());
+    return NextResponse.json(await generateSommelierNotes(parsed.data, avoid));
   } catch (err) {
-    if (err instanceof GoogleGenerativeAIFetchError) {
-      const message =
-        err.status === 400 || err.status === 403
-          ? "La GEMINI_API_KEY no es válida."
-          : err.status === 429
-            ? "Gemini rechazó la solicitud por límite de uso. Espera un momento e intenta de nuevo."
-            : err.status === 404
-              ? "Ningún modelo de Gemini está disponible. Revisa GEMINI_MODEL en .env.local."
-              : err.status === 503
-                ? "Gemini está saturado en este momento. Intenta de nuevo en unos segundos."
-                : `Error de Gemini (${err.status ?? "sin estado"}).`;
-      console.error("[generate-description] error final:", err.status, err.message);
-      return NextResponse.json({ error: message }, { status: 502 });
-    }
+    if (err instanceof SommelierAIError) return NextResponse.json({ error: err.message }, { status: err.status });
     console.error("[generate-description]", err);
     return NextResponse.json({ error: "No se pudo generar la descripción." }, { status: 500 });
   }

@@ -5,10 +5,13 @@ import { Loader2, Save } from "lucide-react";
 import { guardarLanding, obtenerProductosDestacados } from "@/app/actions/admin-landing";
 import { LandingModuleView } from "@/components/landing/LandingModules";
 import StyledBanner from "@/components/landing/StyledBanner";
+import AnnouncementBarView from "@/components/AnnouncementBarView";
+import { resolveAnnouncement, type AnnouncementSettings, type AnnouncementValues } from "@/lib/announcement";
 import { HERO_INTERVALS, type HeroBanner, type HeroSettings } from "@/lib/hero";
 import { collectSpotlightRefs, type LandingModule, type LandingSettings } from "@/lib/landing";
 import { spotlightRef, type BlockStyle } from "@/lib/landing-style";
 import type { Product } from "@/lib/types";
+import AnnouncementEditor from "./AnnouncementEditor";
 import BlockEditor from "./BlockEditor";
 import HeroBannerList from "./HeroBannerList";
 import HeroCtaEditor from "./HeroCtaEditor";
@@ -17,9 +20,10 @@ import { ModuleEditor } from "./LandingModulesEditor";
 import StudioCanvas, { type StudioDevice } from "./StudioCanvas";
 import Switch from "./Switch";
 
-type Target = "hero" | LandingModule["id"];
+type Target = "bar" | "hero" | LandingModule["id"];
 
 const TARGET_LABELS: Record<Target, string> = {
+  bar: "Barra",
   hero: "Hero",
   split: "Dividido",
   impact: "Impacto",
@@ -41,7 +45,13 @@ const inputClass =
  * Studio de la landing: a la izquierda las secciones de edición del elemento elegido (Hero o uno de los 3 bloques),
  * al centro el lienzo con la vista previa real en escritorio o móvil. Guardar publica todo de una vez.
  */
-export default function LandingForm({ initial }: { initial: LandingSettings }) {
+export default function LandingForm({
+  initial,
+  announcementValues,
+}: {
+  initial: LandingSettings;
+  announcementValues: AnnouncementValues;
+}) {
   const [saved, setSaved] = useState(initial);
   const [landing, setLanding] = useState(initial);
   const [isPending, startTransition] = useTransition();
@@ -81,6 +91,11 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
   function update(patch: Partial<HeroSettings>) {
     setNotice(null);
     setLanding((current) => ({ ...current, hero: { ...current.hero, ...patch } }));
+  }
+
+  function updateAnnouncement(patch: Partial<AnnouncementSettings>) {
+    setNotice(null);
+    setLanding((current) => ({ ...current, announcement: { ...current.announcement, ...patch } }));
   }
 
   function updateBanner(index: number, patch: Partial<HeroBanner>) {
@@ -130,11 +145,34 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
     return ref ? (products[ref] ?? null) : null;
   }
 
-  const block = target === "hero" ? null : landing.modules.find((item) => item.id === target);
+  const block = target === "hero" || target === "bar" ? null : landing.modules.find((item) => item.id === target);
+  const barMessages = resolveAnnouncement(
+    landing.announcement.messages.filter((m) => m.trim()),
+    announcementValues,
+  );
   const isVideo = settings.hero_type === "video";
 
   let preview: React.ReactNode = null;
-  if (block) {
+  if (target === "bar") {
+    preview = (
+      <div className="space-y-4">
+        {!landing.announcement.enabled && <p className="text-xs text-muted">Apagada: no se muestra en la tienda.</p>}
+        <div className={`overflow-hidden rounded-2xl ${landing.announcement.enabled ? "" : "opacity-50"}`}>
+          <AnnouncementBarView preview messages={barMessages} href="" />
+        </div>
+        <p className="text-xs text-muted">
+          En celular y tableta los mensajes rotan cada 5 segundos. En computadora se ven todos en una línea:
+        </p>
+        <div className="overflow-hidden rounded-2xl bg-ink px-4 py-2 text-center text-sm font-semibold text-white">
+          {barMessages.join(" · ") || "Sin mensajes"}
+        </div>
+        <p className="text-xs text-muted">
+          {landing.announcement.scope === "home" ? "Solo en la portada." : "En todas las páginas."} Los cambios se ven en la
+          tienda al guardar.
+        </p>
+      </div>
+    );
+  } else if (block) {
     preview = (
       <>
         {!block.enabled && <p className="mb-2 text-xs text-muted">Apagado: no se muestra en la tienda.</p>}
@@ -199,7 +237,9 @@ export default function LandingForm({ initial }: { initial: LandingSettings }) {
             ))}
           </div>
 
-          {block ? (
+          {target === "bar" ? (
+            <AnnouncementEditor value={landing.announcement} onChange={updateAnnouncement} values={announcementValues} />
+          ) : block ? (
             <ModuleEditor
               key={block.id}
               module={block}

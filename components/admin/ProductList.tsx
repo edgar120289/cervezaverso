@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { ArrowUpDown, ChevronDown, Eye, Search, SlidersHorizontal, Star, X } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowUpDown, ChevronDown, CircleAlert, Eye, Loader2, Search, SlidersHorizontal, Sparkles, Star, X } from "lucide-react";
 import {
   activeFilterCount,
   EMPTY_FILTERS,
@@ -11,7 +11,13 @@ import {
   normalize,
   type CatalogFilters,
 } from "@/lib/catalog-filters";
-import { parseListState, serializeListState, type AdminSortId, type StatusFilter } from "@/lib/admin-list-url";
+import {
+  parseListState,
+  serializeListState,
+  type AdminSortId,
+  type MissingFilter,
+  type StatusFilter,
+} from "@/lib/admin-list-url";
 import { formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
 import { normalCase } from "@/lib/text-case";
 import type { StockStatus } from "@/lib/types";
@@ -107,14 +113,37 @@ function StatusBadge({ product }: { product: AdminProductRow }) {
   );
 }
 
-/** Lo que le falta a una pendiente antes de publicarla. */
-function missingForPending(product: AdminProductRow): string[] {
-  const missing: string[] = [];
-  if (!product.image_url) missing.push("foto");
-  if (!product.brewery?.trim()) missing.push("cervecería");
-  if (!product.notas_perfil?.trim()) missing.push("notas de cata");
+/** Lo que le falta a una cerveza para estar completa (foto, cervecería y notas de cata). */
+function missingFields(product: AdminProductRow): MissingFilter[] {
+  const missing: MissingFilter[] = [];
+  if (!product.image_url) missing.push("photo");
+  if (!product.brewery?.trim()) missing.push("brewery");
+  if (!product.notas_perfil?.trim()) missing.push("notes");
   return missing;
 }
+
+const MISSING_LABEL: Record<MissingFilter, string> = {
+  any: "Incompletas",
+  photo: "foto",
+  brewery: "cervecería",
+  notes: "notas de cata",
+};
+
+const MISSING_OPTIONS: { id: MissingFilter; label: string }[] = [
+  { id: "any", label: "Cualquier dato" },
+  { id: "brewery", label: "Sin cervecería" },
+  { id: "photo", label: "Sin foto" },
+  { id: "notes", label: "Sin notas de cata" },
+];
+
+function matchesMissing(product: AdminProductRow, missing: MissingFilter | null): boolean {
+  if (!missing) return true;
+  const fields = missingFields(product);
+  return missing === "any" ? fields.length > 0 : fields.includes(missing);
+}
+
+/** Notas con IA en lote: el navegador pide una ficha a la vez (dos en paralelo) y cada una se guarda sola. */
+const AI_CONCURRENCY = 2;
 
 /** Inventario: búsqueda en tiempo real (nombre o SKU), orden y «Filtros avanzados» (estado, precio, ABV, país y cervecería). */
 export default function ProductList({ products }: { products: AdminProductRow[] }) {
@@ -125,18 +154,23 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
   const [status, setStatus] = useState<StatusFilter>(initial.status);
   const [sort, setSort] = useState<SortId>(initial.sort);
   const [featuredOnly, setFeaturedOnly] = useState(initial.featuredOnly);
+  const [missing, setMissing] = useState<MissingFilter | null>(initial.missing);
+  const router = useRouter();
+  const [aiPanel, setAiPanel] = useState(false);
+  const [aiRun, setAiRun] = useState<{ done: number; total: number; failed: number; error: string | null; running: boolean } | null>(null);
+  const cancelAi = useRef(false);
   const [filters, setFilters] = useState<CatalogFilters>(initial.filters);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // replaceState (no push) deja una sola entrada de historial; con espera para no saturarlo al teclear.
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      const query = serializeListState({ search, status, sort, featuredOnly, filters });
+      const query = serializeListState({ search, status, sort, featuredOnly, missing, filters });
       if (query === window.location.search.replace(/^\?/, "")) return;
       window.history.replaceState(window.history.state, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
     }, 250);
     return () => window.clearTimeout(timer);
-  }, [search, status, sort, featuredOnly, filters]);
+  }, [search, status, sort, featuredOnly, missing, filters]);
 
   const visible = useMemo(() => {
     const words = normalize(search).split(/\s+/).filter(Boolean);
@@ -147,19 +181,69 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
         if (status === "pending" && !(product.pendiente && !product.is_active)) return false;
         if (status === "retired" && !product.retirado) return false;
         if (featuredOnly && !product.is_featured) return false;
+        if (!matchesMissing(product, missing)) return false;
         if (!matchesFilters(product, filters)) return false;
         const haystack = normalize(`${product.name} ${product.sku}`);
         return words.every((word) => haystack.includes(word));
       })
       .sort(COMPARATORS[sort]);
-  }, [products, search, status, featuredOnly, filters, sort]);
+  }, [products, search, status, featuredOnly, missing, filters, sort]);
 
-  const activeCount = activeFilterCount(filters) + (status !== "all" ? 1 : 0) + (featuredOnly ? 1 : 0);
+  // Las retiradas no cuentan: no se van a vender.
+  const incompleteCount = useMemo(
+    () => products.filter((product) => !product.retirado && missingFields(product).length > 0).length,
+    [products],
+  );
+  const withoutNotes = visible.filter((product) => !product.notas_perfil?.trim());
+
+  async function runAi(targets: AdminProductRow[]) {
+    if (targets.length === 0) return;
+    cancelAi.current = false;
+    setAiRun({ done: 0, total: targets.length, failed: 0, error: null, running: true });
+    let next = 0;
+    const worker = async () => {
+      while (next < targets.length && !cancelAi.current) {
+        const product = targets[next++];
+        try {
+          const res = await fetch("/api/ai/enrich", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ product_id: product.id }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            setAiRun((run) => run && { ...run, done: run.done + 1, failed: run.failed + 1, error: data.error ?? "Error" });
+            // Llave inválida o falta de configuración: no tiene caso seguir.
+            if (res.status === 401 || res.status === 403 || res.status === 500) cancelAi.current = true;
+            continue;
+          }
+          setAiRun((run) => run && { ...run, done: run.done + 1 });
+        } catch {
+          setAiRun((run) => run && { ...run, done: run.done + 1, failed: run.failed + 1, error: "Sin conexión." });
+        }
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(AI_CONCURRENCY, targets.length) }, worker));
+    setAiRun((run) => run && { ...run, running: false });
+    router.refresh();
+  }
+
+  const activeCount =
+    activeFilterCount(filters) + (status !== "all" ? 1 : 0) + (featuredOnly ? 1 : 0) + (missing ? 1 : 0);
   const chips = [
     ...(status !== "all"
       ? [{ key: "status", label: STATUS_OPTIONS.find((o) => o.id === status)!.label, clear: () => setStatus("all") }]
       : []),
     ...(featuredOnly ? [{ key: "featured", label: "Destacadas", clear: () => setFeaturedOnly(false) }] : []),
+    ...(missing
+      ? [
+          {
+            key: "missing",
+            label: missing === "any" ? "Incompletas" : `Sin ${MISSING_LABEL[missing]}`,
+            clear: () => setMissing(null),
+          },
+        ]
+      : []),
     ...activeFilterChips(filters, setFilters),
   ];
 
@@ -226,6 +310,15 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
           <Star size={16} aria-hidden className={`shrink-0 ${featuredOnly ? "fill-current" : ""}`} />
           <span className="truncate">Destacadas</span>
         </button>
+        <button
+          type="button"
+          onClick={() => setMissing((current) => (current ? null : "any"))}
+          aria-pressed={missing !== null}
+          className={`${TOGGLE_CLASS} ${missing ? "bg-black text-white" : "bg-white"}`}
+        >
+          <CircleAlert size={16} aria-hidden className="shrink-0" />
+          <span className="truncate">Incompletas ({incompleteCount})</span>
+        </button>
       </div>
 
       <FilterDrawer
@@ -244,6 +337,21 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
                   aria-pressed={status === option.id}
                   onClick={() => setStatus(option.id)}
                   className={chipClass(status === option.id)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </FilterSection>
+          <FilterSection title="Incompletas">
+            <div className="flex flex-wrap gap-1.5">
+              {MISSING_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-pressed={missing === option.id}
+                  onClick={() => setMissing((current) => (current === option.id ? null : option.id))}
+                  className={chipClass(missing === option.id)}
                 >
                   {option.label}
                 </button>
@@ -276,6 +384,7 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
             onClick={() => {
               setStatus("all");
               setFeaturedOnly(false);
+              setMissing(null);
               setFilters(EMPTY_FILTERS);
             }}
             className="text-xs font-semibold text-accent hover:underline"
@@ -283,7 +392,68 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
             Limpiar todos los filtros
           </button>
         )}
+        <button
+          type="button"
+          onClick={() => setAiPanel((open) => !open)}
+          aria-expanded={aiPanel}
+          className="ml-auto flex min-h-9 items-center gap-1.5 rounded-full bg-white px-3 text-xs font-semibold shadow-card hover:bg-black hover:text-white"
+        >
+          <Sparkles size={14} aria-hidden />
+          Notas con IA
+        </button>
       </div>
+
+      {(aiPanel || aiRun) && (
+        <div className="space-y-3 rounded-[28px] bg-white p-4 text-sm shadow-card">
+          {aiRun ? (
+            <div className="flex flex-wrap items-center gap-3" aria-live="polite">
+              {aiRun.running && <Loader2 size={16} className="animate-spin" aria-hidden />}
+              <span className="font-semibold">
+                {aiRun.running ? "Generando" : "Listo"}: {aiRun.done - aiRun.failed} de {aiRun.total}
+                {aiRun.failed > 0 && <span className="text-danger"> · {aiRun.failed} con error</span>}
+              </span>
+              {aiRun.error && <span className="text-xs text-danger">{aiRun.error}</span>}
+              {aiRun.running ? (
+                <button type="button" onClick={() => (cancelAi.current = true)} className="text-xs font-semibold text-accent hover:underline">
+                  Detener
+                </button>
+              ) : (
+                <button type="button" onClick={() => setAiRun(null)} className="text-xs font-semibold text-accent hover:underline">
+                  Cerrar
+                </button>
+              )}
+            </div>
+          ) : (
+            <>
+              <p className="text-muted">
+                Genera con IA el origen, el perfil, el maridaje y las descripciones cortas, y los guarda directo. Trabaja
+                sobre las {visible.length} cervezas de esta vista (usa los filtros para elegirlas). Deja esta pestaña abierta
+                mientras termina.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={withoutNotes.length === 0}
+                  onClick={() => runAi(withoutNotes)}
+                  className="min-h-11 rounded-full bg-accent px-5 font-semibold text-white shadow-accent disabled:opacity-40"
+                >
+                  Completar las que no tienen notas ({withoutNotes.length})
+                </button>
+                <button
+                  type="button"
+                  disabled={visible.length === 0}
+                  onClick={() => {
+                    if (window.confirm(`Se reemplazarán las notas de ${visible.length} cervezas. ¿Continuar?`)) runAi(visible);
+                  }}
+                  className="min-h-11 rounded-full bg-canvas px-5 font-semibold hover:bg-black/10 disabled:opacity-40"
+                >
+                  Regenerar todas las de esta vista ({visible.length})
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {visible.length === 0 ? (
         <div className="rounded-[28px] bg-white p-10 text-center text-sm text-muted shadow-card">
@@ -327,8 +497,10 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
                     <p className="truncate text-xs text-muted">
                       {product.sku} · {STOCK_STATUS_LABEL[product.stock_status]}
                     </p>
-                    {product.pendiente && !product.is_active && missingForPending(product).length > 0 && (
-                      <p className="text-xs font-semibold text-amber-700">Falta: {missingForPending(product).join(", ")}</p>
+                    {!product.retirado && missingFields(product).length > 0 && (
+                      <p className="text-xs font-semibold text-amber-700">
+                        Falta: {missingFields(product).map((field) => MISSING_LABEL[field]).join(", ")}
+                      </p>
                     )}
                   </div>
                 </div>

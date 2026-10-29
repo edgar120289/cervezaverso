@@ -4,7 +4,6 @@ import { connection } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Product } from "@/lib/types";
 import { isProductId } from "@/lib/landing-style";
-import { countryKey } from "@/lib/country-flags";
 
 /**
  * Lectura del catálogo desde Supabase (única fuente de productos).
@@ -187,23 +186,6 @@ export async function getProductSitemapEntries(): Promise<{ sku: string; updated
     return [];
   }
   return data;
-}
-
-/** Cifras de la franja de confianza de la portada: cervezas activas y países distintos entre ellas. */
-export async function getCatalogStats(): Promise<{ beers: number; countries: number }> {
-  await connection();
-  const supabase = getClient();
-  if (!supabase) return { beers: 0, countries: 0 };
-
-  const { data, error } = await supabase.from("products").select("country").eq("is_active", true);
-  if (error) {
-    console.error("[catalog] Error al leer las cifras del catálogo:", error.message);
-    return { beers: 0, countries: 0 };
-  }
-  const countries = new Set(
-    data.map((row) => countryKey(String(row.country ?? ""))).filter((key) => key !== ""),
-  );
-  return { beers: data.length, countries: countries.size };
 }
 
 /**

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { announcementSchema, DEFAULT_ANNOUNCEMENT } from "@/lib/announcement";
 import {
   DEFAULT_GRID_STYLE,
   DEFAULT_IMPACT_STYLE,
@@ -120,6 +121,7 @@ const modulesSchema = z.preprocess(
 export const landingSettingsSchema = z.object({
   hero: heroSettingsSchema,
   modules: modulesSchema,
+  announcement: announcementSchema,
 });
 
 export type LandingModule = z.infer<typeof moduleSchema>;
@@ -138,6 +140,7 @@ export const DEFAULT_LANDING_MODULES: LandingModule[] = [
 export const DEFAULT_LANDING_SETTINGS: LandingSettings = {
   hero: DEFAULT_HERO_SETTINGS,
   modules: DEFAULT_LANDING_MODULES,
+  announcement: DEFAULT_ANNOUNCEMENT,
 };
 
 /** Todas las imágenes que la configuración tiene en uso (Hero y bloques), para limpiar el bucket. */
@@ -168,9 +171,11 @@ export function parseLandingSettings(raw: unknown): LandingSettings {
 
   const hero = heroSettingsSchema.safeParse(source.hero);
   const modules = modulesSchema.safeParse(source.modules);
+  const announcement = announcementSchema.safeParse(source.announcement);
 
   return {
     hero: hero.success ? hero.data : DEFAULT_HERO_SETTINGS,
     modules: modules.success ? modules.data : DEFAULT_LANDING_MODULES,
+    announcement: announcement.success ? announcement.data : DEFAULT_ANNOUNCEMENT,
   };
 }

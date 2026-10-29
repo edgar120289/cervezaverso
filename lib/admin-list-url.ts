@@ -12,6 +12,11 @@ export const SORT_IDS = [
 ] as const;
 
 export type StatusFilter = (typeof STATUS_IDS)[number];
+
+/** Filtro «Incompletas»: lo que le falta a la cerveza. En la URL va en español (`?incompletas=foto`). */
+export const MISSING_IDS = ["any", "brewery", "photo", "notes"] as const;
+export type MissingFilter = (typeof MISSING_IDS)[number];
+const MISSING_PARAM: Record<MissingFilter, string> = { any: "todas", brewery: "cerveceria", photo: "foto", notes: "notas" };
 export type AdminSortId = (typeof SORT_IDS)[number];
 
 /** Estado del inventario del admin que vive en la URL: sobrevive a «Atrás» y se puede compartir. */
@@ -20,6 +25,7 @@ export type AdminListState = {
   status: StatusFilter;
   sort: AdminSortId;
   featuredOnly: boolean;
+  missing: MissingFilter | null;
   filters: CatalogFilters;
 };
 
@@ -28,6 +34,7 @@ export const DEFAULT_LIST_STATE: AdminListState = {
   status: "all",
   sort: "name-asc",
   featuredOnly: false,
+  missing: null,
   filters: EMPTY_FILTERS,
 };
 
@@ -49,6 +56,7 @@ export function parseListState(params: ParamReader): AdminListState {
     status: STATUS_IDS.find((id) => id === status) ?? DEFAULT_LIST_STATE.status,
     sort: SORT_IDS.find((id) => id === sort) ?? DEFAULT_LIST_STATE.sort,
     featuredOnly: params.get("destacadas") === "1",
+    missing: MISSING_IDS.find((id) => MISSING_PARAM[id] === params.get("incompletas")) ?? null,
     filters: {
       ...EMPTY_FILTERS,
       countries: params.getAll("pais"),
@@ -68,6 +76,7 @@ export function serializeListState(state: AdminListState): string {
   if (state.status !== DEFAULT_LIST_STATE.status) params.set("estado", state.status);
   if (state.sort !== DEFAULT_LIST_STATE.sort) params.set("orden", state.sort);
   if (state.featuredOnly) params.set("destacadas", "1");
+  if (state.missing) params.set("incompletas", MISSING_PARAM[state.missing]);
   filters.countries.forEach((value) => params.append("pais", value));
   filters.breweries.forEach((value) => params.append("cerveceria", value));
   if (filters.minPrice !== null) params.set("min", String(filters.minPrice));
