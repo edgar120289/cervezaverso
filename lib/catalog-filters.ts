@@ -59,6 +59,11 @@ export function filterableAbv(product: FilterableProduct): number | null {
   return NON_ALCOHOLIC.test(normalize(`${product.name} ${product.style}`)) ? 0 : null;
 }
 
+/** Texto donde busca el catálogo: nombre, cervecería, estilo y país, sin acentos ni mayúsculas. */
+export function searchHaystack(product: FilterableProduct): string {
+  return normalize([product.name, product.brewery, product.style, product.country].filter(Boolean).join(" "));
+}
+
 type Facet = "countries" | "breweries";
 
 const FACET_FIELD: Record<Facet, (p: FilterableProduct) => string | null> = {
@@ -69,9 +74,7 @@ const FACET_FIELD: Record<Facet, (p: FilterableProduct) => string | null> = {
 /** ¿El producto pasa todos los filtros? `ignore` omite una faceta (para contar sus opciones). */
 export function matchesFilters(product: FilterableProduct, filters: CatalogFilters, ignore?: Facet): boolean {
   if (filters.query) {
-    const haystack = normalize(
-      [product.name, product.brewery, product.style, product.country].filter(Boolean).join(" ")
-    );
+    const haystack = searchHaystack(product);
     // Cada palabra buscada debe aparecer en algún campo, en cualquier orden.
     if (!normalize(filters.query).split(/\s+/).every((word) => haystack.includes(word))) return false;
   }

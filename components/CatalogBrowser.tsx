@@ -16,6 +16,7 @@ import {
   type SortId,
 } from "@/lib/catalog-filters";
 import { parseCatalogState, serializeCatalogState } from "@/lib/catalog-url";
+import { buildVocabulary, correctQuery } from "@/lib/fuzzy-search";
 import { activeFilterChips, FilterDrawer, FilterPanel } from "./CatalogFilterPanel";
 import CategoriesMenu from "./CategoriesMenu";
 import ProductCard from "./ProductCard";
@@ -51,9 +52,30 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
   // El texto se filtra con prioridad baja: escribir nunca se siente trabado.
   const deferredFilters = useDeferredValue(filters);
 
+  const vocabulary = useMemo(() => buildVocabulary(products), [products]);
+  const exactResults = useMemo(
+    () => products.filter((product) => matchesFilters(product, deferredFilters)),
+    [products, deferredFilters]
+  );
+  // Sin resultados por un error de dedo («shoferhofer»): se busca lo más parecido y se avisa.
+  const correction = useMemo(
+    () =>
+      exactResults.length === 0 && deferredFilters.query.trim()
+        ? correctQuery(deferredFilters.query, products, vocabulary)
+        : null,
+    [exactResults.length, deferredFilters.query, products, vocabulary]
+  );
+  const effectiveFilters = useMemo(
+    () => (correction ? { ...deferredFilters, query: correction } : deferredFilters),
+    [correction, deferredFilters]
+  );
   const results = useMemo(
-    () => sortProducts(products.filter((product) => matchesFilters(product, deferredFilters)), sort),
-    [products, deferredFilters, sort]
+    () =>
+      sortProducts(
+        correction ? products.filter((product) => matchesFilters(product, effectiveFilters)) : exactResults,
+        sort
+      ),
+    [correction, products, effectiveFilters, exactResults, sort]
   );
   // Cualquier cambio de búsqueda, filtros u orden vuelve a la primera página.
   const resetKey = JSON.stringify([deferredFilters, sort]);
@@ -94,7 +116,9 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
 
   const activeChips = activeFilterChips(filters, setFilters);
 
-  const panel = <FilterPanel products={products} filters={filters} setFilters={setFilters} />;
+  // Con búsqueda corregida, los conteos del panel siguen a lo que se muestra.
+  const panelFilters = correction ? { ...filters, query: correction } : filters;
+  const panel = <FilterPanel products={products} filters={panelFilters} setFilters={setFilters} />;
 
   return (
     <div className="min-w-0 space-y-4">
@@ -174,6 +198,20 @@ export default function CatalogBrowser({ products }: { products: Product[] }) {
           </button>
         )}
       </div>
+
+      {correction && (
+        <p className="rounded-[28px] bg-white px-5 py-4 text-sm shadow-card" aria-live="polite">
+          Quizás quisiste decir{" "}
+          <button
+            type="button"
+            onClick={() => setFilters((c) => ({ ...c, query: correction }))}
+            className="font-semibold text-accent underline-offset-2 hover:underline"
+          >
+            «{correction}»
+          </button>
+          . <span className="text-muted">No encontramos «{deferredFilters.query.trim()}», así que te mostramos lo más parecido.</span>
+        </p>
+      )}
 
       {results.length === 0 ? (
         <div className="rounded-[28px] bg-white px-6 py-14 text-center shadow-card">

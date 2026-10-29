@@ -14,6 +14,7 @@ import {
   type FilterableProduct,
 } from "@/lib/catalog-filters";
 import { formatMXN } from "@/lib/pricing";
+import { fuzzyIncludes } from "@/lib/fuzzy-search";
 import { normalCase } from "@/lib/text-case";
 import { useIsClient } from "@/lib/use-is-client";
 
@@ -55,7 +56,9 @@ function CheckboxList({
       Number(selected.includes(b.value)) - Number(selected.includes(a.value)) ||
       Number(b.count > 0) - Number(a.count > 0)
   );
-  const matching = term ? sorted.filter((o) => normalize(o.value).includes(term)) : sorted;
+  // Primero lo exacto; si nada coincide, se toleran errores de dedo («wendladt» → Wendlandt).
+  const exact = term ? sorted.filter((o) => normalize(o.value).includes(term)) : sorted;
+  const matching = term && exact.length === 0 ? sorted.filter((o) => fuzzyIncludes(term, o.value)) : exact;
   const visible = expanded || term ? matching : matching.slice(0, COLLAPSED_OPTIONS);
 
   return (
