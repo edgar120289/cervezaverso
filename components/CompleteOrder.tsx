@@ -7,6 +7,7 @@ import { obtenerSugerenciasPedido } from "@/app/actions/sugerencias";
 import { trackAddToCart } from "@/lib/analytics";
 import { useCart } from "@/lib/cart-context";
 import { formatMXN } from "@/lib/pricing";
+import { normalCase } from "@/lib/text-case";
 import type { Product } from "@/lib/types";
 import ProductImage from "./ProductImage";
 
@@ -51,13 +52,13 @@ export default function CompleteOrder() {
               className="flex min-w-0 flex-1 items-center gap-3"
             >
               <span className="group relative block h-20 w-16 shrink-0 overflow-hidden rounded-[14px] bg-white">
-                <ProductImage src={product.image_url} alt={product.name} sizes="64px" />
+                <ProductImage src={product.image_url} alt={normalCase(product.name)} sizes="64px" thumb />
               </span>
               <span className="min-w-0">
                 <span className="line-clamp-2 block text-sm font-semibold leading-snug tracking-[-0.02em]">
-                  {product.name}
+                  {normalCase(product.name)}
                 </span>
-                <span className="block truncate text-xs text-muted">{product.style}</span>
+                <span className="block truncate text-xs text-muted">{normalCase(product.style)}</span>
                 <span className="mt-0.5 block text-sm font-semibold">{formatMXN(product.sale_price)}</span>
               </span>
             </Link>
@@ -67,7 +68,7 @@ export default function CompleteOrder() {
                 addItem(product, 1, { openDrawer: false });
                 trackAddToCart(product);
               }}
-              aria-label={`Agregar ${product.name} al carrito`}
+              aria-label={`Agregar ${normalCase(product.name)} al carrito`}
               className="flex min-h-11 shrink-0 items-center gap-1 rounded-full bg-accent px-4 text-sm font-semibold text-white transition-transform active:scale-95"
             >
               <Plus size={16} strokeWidth={2.5} aria-hidden />
