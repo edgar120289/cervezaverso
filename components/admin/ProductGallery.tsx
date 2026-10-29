@@ -5,6 +5,8 @@ import Image from "next/image";
 import { ArrowLeft, ArrowRight, GripVertical, ImageUp, Loader2, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { actualizarGaleriaProducto } from "@/app/actions/admin-productos";
+import { productThumbPath } from "@/lib/product-images";
+import { resizeProductImage } from "@/lib/resize-image";
 import {
   firstIssue,
   MAX_PRODUCT_IMAGES,
@@ -94,14 +96,19 @@ export default function ProductGallery({ productId, productName, sku, initialUrl
     const uploadedUrls: string[] = [];
     try {
       for (const [i, file] of valid.entries()) {
-        const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+        const { full, thumb } = await resizeProductImage(file);
         // Nombre único: evita que la CDN sirva una versión anterior cacheada.
-        const path = `${sku}/${Date.now()}-${i}.${extension}`;
-        const { error: uploadError } = await supabase.storage
-          .from(PRODUCT_IMAGE_BUCKET)
-          .upload(path, file, { contentType: file.type, cacheControl: "31536000", upsert: false });
+        const path = `${sku}/${Date.now()}-${i}.webp`;
+        const thumbPath = productThumbPath(path);
+        const options = { contentType: "image/webp", cacheControl: "31536000", upsert: false };
+        const { error: uploadError } = await supabase.storage.from(PRODUCT_IMAGE_BUCKET).upload(path, full, options);
         if (uploadError) throw uploadError;
         uploadedPaths.push(path);
+        const { error: thumbError } = await supabase.storage
+          .from(PRODUCT_IMAGE_BUCKET)
+          .upload(thumbPath, thumb, options);
+        if (thumbError) throw thumbError;
+        uploadedPaths.push(thumbPath);
         uploadedUrls.push(supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path).data.publicUrl);
       }
       const saved = await persist([...urls, ...uploadedUrls]);
