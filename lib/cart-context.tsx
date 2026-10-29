@@ -11,6 +11,8 @@ import {
 } from "react";
 import type { AppliedPromo, CartItem, Product } from "@/lib/types";
 import { calculateOrderTotals } from "@/lib/pricing";
+import { getShippingZone, type ShippingZone } from "@/lib/shipping-zones";
+import { useAccount } from "@/lib/account-context";
 import { validarCodigoPromo } from "@/app/actions/promo";
 
 const STORAGE_KEY = "cervezaverso:cart";
@@ -32,8 +34,11 @@ type CartContextValue = {
   discount: number;
   /** Descuento por volumen (10% en compras mayores a $6,000), no acumulable con códigos. */
   volumeDiscount: number;
-  /** Envío estimado con la regla de CDMX y zona metropolitana; el checkout recalcula según la dirección. */
-  shippingCost: number;
+  /** Zona de envío según el CP de la dirección predeterminada; `null` mientras no se conozca el CP. */
+  shippingZone: ShippingZone | null;
+  /** Costo de envío estimado; `null` si aún no hay CP. El servidor recalcula con la dirección real. */
+  shippingCost: number | null;
+  /** Total; sin envío mientras `shippingCost` sea `null`. */
   total: number;
   itemCount: number;
   /** false hasta leer localStorage: evita mostrar "carrito vacío" por un instante. */
@@ -134,10 +139,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     () => items.reduce((sum, item) => sum + item.product.sale_price * item.quantity, 0),
     [items]
   );
-  const { discount, volumeDiscount, shippingCost, total } = useMemo(
-    () => calculateOrderTotals(subtotal, promo, "metro"),
-    [subtotal, promo]
+  const { defaultPostalCode } = useAccount();
+  const shippingZone = useMemo<ShippingZone | null>(
+    () => (defaultPostalCode && /^d{5}$/.test(defaultPostalCode) ? getShippingZone({ codigo_postal: defaultPostalCode }) : null),
+    [defaultPostalCode]
   );
+  const { discount, volumeDiscount, shippingCost, total } = useMemo(() => {
+    const totals = calculateOrderTotals(subtotal, promo, shippingZone ?? "nacional");
+    // Sin CP no se supone ninguna zona: el envío queda fuera del total hasta conocerla.
+    return shippingZone ? totals : { ...totals, shippingCost: null, total: totals.total - totals.shippingCost };
+  }, [subtotal, promo, shippingZone]);
   const itemCount = useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
     [items]
@@ -155,6 +166,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     removePromo,
     discount,
     volumeDiscount,
+    shippingZone,
     shippingCost,
     total,
     itemCount,

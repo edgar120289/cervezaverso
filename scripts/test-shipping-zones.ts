@@ -4,7 +4,7 @@
  */
 import assert from "node:assert/strict";
 import { ESTADOS_MX } from "@/lib/estados-mx";
-import { codigoPostalCorrespondeAEstado } from "@/lib/postal-estados";
+import { codigoPostalCorrespondeAEstado, estadoDeCodigoPostal } from "@/lib/postal-estados";
 import { getShippingZone } from "@/lib/shipping-zones";
 import { direccionSchema } from "@/lib/validation";
 
@@ -66,5 +66,13 @@ for (const estado of ESTADOS_MX) {
   }
   assert.ok(tiene, `${estado} no tiene prefijos`);
 }
+
+// El estado sugerido para el checkout sale del CP y coincide con la validación.
+for (const [prefijo, estado] of dueno) assert.equal(estadoDeCodigoPostal(String(prefijo).padStart(2, "0") + "123"), estado);
+assert.equal(estadoDeCodigoPostal("06700"), "Ciudad de México");
+assert.equal(estadoDeCodigoPostal("64000"), "Nuevo León");
+assert.equal(estadoDeCodigoPostal("1800"), null);
+assert.equal(estadoDeCodigoPostal("00123"), null);
+assert.equal(estadoDeCodigoPostal("18000"), null);
 
 console.log(`OK: ${casos.length} casos de zona y CP verificados, 32 estados sin prefijos repetidos.`);

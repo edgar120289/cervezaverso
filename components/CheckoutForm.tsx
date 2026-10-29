@@ -15,6 +15,7 @@ import {
   type PaymentMethod,
 } from "@/lib/pricing";
 import { ESTADOS_MX } from "@/lib/estados-mx";
+import { estadoDeCodigoPostal } from "@/lib/postal-estados";
 import { getShippingZone } from "@/lib/shipping-zones";
 import { checkoutSchema, firstIssue, isHoneypotFilled, MAX_NOTAS } from "@/lib/validation";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
@@ -109,6 +110,15 @@ export default function CheckoutForm({
 
   function updateNueva(campo: keyof DireccionEnvio, value: string) {
     setNueva((prev) => ({ ...prev, [campo]: value }));
+  }
+
+  /** Con 5 dígitos, el estado se rellena según el CP si está vacío o no coincide; el cliente puede cambiarlo después. */
+  function updateCodigoPostal(value: string) {
+    const codigo = value.replace(/\D/g, "");
+    setNueva((prev) => {
+      const sugerido = estadoDeCodigoPostal(codigo);
+      return { ...prev, codigo_postal: codigo, estado: sugerido && prev.estado !== sugerido ? sugerido : prev.estado };
+    });
   }
 
   function handleSubmit(e: FormEvent) {
@@ -300,7 +310,7 @@ export default function CheckoutForm({
                     maxLength={5}
                     autoComplete="postal-code"
                     value={nueva.codigo_postal}
-                    onChange={(e) => updateNueva("codigo_postal", e.target.value.replace(/\D/g, ""))}
+                    onChange={(e) => updateCodigoPostal(e.target.value)}
                   />
                 </FormField>
               </div>

@@ -187,3 +187,45 @@ export async function getProductSitemapEntries(): Promise<{ sku: string; updated
   }
   return data;
 }
+
+/**
+ * «Completa tu pedido»: hasta `limit` cervezas activas, con foto y existencia, que no estén ya en el
+ * carrito. Primero las del mismo estilo que lo que hay en el carrito; si faltan, destacadas.
+ * `excludeIds` debe venir validado como UUID (se interpola en el filtro `not.in`).
+ */
+export async function getCompleteOrderSuggestions(styles: string[], excludeIds: string[], limit = 3): Promise<Product[]> {
+  const supabase = getClient();
+  if (!supabase) return [];
+
+  // Sin exclusiones se usa un UUID nulo, que no existe en la tabla, para no armar el filtro condicionalmente.
+  const excluded = `(${(excludeIds.length > 0 ? excludeIds : ["00000000-0000-0000-0000-000000000000"]).join(",")})`;
+  const base = () =>
+    supabase
+      .from("products")
+      .select(PRODUCT_COLUMNS)
+      .eq("is_active", true)
+      .not("image_url", "is", null)
+      .in("stock_status", ["in_stock", "low_stock"])
+      .not("id", "in", excluded)
+      .order("name", { ascending: true });
+
+  const picked: Product[] = [];
+  const take = (rows: Record<string, unknown>[] | null) => {
+    for (const row of rows ?? []) {
+      const product = toProduct(row);
+      if (picked.length < limit && !picked.some((p) => p.id === product.id)) picked.push(product);
+    }
+  };
+
+  if (styles.length > 0) {
+    const { data, error } = await base().in("style", styles).limit(limit);
+    if (error) console.error("[catalog] Error al leer sugerencias por estilo:", error.message);
+    take(data);
+  }
+  if (picked.length < limit) {
+    const { data, error } = await base().eq("is_featured", true).limit(limit * 2);
+    if (error) console.error("[catalog] Error al leer sugerencias destacadas:", error.message);
+    take(data);
+  }
+  return picked;
+}
