@@ -111,3 +111,8 @@ export function countryFlagUrl(country: string): string | null {
   const code = countryFlagCode(country);
   return code ? `/flags/${code}.png` : null;
 }
+
+/** Clave para contar países distintos: «USA», «EUA» y «Estados Unidos» comparten clave. */
+export function countryKey(country: string): string {
+  return countryFlagCode(country) ?? normalize(country);
+}
