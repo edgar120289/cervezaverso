@@ -8,7 +8,7 @@
  * Requiere NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en .env.local (también en
  * --dry-run, porque la vista previa compara contra el catálogo actual). Mismas reglas que el
  * panel (`lib/catalog-plan.ts`): retiradas ignoradas, nuevas como pendientes y precio con el
- * margen de 35 % (costo / 0.65) o el margen personalizado del producto.
+ * margen de 30 % (costo / 0.70) o el margen personalizado del producto.
  */
 import { readFile } from "node:fs/promises";
 import { createClient } from "@supabase/supabase-js";

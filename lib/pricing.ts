@@ -18,13 +18,13 @@ export function freeShippingThreshold(zone: ShippingZone): number {
   return zone === "metro" ? FREE_SHIPPING_THRESHOLD_METRO : FREE_SHIPPING_THRESHOLD;
 }
 
-export const DEFAULT_MARGIN_PCT = 35;
+export const DEFAULT_MARGIN_PCT = 30;
 /** Tope del margen real: con 100% el divisor sería cero. */
 export const MAX_MARGIN_PCT = 95;
 
 /**
  * Regla de precio de venta obligatoria (SPEC.md #6.3):
- * margen de utilidad real sobre el precio de venta (35% por defecto): costo / (1 - margen),
+ * margen de utilidad real sobre el precio de venta (30% por defecto): costo / (1 - margen),
  * redondeado hacia abajo al múltiplo de 5.
  */
 export function calculateSalePrice(costPrice: number, marginPct: number = DEFAULT_MARGIN_PCT): number {
