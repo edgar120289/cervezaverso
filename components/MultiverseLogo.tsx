@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { optimizedBrandSrc } from "@/lib/media-paths";
 
 const FALLBACK_JARS = [
   "/multiverso/jar-1.svg",
@@ -23,6 +24,7 @@ type MultiverseLogoProps = {
   size?: number;
   /** Si se define, el tarro cambia solo cada `autoCycleMs` milisegundos. */
   autoCycleMs?: number;
+  /** Marco y primer tarro con fetchPriority alto; los demás tarros cargan al mostrarse. */
   priority?: boolean;
 };
 
@@ -57,7 +59,14 @@ export default function MultiverseLogo({
       style={{ width: size, height: size }}
     >
       {frame && (
-        <Image src={frame} alt="" fill sizes={`${size}px`} priority={priority} className="object-contain" />
+        <Image
+          src={optimizedBrandSrc(frame, size)}
+          alt=""
+          fill
+          sizes={`${size}px`}
+          fetchPriority={priority ? "high" : undefined}
+          className="object-contain"
+        />
       )}
       <AnimatePresence mode="wait">
         <motion.div
@@ -68,7 +77,14 @@ export default function MultiverseLogo({
           transition={{ duration: 0.35, ease: "easeOut" }}
           className="absolute inset-0"
         >
-          <Image src={jar} alt="" fill sizes={`${size}px`} quality={100} priority={priority} className="object-contain" />
+          <Image
+            src={optimizedBrandSrc(jar, size)}
+            alt=""
+            fill
+            sizes={`${size}px`}
+            fetchPriority={priority && jar === jars[0] ? "high" : undefined}
+            className="object-contain"
+          />
         </motion.div>
       </AnimatePresence>
     </button>

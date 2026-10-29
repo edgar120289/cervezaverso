@@ -30,11 +30,4 @@ export function listPublicImages(dir: string): string[] {
   return listPublicFiles(dir, IMAGE_EXTENSIONS);
 }
 
-/** Carpetas de `public/` que alimentan la identidad visual. */
-export const MEDIA_DIRS = {
-  /** Tarros recortados (sin fondo): logo del header. */
-  tarros: "img/cervezaverso-tarros-sin-fondo/tarros-sin-fondo",
-  /** Capas de tarro alineadas al marco circular (1024×1024). */
-  capasCirculares: "img/cervezaverso-logos-v2/capas-tarro/circular",
-  marcoCircular: "img/cervezaverso-logos-v2/marcos/marco-circular.png",
-} as const;
+export { MEDIA_DIRS } from "./media-paths";

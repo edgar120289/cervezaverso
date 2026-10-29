@@ -10,6 +10,7 @@ import { recommendProducts } from "@/app/actions/sommelier";
 import type { Recommendation } from "@/lib/sommelier";
 import MiniProductCard from "@/components/MiniProductCard";
 import { SOMMELIER_MASCOT, SOMMELIER_NAME } from "@/lib/site";
+import { optimizedBrandSrc } from "@/lib/media-paths";
 
 type PartialAnswers = Partial<QuizAnswers>;
 
@@ -88,7 +89,7 @@ export default function SommelierModal({ isOpen, onClose }: { isOpen: boolean; o
                 </button>
               ) : (
                 <span className="flex items-center gap-2 text-sm font-semibold text-accent">
-                  <Image src={SOMMELIER_MASCOT} alt="" width={28} height={34} className="h-8 w-auto" />
+                  <Image src={optimizedBrandSrc(SOMMELIER_MASCOT, 40)} alt="" width={28} height={34} className="h-8 w-auto" />
                   {SOMMELIER_NAME} · Sommelier Cervezaverso
                 </span>
               )}
