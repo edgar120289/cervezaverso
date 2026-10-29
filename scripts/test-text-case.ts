@@ -17,6 +17,8 @@ const casos: [string, string][] = [
   ["STOUT CON AVELLANA Y VAINILLA", "Stout con Avellana y Vainilla"],
   ["IMPERIAL STOUT AGED IN BOURBON BARRELS", "Imperial Stout Aged In Bourbon Barrels"],
   ["TSINGTAO IPA", "Tsingtao IPA"],
+  ["INTERSTELLAR NTC NEGATIVE TEMPERATURE COEFFICIENT", "Interstellar NTC Negative Temperature Coefficient"],
+  ["PTC POSITIVE TEMPERATURE COEFFICIENT", "PTC Positive Temperature Coefficient"],
   ["BÉLGICA", "Bélgica"],
   ["USA", "USA"],
   ["Birra Baladin Lippa IPA", "Birra Baladin Lippa IPA"],

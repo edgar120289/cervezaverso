@@ -8,7 +8,6 @@ import { useCart } from "@/lib/cart-context";
 import {
   calculateOrderTotals,
   calculateShippingCost,
-  freeShippingThreshold,
   formatMXN,
   PAYMENT_METHODS,
   SHIPPING_METHODS,
@@ -17,6 +16,7 @@ import {
 import { ESTADOS_MX } from "@/lib/estados-mx";
 import { estadoDeCodigoPostal } from "@/lib/postal-estados";
 import { getShippingZone } from "@/lib/shipping-zones";
+import ShippingGoals from "./ShippingGoals";
 import { checkoutSchema, firstIssue, isHoneypotFilled, MAX_NOTAS } from "@/lib/validation";
 import PromoCodeField, { DiscountRow } from "@/components/PromoCodeField";
 import { VolumeDiscountNotice, VolumeDiscountRow } from "@/components/VolumeDiscount";
@@ -88,10 +88,12 @@ export default function CheckoutForm({
 
   const guardada = direcciones.find((d) => d.id === seleccion);
   const direccion: DireccionEnvio = guardada ?? nueva;
-  // Sin código postal completo se muestra la regla de CDMX; el servidor siempre recalcula con la dirección real.
-  const zona = /^\d{5}$/.test(direccion.codigo_postal) ? getShippingZone(direccion) : "metro";
-  const { discount, volumeDiscount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo, zona);
-  const faltaParaGratis = Math.max(0, freeShippingThreshold(zona) - subtotal);
+  // Sin código postal completo no se supone ninguna zona; el servidor siempre recalcula con la dirección real.
+  const zona = /^\d{5}$/.test(direccion.codigo_postal) ? getShippingZone(direccion) : null;
+  const totales = calculateOrderTotals(subtotal, promo, zona ?? "nacional");
+  const { discount, volumeDiscount } = totales;
+  const costoEnvio = zona ? totales.shippingCost : null;
+  const total = zona ? totales.total : totales.total - totales.shippingCost;
 
   if (!isHydrated || isRedirecting) {
     return <div className="h-96 animate-pulse rounded-[28px] bg-white shadow-card" />;
@@ -400,15 +402,13 @@ export default function CheckoutForm({
                     <p className="text-sm text-muted">{SHIPPING_METHODS.nacional.description}</p>
                   </div>
                 </div>
-                <ShippingPrice amount={calculateShippingCost(subtotal, zona)} />
+                <ShippingPrice amount={zona ? calculateShippingCost(subtotal, zona) : null} />
               </div>
             </OptionCard>
           </div>
-          {faltaParaGratis > 0 && (
-            <p className="mt-3 rounded-[20px] bg-canvas px-4 py-3 text-xs text-black/60">
-              Te faltan {formatMXN(faltaParaGratis)} para el envío gratis.
-            </p>
-          )}
+          <div className="mt-3 rounded-[20px] bg-canvas px-4 py-3">
+            <ShippingGoals subtotal={subtotal} zone={zona} />
+          </div>
         </section>
 
         {/* Pago */}
@@ -488,11 +488,13 @@ export default function CheckoutForm({
           {promo && <DiscountRow code={promo.code} amount={discount} />}
           <VolumeDiscountRow amount={volumeDiscount} />
           <div className="flex justify-between text-black/60">
-            <span>Envío nacional</span>
-            <span className="tabular-nums">{costoEnvio === 0 ? "Gratis" : formatMXN(costoEnvio)}</span>
+            <span>Envío</span>
+            <span className="tabular-nums">
+              {costoEnvio === null ? "Se calcula con tu código postal" : costoEnvio === 0 ? "Gratis" : formatMXN(costoEnvio)}
+            </span>
           </div>
           <div className="flex justify-between pt-2 text-base font-semibold">
-            <span>Total</span>
+            <span>{costoEnvio === null ? "Total sin envío" : "Total"}</span>
             <span className="tabular-nums">{formatMXN(total)}</span>
           </div>
         </div>
@@ -555,7 +557,8 @@ function SectionTitle({ step, title }: { step: number; title: string }) {
   );
 }
 
-function ShippingPrice({ amount }: { amount: number }) {
+function ShippingPrice({ amount }: { amount: number | null }) {
+  if (amount === null) return <span className="shrink-0 text-right text-sm text-muted">Se calcula con tu código postal</span>;
   return (
     <span className={`shrink-0 font-semibold tabular-nums ${amount === 0 ? "text-accent" : ""}`}>
       {amount === 0 ? "Gratis" : formatMXN(amount)}

@@ -8,7 +8,7 @@ const SMALL_WORDS = new Set([
   "the", "of", "and", "von", "van", "der", "du", "au", "le",
 ]);
 const KEEP_UPPER = new Set([
-  "ipa", "neipa", "dipa", "ddh", "apa", "esb", "ipl", "xpa", "aipa", "ii", "iii", "iv", "vi", "vii", "viii", "ix", "usa", "uk", "ny",
+  "ipa", "neipa", "dipa", "ddh", "apa", "esb", "ipl", "xpa", "aipa", "ii", "iii", "iv", "vi", "vii", "viii", "ix", "usa", "uk", "ny", "ntc", "ptc",
 ]);
 
 /** Palabra en mayúsculas → formato normal; mayúscula tras guion, barra, paréntesis o comillas, no tras apóstrofo (Fuller's). */
