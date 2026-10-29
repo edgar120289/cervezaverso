@@ -8,7 +8,8 @@ const SMALL_WORDS = new Set([
   "the", "of", "and", "von", "van", "der", "du", "au", "le",
 ]);
 const KEEP_UPPER = new Set([
-  "ipa", "neipa", "dipa", "ddh", "apa", "esb", "ipl", "xpa", "aipa", "ii", "iii", "iv", "vi", "vii", "viii", "ix", "usa", "uk", "ny", "ntc", "ptc",
+  "ipa", "neipa", "dipa", "ddh", "apa", "esb", "ipl", "xpa", "aipa", "ii", "iii", "iv", "vi", "vii", "viii", "ix", "usa", "uk", "ny", "nyc", "ntc", "ptc",
+  "tdh", "hb", "nz", "xh", "mb", "acdc", "ita", "bbq",
 ]);
 
 /** Palabra en mayúsculas → formato normal; mayúscula tras guion, barra, paréntesis o comillas, no tras apóstrofo (Fuller's). */
@@ -17,7 +18,15 @@ function capitalize(word: string, index: number): string {
   if (KEEP_UPPER.has(bare.toLowerCase())) return word.toUpperCase();
   const lower = word.toLowerCase();
   if (index > 0 && SMALL_WORDS.has(bare.toLowerCase())) return lower;
-  return lower.replace(/(^|[-/("“])(\p{L})/gu, (_, sep: string, letter: string) => sep + letter.toUpperCase());
+  // Elisión francesa o italiana: «d'Achouffe», «Tarot d'Or», «l'Abbaye».
+  const elision = lower.match(/^([dl])['’](\p{L})(.*)$/u);
+  if (elision) {
+    const [, article, letter, rest] = elision;
+    return (index === 0 ? article.toUpperCase() : article) + "'" + letter.toUpperCase() + rest;
+  }
+  const cased = lower.replace(/(^|[-/("“])(\p{L})/gu, (_, sep: string, letter: string) => sep + letter.toUpperCase());
+  // Apellidos escoceses: «McEwan's», «McCallum's».
+  return cased.replace(/^Mc(\p{L})/u, (_, letter: string) => "Mc" + letter.toUpperCase());
 }
 
 /**

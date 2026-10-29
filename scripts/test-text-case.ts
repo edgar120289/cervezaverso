@@ -22,6 +22,15 @@ const casos: [string, string][] = [
   ["BÉLGICA", "Bélgica"],
   ["USA", "USA"],
   ["Birra Baladin Lippa IPA", "Birra Baladin Lippa IPA"],
+  ["D'ACHOUFFE MC CHOUFFE", "D'Achouffe Mc Chouffe"],
+  ["LINDEMANS TAROT D'OR", "Lindemans Tarot d'Or"],
+  ["MCEWAN'S CHAMPION", "McEwan's Champion"],
+  ["BELHAVEN MCCALLUM'S ETIQUETA ROJA", "Belhaven McCallum's Etiqueta Roja"],
+  ["EVIL TWIN NYC X RÁMURI EVEN MORE LÁGRIMAS NYC VERSION", "Evil Twin NYC x Rámuri Even More Lágrimas NYC Version"],
+  ["HB MÜNCHNER WEISSE", "HB Münchner Weisse"],
+  ["AC/DC ROCK OR BUST LATA", "AC/DC Rock Or Bust Lata"],
+  ["TDH HAZY IPA", "TDH Hazy IPA"],
+  ["PÈRE NOËL", "Père Noël"],
 ];
 for (const [entrada, esperado] of casos) assert.equal(normalCase(entrada), esperado, entrada);
 

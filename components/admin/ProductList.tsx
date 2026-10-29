@@ -13,6 +13,7 @@ import {
 } from "@/lib/catalog-filters";
 import { parseListState, serializeListState, type AdminSortId, type StatusFilter } from "@/lib/admin-list-url";
 import { formatMXN, STOCK_STATUS_LABEL } from "@/lib/pricing";
+import { normalCase } from "@/lib/text-case";
 import type { StockStatus } from "@/lib/types";
 import { activeFilterChips, chipClass, FilterDrawer, FilterPanel, FilterSection } from "@/components/CatalogFilterPanel";
 import ProductPlaceholder from "@/components/ProductPlaceholder";
@@ -317,11 +318,11 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold leading-snug">
-                      {product.name}
+                      {normalCase(product.name)}
                       <StatusBadge product={product} />
                     </p>
                     <p className="truncate text-xs text-muted">
-                      {product.country} · {product.style}
+                      {normalCase(product.country)} · {normalCase(product.style)}
                     </p>
                     <p className="truncate text-xs text-muted">
                       {product.sku} · {STOCK_STATUS_LABEL[product.stock_status]}

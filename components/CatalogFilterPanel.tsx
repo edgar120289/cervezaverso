@@ -14,6 +14,7 @@ import {
   type FilterableProduct,
 } from "@/lib/catalog-filters";
 import { formatMXN } from "@/lib/pricing";
+import { normalCase } from "@/lib/text-case";
 import { useIsClient } from "@/lib/use-is-client";
 
 type Facet = "countries" | "breweries";
@@ -86,7 +87,7 @@ function CheckboxList({
               onChange={() => onToggle(value)}
               className="h-4 w-4 shrink-0 cursor-pointer rounded accent-accent"
             />
-            <span className="min-w-0 flex-1 truncate">{value}</span>
+            <span className="min-w-0 flex-1 truncate">{normalCase(value)}</span>
             <span className="text-xs tabular-nums text-muted">{count}</span>
           </label>
         );
@@ -306,7 +307,7 @@ export function activeFilterChips(
     ...(["countries", "breweries"] as const).flatMap((facet) =>
       filters[facet].map((value) => ({
         key: `${facet}:${value}`,
-        label: value,
+        label: normalCase(value),
         clear: () => setFilters((c) => ({ ...c, [facet]: c[facet].filter((v) => v !== value) })),
       }))
     ),

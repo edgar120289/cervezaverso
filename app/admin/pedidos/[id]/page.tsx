@@ -5,6 +5,7 @@ import { z } from "zod";
 import { ChevronLeft, MapPin, MessageSquareText, UserRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatMXN, SHIPPING_METHODS } from "@/lib/pricing";
+import { normalCase } from "@/lib/text-case";
 import { ESTADO_BADGE, folio, formatFecha, PEDIDO_DETALLE_COLUMNS } from "@/lib/pedidos";
 import PedidoEstadoSelect from "@/components/admin/PedidoEstadoSelect";
 import CancelPendingButton from "@/components/admin/CancelPendingButton";
@@ -90,7 +91,7 @@ export default async function AdminPedidoDetallePage({ params }: PageProps<"/adm
           {pedido.pedido_items.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-4 py-3 text-sm">
               <div className="min-w-0">
-                <p className="font-semibold">{item.nombre}</p>
+                <p className="font-semibold">{normalCase(item.nombre)}</p>
                 <p className="text-muted tabular-nums">
                   {item.sku} · {item.cantidad} × {formatMXN(Number(item.precio_unitario))}
                 </p>

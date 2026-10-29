@@ -24,7 +24,7 @@ export default function ProductSpotlight({ product, badge }: { product: Product;
         <ProductImage src={product.image_url} alt={normalCase(product.name)} sizes="(min-width: 1024px) 384px, 90vw" thumb />
       </Link>
       <div className="shrink-0">
-        <p className="text-xs font-semibold uppercase tracking-wide text-muted">{product.brewery}</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted">{product.brewery && normalCase(product.brewery)}</p>
         <h3 className="line-clamp-2 text-lg font-semibold tracking-tight">{normalCase(product.name)}</h3>
         <p className="mt-1 text-xl font-bold">{formatMXN(product.sale_price)} MXN</p>
       </div>
