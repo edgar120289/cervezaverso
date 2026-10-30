@@ -20,6 +20,6 @@ export async function validarCodigoPromo(code: string): Promise<PromoResult> {
   const result = await findActivePromo(parsed.data);
   if (!result.ok) return result;
   // Sin el id interno: el navegador sólo necesita lo necesario para mostrar el descuento.
-  const { code: promoCode, discount_type, value, min_purchase } = result.promo;
-  return { ok: true, promo: { code: promoCode, discount_type, value, min_purchase } };
+  const { code: promoCode, discount_type, value, min_purchase, country } = result.promo;
+  return { ok: true, promo: { code: promoCode, discount_type, value, min_purchase, country } };
 }

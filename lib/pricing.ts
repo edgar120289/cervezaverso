@@ -1,5 +1,6 @@
 import type { AppliedPromo, StockStatus } from "@/lib/types";
 import type { ShippingZone } from "@/lib/shipping-zones";
+import { countryKey } from "@/lib/country-flags";
 
 /** Envío gratis desde este subtotal en el resto del país. */
 const FREE_SHIPPING_THRESHOLD = 3000;
@@ -95,15 +96,25 @@ export function calculateShippingCost(subtotal: number, zone: ShippingZone): num
  * Descuento de un código sobre el subtotal de productos (en pesos enteros).
  * 0 si no alcanza la compra mínima. Un monto fijo nunca excede el subtotal.
  */
-function calculateDiscount(subtotal: number, promo: AppliedPromo | null): number {
-  if (!promo || subtotal <= 0 || subtotal < promo.min_purchase) return 0;
-  const raw = promo.discount_type === "percent" ? (subtotal * promo.value) / 100 : promo.value;
-  return Math.min(Math.floor(raw), subtotal);
+function calculateDiscount(subtotal: number, base: number, promo: AppliedPromo | null): number {
+  if (!promo || base <= 0 || subtotal < promo.min_purchase) return 0;
+  const raw = promo.discount_type === "percent" ? (base * promo.value) / 100 : promo.value;
+  return Math.min(Math.floor(raw), base);
 }
 
 /**
- * Descuento por volumen sobre el subtotal de productos (nunca sobre el envío). No es acumulable:
- * si un código ya descuenta algo (`promoDiscount > 0`), no se aplica.
+ * Parte del subtotal a la que aplica el código: todo el pedido o, si el código es de un país
+ * («Graciela viaja»), solo las cervezas de ese país.
+ */
+export function promoBase(lines: { country: string; amount: number }[], promo: AppliedPromo | null): number {
+  const target = promo?.country ? countryKey(promo.country) : null;
+  return lines.reduce((sum, line) => (target === null || countryKey(line.country) === target ? sum + line.amount : sum), 0);
+}
+
+/**
+ * Descuento por volumen sobre el subtotal de productos (nunca sobre el envío). No es acumulable
+ * con códigos: si uno ya descuenta algo (`promoDiscount > 0`), no se aplica (con un código de país
+ * se queda el mayor de los dos, ver `calculateOrderTotals`).
  */
 export function calculateVolumeDiscount(subtotal: number, promoDiscount: number): number {
   if (promoDiscount > 0 || subtotal <= VOLUME_DISCOUNT_THRESHOLD) return 0;
@@ -127,10 +138,17 @@ export type OrderTotals = {
 export function calculateOrderTotals(
   subtotal: number,
   promo: AppliedPromo | null,
-  zone: ShippingZone
+  zone: ShippingZone,
+  /** Subtotal al que aplica el código (`promoBase`); por defecto, todo. */
+  base: number = subtotal
 ): OrderTotals {
-  const discount = calculateDiscount(subtotal, promo);
-  const volumeDiscount = calculateVolumeDiscount(subtotal, discount);
+  let discount = calculateDiscount(subtotal, base, promo);
+  let volumeDiscount = calculateVolumeDiscount(subtotal, discount);
+  // Un código de país solo descuenta una parte del pedido: si el de volumen conviene más, gana el de volumen.
+  if (promo?.country && discount > 0) {
+    const volumeOnly = calculateVolumeDiscount(subtotal, 0);
+    if (volumeOnly > discount) [discount, volumeDiscount] = [0, volumeOnly];
+  }
   const shippingCost = subtotal > 0 ? calculateShippingCost(subtotal, zone) : 0;
   return { subtotal, discount, volumeDiscount, shippingCost, total: subtotal - discount - volumeDiscount + shippingCost };
 }

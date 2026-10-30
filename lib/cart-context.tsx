@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import type { AppliedPromo, CartItem, Product } from "@/lib/types";
-import { calculateOrderTotals } from "@/lib/pricing";
+import { calculateOrderTotals, promoBase } from "@/lib/pricing";
 import { getShippingZone, type ShippingZone } from "@/lib/shipping-zones";
 import { useAccount } from "@/lib/account-context";
 import { validarCodigoPromo } from "@/app/actions/promo";
@@ -141,14 +141,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
   const { defaultPostalCode } = useAccount();
   const shippingZone = useMemo<ShippingZone | null>(
-    () => (defaultPostalCode && /^d{5}$/.test(defaultPostalCode) ? getShippingZone({ codigo_postal: defaultPostalCode }) : null),
+    () => (defaultPostalCode && /^\d{5}$/.test(defaultPostalCode) ? getShippingZone({ codigo_postal: defaultPostalCode }) : null),
     [defaultPostalCode]
   );
   const { discount, volumeDiscount, shippingCost, total } = useMemo(() => {
-    const totals = calculateOrderTotals(subtotal, promo, shippingZone ?? "nacional");
+    const base = promoBase(items.map((item) => ({ country: item.product.country, amount: item.product.sale_price * item.quantity })), promo);
+    const totals = calculateOrderTotals(subtotal, promo, shippingZone ?? "nacional", base);
     // Sin CP no se supone ninguna zona: el envío queda fuera del total hasta conocerla.
     return shippingZone ? totals : { ...totals, shippingCost: null, total: totals.total - totals.shippingCost };
-  }, [subtotal, promo, shippingZone]);
+  }, [items, subtotal, promo, shippingZone]);
   const itemCount = useMemo(
     () => items.reduce((sum, item) => sum + item.quantity, 0),
     [items]

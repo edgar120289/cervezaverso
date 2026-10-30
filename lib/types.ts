@@ -39,6 +39,8 @@ export type AppliedPromo = {
   discount_type: DiscountType;
   value: number;
   min_purchase: number;
+  /** Solo descuenta las cervezas de este país (código de «Graciela viaja»). No se acumula con el descuento por volumen. */
+  country?: string | null;
 };
 
 export type PromoCode = AppliedPromo & {

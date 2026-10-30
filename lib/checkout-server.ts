@@ -2,7 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { calculateOrderTotals, formatMXN, type PaymentMethod } from "@/lib/pricing";
+import { calculateOrderTotals, formatMXN, promoBase, type PaymentMethod } from "@/lib/pricing";
 import { findActivePromo } from "@/lib/promo";
 import { getShippingZone } from "@/lib/shipping-zones";
 import { checkoutSchema, firstIssue } from "@/lib/validation";
@@ -65,12 +65,13 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
   const productIds = [...new Set(items.map((item) => item.product_id))];
   const { data: products, error: productsError } = await admin
     .from("products")
-    .select("id, sku, name, sale_price, stock_status, is_active")
+    .select("id, sku, name, country, sale_price, stock_status, is_active")
     .in("id", productIds);
   if (productsError) return { ok: false, error: "No pudimos confirmar los precios. Intenta de nuevo." };
 
   const byId = new Map(products.map((product) => [product.id, product]));
   const lineas = [];
+  const paises: { country: string; amount: number }[] = [];
   for (const { product_id, cantidad } of items) {
     const product = byId.get(product_id);
     // La service role no pasa por RLS: un producto inactivo se trata aquí como no disponible.
@@ -87,6 +88,7 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
       cantidad,
       importe: precio * cantidad,
     });
+    paises.push({ country: product.country as string, amount: precio * cantidad });
   }
 
   const subtotal = lineas.reduce((sum, linea) => sum + linea.importe, 0);
@@ -114,7 +116,17 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
     if (promo) await admin.rpc("release_promo_code", { p_id: promo.id });
   };
 
-  const { discount, volumeDiscount, shippingCost: costoEnvio, total } = calculateOrderTotals(subtotal, promo, getShippingZone(direccion));
+  const { discount, volumeDiscount, shippingCost: costoEnvio, total } = calculateOrderTotals(
+    subtotal,
+    promo,
+    getShippingZone(direccion),
+    promoBase(paises, promo),
+  );
+  // Código de país sin cervezas de ese país, o que pierde frente al descuento por volumen: no se usa.
+  if (promo && discount === 0) {
+    await releasePromo();
+    promo = null;
+  }
   const direccionEnvio: DireccionEnvio = direccion;
 
   const { data: pedido, error: pedidoError } = await admin

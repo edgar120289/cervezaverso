@@ -11,7 +11,7 @@ export type PromoLookup = { ok: true; promo: AppliedPromo & { id: string } } | {
 export async function findActivePromo(code: string): Promise<PromoLookup> {
   const { data, error } = await createAdminClient()
     .from("promo_codes")
-    .select("id, code, discount_type, value, min_purchase, active, max_uses, times_used, reward_level")
+    .select("id, code, discount_type, value, min_purchase, active, max_uses, times_used, reward_level, country, starts_at, ends_at")
     .eq("code", code)
     .maybeSingle();
 
@@ -24,7 +24,10 @@ export async function findActivePromo(code: string): Promise<PromoLookup> {
   if (data.reward_level !== null) {
     return { ok: false, error: "Este código de recompensa se canjea escribiéndonos con tu pedido." };
   }
-  if (data.max_uses !== null &&data.times_used >= data.max_uses) {
+  const now = Date.now();
+  if (data.starts_at && new Date(data.starts_at).getTime() > now) return { ok: false, error: "Este código todavía no está vigente." };
+  if (data.ends_at && new Date(data.ends_at).getTime() < now) return { ok: false, error: "Este código ya venció." };
+  if (data.max_uses !== null && data.times_used >= data.max_uses) {
     return { ok: false, error: "Este código ya fue utilizado." };
   }
 
@@ -36,6 +39,7 @@ export async function findActivePromo(code: string): Promise<PromoLookup> {
       discount_type: data.discount_type,
       value: Number(data.value),
       min_purchase: Number(data.min_purchase),
+      country: data.country ?? null,
     },
   };
 }

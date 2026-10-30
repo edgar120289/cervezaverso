@@ -4,6 +4,7 @@ import { useState, useTransition, type FormEvent } from "react";
 import { Gift, Loader2, TicketPercent, X } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { formatMXN, formatPromoValue } from "@/lib/pricing";
+import { normalCase } from "@/lib/text-case";
 
 /**
  * "¿Tienes un código de descuento?". No es un <form> anidado: en el
@@ -41,7 +42,9 @@ export default function PromoCodeField() {
             <p className="font-semibold tracking-wide">{promo.code}</p>
             <p className="text-xs text-muted">
               {promo.discount_type === "fixed" ? "Tarjeta de regalo" : "Descuento"} de {formatPromoValue(promo)}
+              {promo.country && ` en cervezas de ${normalCase(promo.country)}`}
               {discount > 0 && ` · ahorras ${formatMXN(discount)}`}
+              {promo.country && discount === 0 && " · no aplica a tu carrito (o te conviene más el descuento por volumen)"}
             </p>
           </div>
           <button

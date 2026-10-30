@@ -7,6 +7,7 @@ import { Check, CreditCard, Landmark, Truck, Zap } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import {
   calculateOrderTotals,
+  promoBase,
   calculateShippingCost,
   formatMXN,
   PAYMENT_METHODS,
@@ -90,7 +91,8 @@ export default function CheckoutForm({
   const direccion: DireccionEnvio = guardada ?? nueva;
   // Sin código postal completo no se supone ninguna zona; el servidor siempre recalcula con la dirección real.
   const zona = /^\d{5}$/.test(direccion.codigo_postal) ? getShippingZone(direccion) : null;
-  const totales = calculateOrderTotals(subtotal, promo, zona ?? "nacional");
+  const base = promoBase(items.map((item) => ({ country: item.product.country, amount: item.product.sale_price * item.quantity })), promo);
+  const totales = calculateOrderTotals(subtotal, promo, zona ?? "nacional", base);
   const { discount, volumeDiscount } = totales;
   const costoEnvio = zona ? totales.shippingCost : null;
   const total = zona ? totales.total : totales.total - totales.shippingCost;
