@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { cuentaMeta, metaConfigurado, publicarFacebook, publicarInstagram, type MetaCuenta } from "@/lib/meta";
+import {
+  cuentaMeta,
+  metaConfigurado,
+  publicarFacebook,
+  publicarHistoriaFacebook,
+  publicarHistoriaInstagram,
+  publicarInstagram,
+  type MetaCuenta,
+} from "@/lib/meta";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -14,6 +22,7 @@ type Fila = {
   caption: string;
   imagenes: string[];
   redes: string[];
+  formato: string | null;
   ig_media_id: string | null;
   fb_post_id: string | null;
   intentos: number;
@@ -43,14 +52,20 @@ export async function GET() {
       cuenta ??= await cuentaMeta();
       if (fila.redes.includes("instagram") && !fila.ig_media_id) {
         try {
-          cambios.ig_media_id = await publicarInstagram(cuenta, fila.imagenes, fila.caption);
+          cambios.ig_media_id =
+            fila.formato === "historia"
+              ? await publicarHistoriaInstagram(cuenta, fila.imagenes[0])
+              : await publicarInstagram(cuenta, fila.imagenes, fila.caption);
         } catch (err) {
           errores.push(`Instagram: ${err instanceof Error ? err.message : String(err)}`);
         }
       }
       if (fila.redes.includes("facebook") && !fila.fb_post_id) {
         try {
-          cambios.fb_post_id = await publicarFacebook(cuenta, fila.imagenes, fila.caption);
+          cambios.fb_post_id =
+            fila.formato === "historia"
+              ? await publicarHistoriaFacebook(cuenta, fila.imagenes[0])
+              : await publicarFacebook(cuenta, fila.imagenes, fila.caption);
         } catch (err) {
           errores.push(`Facebook: ${err instanceof Error ? err.message : String(err)}`);
         }

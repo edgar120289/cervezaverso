@@ -115,3 +115,21 @@ export async function publicarFacebook(cuenta: MetaCuenta, imagenes: string[], m
   const { id } = await graph<{ id: string }>("POST", `${cuenta.pageId}/feed`, { message, ...attached }, token);
   return id;
 }
+
+/** Historia de Instagram (una imagen, dura 24 h). Las historias por API no admiten stickers ni enlaces. */
+export async function publicarHistoriaInstagram(cuenta: MetaCuenta, imagen: string): Promise<string> {
+  if (!cuenta.igId) throw new MetaError("La página de Facebook no tiene una cuenta de Instagram profesional ligada.");
+  const token = cuenta.pageToken;
+  const { id: creationId } = await graph<{ id: string }>("POST", `${cuenta.igId}/media`, { image_url: imagen, media_type: "STORIES" }, token);
+  await esperarContenedor(creationId, token);
+  const { id } = await graph<{ id: string }>("POST", `${cuenta.igId}/media_publish`, { creation_id: creationId }, token);
+  return id;
+}
+
+/** Historia de la página de Facebook: se sube la foto sin publicar y luego se manda a photo_stories. */
+export async function publicarHistoriaFacebook(cuenta: MetaCuenta, imagen: string): Promise<string> {
+  const token = cuenta.pageToken;
+  const { id: photoId } = await graph<{ id: string }>("POST", `${cuenta.pageId}/photos`, { url: imagen, published: "false" }, token);
+  const { post_id, id } = await graph<{ id?: string; post_id?: string }>("POST", `${cuenta.pageId}/photo_stories`, { photo_id: photoId }, token);
+  return post_id ?? id ?? photoId;
+}

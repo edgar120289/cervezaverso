@@ -14,9 +14,11 @@ import {
   cdmxLocalToIso,
   formatCdmx,
   isoToCdmxLocal,
+  FORMATOS,
   REDES,
   REDES_BUCKET,
   type Publicacion,
+  type Formato,
   type Red,
 } from "@/lib/redes";
 
@@ -32,14 +34,17 @@ const RED_LABEL: Record<Red, string> = { instagram: "Instagram", facebook: "Face
 const btn = "flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold disabled:opacity-50";
 const input = "min-h-11 w-full rounded-2xl bg-canvas px-4 text-sm outline-none focus:ring-2 focus:ring-black/15";
 
-/** Instagram exige JPG y proporción entre 4:5 (vertical) y 1.91:1 (horizontal). Se convierte en el navegador. */
-async function aJpg(file: File): Promise<Blob> {
+/**
+ * Instagram exige JPG; en el muro, proporción entre 4:5 (vertical) y 1.91:1 (horizontal); en historias, 9:16 ideal.
+ * Se convierte en el navegador.
+ */
+async function aJpg(file: File, historia: boolean): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
   const ratio = bitmap.height / bitmap.width;
-  if (ratio > 1.26 || ratio < 0.52) {
+  if (!historia && (ratio > 1.26 || ratio < 0.52)) {
     throw new Error("Instagram acepta imágenes entre 4:5 (vertical, 1080×1350) y 1.91:1 (horizontal).");
   }
-  const scale = Math.min(1, 1440 / bitmap.width);
+  const scale = Math.min(1, (historia ? 1080 : 1440) / bitmap.width);
   const canvas = document.createElement("canvas");
   canvas.width = Math.round(bitmap.width * scale);
   canvas.height = Math.round(bitmap.height * scale);
@@ -52,7 +57,8 @@ async function aJpg(file: File): Promise<Blob> {
   );
 }
 
-type Draft = { titulo: string; caption: string; imagenes: string[]; redes: Red[]; fecha: string };
+type Draft = { titulo: string; caption: string; imagenes: string[]; redes: Red[]; formato: Formato; fecha: string };
+const FORMATO_LABEL: Record<Formato, string> = { feed: "Publicación", historia: "Historia (24 h)" };
 
 function draftDe(p?: Publicacion): Draft {
   const manana = new Date(Date.now() + 24 * 3600 * 1000);
@@ -62,6 +68,7 @@ function draftDe(p?: Publicacion): Draft {
     caption: p?.caption ?? "",
     imagenes: p?.imagenes ?? [],
     redes: p?.redes ?? ["instagram", "facebook"],
+    formato: p?.formato ?? "feed",
     fecha: isoToCdmxLocal(p?.programada_para ?? manana.toISOString()),
   };
 }
@@ -84,7 +91,7 @@ function Editor({ publicacion, onDone }: { publicacion?: Publicacion; onDone: ()
       const supabase = createClient();
       const urls: string[] = [];
       for (const file of files.slice(0, 10 - draft.imagenes.length)) {
-        const blob = await aJpg(file);
+        const blob = await aJpg(file, draft.formato === "historia");
         const path = `${Date.now()}-${crypto.randomUUID()}.jpg`;
         const { error: upErr } = await supabase.storage
           .from(REDES_BUCKET)
@@ -118,6 +125,7 @@ function Editor({ publicacion, onDone }: { publicacion?: Publicacion; onDone: ()
           caption: draft.caption,
           imagenes: draft.imagenes,
           redes: draft.redes,
+          formato: draft.formato,
           programada_para: cdmxLocalToIso(draft.fecha),
         },
         aprobar,
@@ -188,6 +196,16 @@ function Editor({ publicacion, onDone }: { publicacion?: Publicacion; onDone: ()
           Fecha y hora (CDMX)
           <input type="datetime-local" value={draft.fecha} onChange={(e) => set({ fecha: e.target.value })} className={`${input} mt-1 font-normal`} />
         </label>
+        <label className="text-xs font-semibold uppercase tracking-wide text-muted">
+          Formato
+          <select value={draft.formato} onChange={(e) => set({ formato: e.target.value as Formato })} className={`${input} mt-1 font-normal`}>
+            {FORMATOS.map((f) => (
+              <option key={f} value={f}>
+                {FORMATO_LABEL[f]}
+              </option>
+            ))}
+          </select>
+        </label>
         <fieldset className="flex gap-2">
           <legend className="sr-only">Redes</legend>
           {REDES.map((red) => {
@@ -243,6 +261,7 @@ function Tarjeta({ p }: { p: Publicacion }) {
         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${ESTADO[p.estado].tone}`}>{ESTADO[p.estado].label}</span>
         <span className="text-sm font-semibold">{formatCdmx(p.publicada_at ?? p.programada_para)}</span>
         <span className="text-xs text-muted">{p.redes.map((r) => RED_LABEL[r]).join(" + ")}</span>
+        {p.formato === "historia" && <span className="rounded-full bg-black px-3 py-1 text-xs font-semibold text-white">Historia</span>}
       </div>
       {editando ? (
         <Editor publicacion={p} onDone={() => setEditando(false)} />
