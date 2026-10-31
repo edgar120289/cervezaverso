@@ -9,6 +9,7 @@ import { normalCase } from "@/lib/text-case";
 import { ESTADO_BADGE, folio, formatFecha, PEDIDO_DETALLE_COLUMNS } from "@/lib/pedidos";
 import PedidoEstadoSelect from "@/components/admin/PedidoEstadoSelect";
 import CancelPendingButton from "@/components/admin/CancelPendingButton";
+import ResendEmailButton from "@/components/admin/ResendEmailButton";
 import type { PedidoDetalle } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Detalle del pedido" };
@@ -46,6 +47,7 @@ export default async function AdminPedidoDetallePage({ params }: PageProps<"/adm
           </span>
           <PedidoEstadoSelect id={pedido.id} estado={pedido.estado} prominent />
           {pedido.estado === "Pendiente" && <CancelPendingButton id={pedido.id} promoCode={pedido.promo_code ?? null} />}
+          {["Pagado", "Enviado", "Cancelado"].includes(pedido.estado) && <ResendEmailButton id={pedido.id} />}
         </div>
       </section>
 

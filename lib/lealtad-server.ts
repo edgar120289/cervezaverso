@@ -61,8 +61,8 @@ export async function revertirPedidoCancelado(pedidoId: string): Promise<void> {
 }
 
 /** Avisa al cliente del cambio de estado de su pedido (solo Pagado, Enviado y Cancelado). */
-export async function notificarEstadoPedido(pedidoId: string, estado: string): Promise<void> {
-  if (!esEstadoConCorreo(estado)) return;
+export async function notificarEstadoPedido(pedidoId: string, estado: string): Promise<boolean> {
+  if (!esEstadoConCorreo(estado)) return false;
   const { data, error } = await createAdminClient()
     .from("pedidos")
     .select("*")
@@ -70,7 +70,7 @@ export async function notificarEstadoPedido(pedidoId: string, estado: string): P
     .maybeSingle();
   if (error || !data) {
     console.error("[lealtad] No se pudo leer el pedido para el correo:", error?.message ?? "sin datos");
-    return;
+    return false;
   }
   const mensaje = estadoPedidoEmail(estado, {
     nombre: data.cliente_nombre,
@@ -79,7 +79,7 @@ export async function notificarEstadoPedido(pedidoId: string, estado: string): P
     descuentoVolumen: Number(data.descuento_volumen ?? 0) > 0 ? formatMXN(Number(data.descuento_volumen)) : undefined,
     pedidoUrl: `${SITE.url}/pedido/${data.id}`,
   });
-  await sendEmail({ to: data.cliente_email, ...mensaje });
+  return sendEmail({ to: data.cliente_email, ...mensaje });
 }
 
 /**
@@ -116,7 +116,8 @@ export async function notificarAdminPedido(pedidoId: string, motivo: MotivoAviso
       adminUrl: `${SITE.url}/admin/pedidos/${pedido.id}`,
       pagoId,
     });
-    await sendEmail({ to: CONTACT.email, ...mensaje, replyTo: pedido.cliente_email });
+    // Directo al buzón del dueño (ADMIN_NOTIFY_EMAIL): los reenvíos de ImprovMX llegan peor a Outlook.
+    await sendEmail({ to: process.env.ADMIN_NOTIFY_EMAIL?.trim() || CONTACT.email, ...mensaje, replyTo: pedido.cliente_email });
   } catch (err) {
     console.error("[aviso-admin] Error al avisar del pedido:", err instanceof Error ? err.message : err);
   }

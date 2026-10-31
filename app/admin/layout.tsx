@@ -20,11 +20,14 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   if (profile?.role !== "admin") redirect("/");
 
+  // Pedidos cobrados que falta enviar: se ven en el menú aunque no llegue el correo de aviso.
+  const { count: porEnviar } = await supabase.from("pedidos").select("id", { count: "exact", head: true }).eq("estado", "Pagado");
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="mb-4 text-2xl font-semibold tracking-tight">Panel de Administración</h1>
       <div className="mb-8 flex flex-wrap items-center gap-x-3 gap-y-2">
-        <AdminNav />
+        <AdminNav porEnviar={porEnviar ?? 0} />
         <div className="ml-auto">
           <SignOutButton variant="outline" />
         </div>

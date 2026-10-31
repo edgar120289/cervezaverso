@@ -15,7 +15,7 @@ const LINKS = [
 ] as const;
 
 /** Navegación del panel: enlaces tipo píldora, con la sección actual resaltada. */
-export default function AdminNav() {
+export default function AdminNav({ porEnviar = 0 }: { porEnviar?: number }) {
   const pathname = usePathname();
 
   return (
@@ -33,6 +33,15 @@ export default function AdminNav() {
             }`}
           >
             {label}
+            {href === "/admin/pedidos" && porEnviar > 0 && (
+              <span
+                className="ml-2 inline-flex min-w-6 items-center justify-center rounded-full bg-danger px-1.5 text-xs font-bold text-white"
+                title={`${porEnviar} por enviar`}
+              >
+                {porEnviar}
+                <span className="sr-only"> por enviar</span>
+              </span>
+            )}
           </Link>
         );
       })}

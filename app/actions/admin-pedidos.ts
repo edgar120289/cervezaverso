@@ -77,3 +77,14 @@ export async function cancelarPedidoPendiente(id: string): Promise<PedidoEstadoR
   refresh();
   return { ok: true };
 }
+
+/** Vuelve a mandar al cliente el correo del estado actual del pedido (Pagado, Enviado o Cancelado). */
+export async function reenviarCorreoPedido(id: string): Promise<PedidoEstadoResult> {
+  const parsed = z.uuid().safeParse(id);
+  if (!parsed.success) return { ok: false, error: "Datos inválidos." };
+  await requireAdmin("/admin/pedidos");
+  const { data } = await createAdminClient().from("pedidos").select("estado").eq("id", parsed.data).maybeSingle();
+  if (!data) return { ok: false, error: "No existe el pedido." };
+  const enviado = await notificarEstadoPedido(parsed.data, data.estado);
+  return enviado ? { ok: true } : { ok: false, error: `No se pudo enviar (el estado «${data.estado}» no tiene correo, o falló el envío).` };
+}
