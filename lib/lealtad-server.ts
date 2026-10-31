@@ -78,6 +78,7 @@ export async function notificarEstadoPedido(pedidoId: string, estado: string): P
     total: formatMXN(Number(data.total)),
     descuentoVolumen: Number(data.descuento_volumen ?? 0) > 0 ? formatMXN(Number(data.descuento_volumen)) : undefined,
     pedidoUrl: `${SITE.url}/pedido/${data.id}`,
+    guia: data.guia ? { paqueteria: data.paqueteria ?? "Paquetería", numero: data.guia, url: data.guia_url } : null,
   });
   return sendEmail({ to: data.cliente_email, ...mensaje });
 }

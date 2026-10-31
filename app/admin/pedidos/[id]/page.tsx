@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { z } from "zod";
-import { ChevronLeft, MapPin, MessageSquareText, UserRound } from "lucide-react";
+import { ChevronLeft, MapPin, MessageSquareText, Truck, UserRound } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatMXN, SHIPPING_METHODS } from "@/lib/pricing";
 import { normalCase } from "@/lib/text-case";
@@ -10,6 +10,7 @@ import { ESTADO_BADGE, folio, formatFecha, PEDIDO_DETALLE_COLUMNS } from "@/lib/
 import PedidoEstadoSelect from "@/components/admin/PedidoEstadoSelect";
 import CancelPendingButton from "@/components/admin/CancelPendingButton";
 import ResendEmailButton from "@/components/admin/ResendEmailButton";
+import GuiaForm from "@/components/admin/GuiaForm";
 import type { PedidoDetalle } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Detalle del pedido" };
@@ -131,6 +132,20 @@ export default async function AdminPedidoDetallePage({ params }: PageProps<"/adm
           </div>
         </div>
       </section>
+
+      {pedido.estado !== "Pendiente" && pedido.estado !== "Cancelado" && (
+        <section className="rounded-[28px] bg-white p-6 shadow-card">
+          <h2 className="mb-1 flex items-center gap-2 font-semibold tracking-tight">
+            <Truck size={18} className="text-muted" /> Guía de envío
+          </h2>
+          <p className="mb-4 text-sm text-muted">El cliente la recibe en su correo de «Tu pedido va en camino» y la ve en su pedido.</p>
+          <GuiaForm
+            id={pedido.id}
+            estado={pedido.estado}
+            inicial={{ paqueteria: pedido.paqueteria ?? "", guia: pedido.guia ?? "", guia_url: pedido.guia_url ?? "" }}
+          />
+        </section>
+      )}
 
       <section className="rounded-[28px] bg-white p-6 shadow-card">
         <h2 className="mb-3 flex items-center gap-2 font-semibold tracking-tight">

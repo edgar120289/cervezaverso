@@ -143,6 +143,24 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
         </section>
       )}
 
+      {pedido.guia && (pedido.estado === "Enviado" || pedido.estado === "Entregado") && (
+        <section className="rounded-[28px] bg-white p-6 shadow-card">
+          <h2 className="text-lg font-semibold tracking-tight">Guía de envío</h2>
+          <p className="mt-2 text-sm text-muted">{pedido.paqueteria}</p>
+          <p className="text-xl font-semibold tracking-wide tabular-nums">{pedido.guia}</p>
+          {pedido.guia_url && (
+            <a
+              href={pedido.guia_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex min-h-11 items-center rounded-full bg-accent px-5 text-sm font-semibold text-white"
+            >
+              Rastrear mi paquete
+            </a>
+          )}
+        </section>
+      )}
+
       <section className="rounded-[28px] bg-white p-6 shadow-card">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-semibold tracking-tight">Resumen de la compra</h2>

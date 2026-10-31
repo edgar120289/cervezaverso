@@ -88,3 +88,37 @@ export async function reenviarCorreoPedido(id: string): Promise<PedidoEstadoResu
   const enviado = await notificarEstadoPedido(parsed.data, data.estado);
   return enviado ? { ok: true } : { ok: false, error: `No se pudo enviar (el estado «${data.estado}» no tiene correo, o falló el envío).` };
 }
+
+const guiaSchema = z.object({
+  id: z.uuid(),
+  paqueteria: z.string().trim().min(2, "Escribe la paquetería.").max(60),
+  guia: z.string().trim().min(4, "Escribe el número de guía.").max(80),
+  guia_url: z.union([z.literal(""), z.url({ protocol: /^https$/, message: "El enlace debe empezar con https://" })]).optional(),
+});
+
+/**
+ * Guarda la guía de envío. Si el pedido estaba Pagado lo pasa a Enviado (el correo lleva la guía);
+ * si ya estaba Enviado, reenvía el aviso con la guía nueva.
+ */
+export async function guardarGuia(input: { id: string; paqueteria: string; guia: string; guia_url?: string }): Promise<PedidoEstadoResult> {
+  const parsed = guiaSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Datos inválidos." };
+  await requireAdmin("/admin/pedidos");
+  const admin = createAdminClient();
+  const { id, paqueteria, guia, guia_url } = parsed.data;
+  const { data, error } = await admin
+    .from("pedidos")
+    .update({ paqueteria, guia, guia_url: guia_url || null })
+    .eq("id", id)
+    .select("estado");
+  if (error || !data?.length) return { ok: false, error: "No se pudo guardar la guía." };
+  const estado = data[0].estado as string;
+  if (estado === "Pagado") return cambiarEstadoPedido(id, "Enviado");
+  if (estado === "Enviado") {
+    const enviado = await notificarEstadoPedido(id, "Enviado");
+    refresh();
+    return enviado ? { ok: true } : { ok: false, error: "Se guardó la guía, pero no se pudo enviar el correo." };
+  }
+  refresh();
+  return { ok: true };
+}

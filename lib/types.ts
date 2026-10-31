@@ -116,5 +116,9 @@ export type PedidoDetalle = Pedido & {
   descuento_volumen?: number;
   direccion: DireccionEnvio | null;
   notas: string | null;
+  /** Guía de envío (migración 031). */
+  paqueteria?: string | null;
+  guia?: string | null;
+  guia_url?: string | null;
   pedido_items: PedidoItem[];
 };
