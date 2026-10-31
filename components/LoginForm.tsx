@@ -10,6 +10,7 @@ import FormField, { INPUT_CLASS } from "@/components/FormField";
 import FormMessage from "@/components/FormMessage";
 import PrivacyNotice from "@/components/PrivacyNotice";
 import SocialLoginButtons from "@/components/SocialLoginButtons";
+import { SPAM_HINT } from "@/lib/site";
 
 type Mode = "signin" | "signup";
 
@@ -60,7 +61,7 @@ export default function LoginForm({
         const result = await registrarCuenta({ ...common, fecha_nacimiento: birthDate, next });
         if (!result.ok) return setError(result.error);
         if (!result.needsConfirmation) return window.location.assign(next);
-        setNotice("Cuenta creada. Revisa tu correo y abre el enlace para confirmar tu registro.");
+        setNotice(`Cuenta creada. Revisa tu correo y abre el enlace para confirmar tu registro. ${SPAM_HINT}`);
         return;
       }
 

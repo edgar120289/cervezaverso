@@ -44,3 +44,7 @@ export const SOMMELIER_NAME = "Graciela";
 
 /** Tarrito kawaii del Sommelier (botón flotante, quiz y presentación en la landing). */
 export const SOMMELIER_MASCOT = "/img/cervezaverso-tarros-sin-fondo/tarros-sin-fondo/14-kawaii-sonriente.png";
+
+/** Remitente de los correos (igual que EMAIL_FROM) y aviso para que el cliente lo busque si no llega. */
+export const EMAIL_SENDER = "pedidos@cervezaverso.com";
+export const SPAM_HINT = `Si no lo ves en unos minutos, revisa tu carpeta de spam o «Correo no deseado» y agrega ${EMAIL_SENDER} a tus contactos.`;

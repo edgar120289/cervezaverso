@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { CircleCheck, CircleX, MapPin, MessageSquareText, Truck } from "lucide-react";
 import BankTransferCard from "@/components/BankTransferCard";
 import { WhatsAppIcon } from "@/components/SocialIcons";
-import { CONTACT } from "@/lib/site";
+import { CONTACT, SPAM_HINT } from "@/lib/site";
 import { z } from "zod";
 import ClearCart from "@/components/ClearCart";
 import PurchaseTracker from "@/components/PurchaseTracker";
@@ -97,6 +97,7 @@ export default async function PedidoPage({ params, searchParams }: PageProps<"/p
               : "Te avisaremos en "}
             <span className="font-semibold text-black">{pedido.cliente_email}</span> en cuanto quede confirmado.
           </p>
+          <p className="max-w-md text-sm text-muted">{SPAM_HINT}</p>
         </section>
       ) : fallido ? (
         <section className="flex flex-col items-center gap-3 rounded-[28px] bg-white px-6 py-10 text-center shadow-card">

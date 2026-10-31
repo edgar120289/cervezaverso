@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { guardPublicForm } from "@/lib/security/form-guard";
 import { firstIssue, loginSchema, recoverSchema, signupSchema } from "@/lib/validation";
 import { safeNextPath } from "@/lib/safe-next";
-import { SITE } from "@/lib/site";
+import { SITE, SPAM_HINT } from "@/lib/site";
 import type { UserRole } from "@/lib/types";
 
 /**
@@ -42,7 +42,7 @@ export async function iniciarSesion(input: unknown): Promise<AuthResult<{ role: 
   if (error || !data.user) {
     if (error) console.error("[auth] Error al iniciar sesión:", error.code, error.status, error.message);
     if (error?.code === "email_not_confirmed") {
-      return { ok: false, error: "Confirma tu correo con el enlace que te enviamos antes de entrar." };
+      return { ok: false, error: `Confirma tu correo con el enlace que te enviamos antes de entrar. ${SPAM_HINT}` };
     }
     return { ok: false, error: "Correo o contraseña incorrectos." };
   }

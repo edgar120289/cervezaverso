@@ -1,5 +1,6 @@
 "use client";
 
+import { SPAM_HINT } from "@/lib/site";
 import { useId, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { solicitarRecuperacion } from "@/app/actions/auth";
@@ -53,7 +54,7 @@ export default function RecoverPasswordForm() {
         {sent ? (
           <div className="mt-6">
             <FormMessage tone="info">
-              Si hay una cuenta con ese correo, recibirás el enlace en unos minutos. Revisa también la carpeta de spam.
+              Si hay una cuenta con ese correo, recibirás el enlace en unos minutos. {SPAM_HINT}
             </FormMessage>
           </div>
         ) : (
