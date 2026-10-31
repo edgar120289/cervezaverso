@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateSommelierNotes, overusedPairings, SommelierAIError } from "@/lib/sommelier-ai";
 
-export const maxDuration = 60;
+// Con respaldo entre modelos de Gemini (hasta ~100 s) cuando uno está saturado.
+export const maxDuration = 120;
 
 const requestSchema = z.object({ product_id: z.uuid() });
 

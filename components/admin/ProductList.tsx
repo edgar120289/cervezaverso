@@ -205,16 +205,24 @@ export default function ProductList({ products }: { products: AdminProductRow[] 
       while (next < targets.length && !cancelAi.current) {
         const product = targets[next++];
         try {
-          const res = await fetch("/api/ai/enrich", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ product_id: product.id }),
-          });
+          const enrich = () =>
+            fetch("/api/ai/enrich", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ product_id: product.id }),
+            });
+          let res = await enrich();
+          // Gemini saturado o tiempo agotado: un segundo intento tras una pausa suele salir.
+          if (res.status >= 500 && !cancelAi.current) {
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+            res = await enrich();
+          }
           const data = await res.json().catch(() => ({}));
           if (!res.ok) {
-            setAiRun((run) => run && { ...run, done: run.done + 1, failed: run.failed + 1, error: data.error ?? "Error" });
-            // Llave inválida o falta de configuración: no tiene caso seguir.
-            if (res.status === 401 || res.status === 403 || res.status === 500) cancelAi.current = true;
+            const error = res.status === 504 ? "La IA tardó demasiado (servicio saturado)." : (data.error ?? "Error");
+            setAiRun((run) => run && { ...run, done: run.done + 1, failed: run.failed + 1, error });
+            // Sesión vencida o sin permiso: no tiene caso seguir.
+            if (res.status === 401 || res.status === 403) cancelAi.current = true;
             continue;
           }
           setAiRun((run) => run && { ...run, done: run.done + 1 });
