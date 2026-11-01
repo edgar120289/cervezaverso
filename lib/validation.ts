@@ -156,7 +156,7 @@ export const productUpdateSchema = z.object({
   sku: z
     .string("Escribe el SKU.")
     .trim()
-    .regex(/^[A-Za-z0-9][A-Za-z0-9._-]{2,49}$/, "El SKU debe tener de 3 a 50 caracteres: letras, números, punto, guion o guion bajo."),
+    .regex(/^[A-Za-z0-9][A-Za-z0-9._-]{2,119}$/, "El SKU debe tener de 3 a 120 caracteres: letras, números, punto, guion o guion bajo."),
   name: trimmed(160, "Escribe el nombre de la cerveza."),
   brewery: optionalText(160),
   gtin: z
