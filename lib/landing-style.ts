@@ -7,7 +7,7 @@ export const LAYOUTS = ["background", "split"] as const;
 export const BUTTON_VARIANTS = ["solid", "pill", "outline", "link"] as const;
 export const OVERLAYS = [0, 25, 50, 75, 100] as const;
 export const SPOTLIGHT_BADGE_MAX = 40;
-export const SPOTLIGHT_REF_MAX = 60;
+export const SPOTLIGHT_REF_MAX = 120;
 
 export type TitleSize = (typeof TITLE_SIZES)[number];
 export type SubtitleSize = (typeof SUBTITLE_SIZES)[number];
