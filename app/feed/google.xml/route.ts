@@ -1,6 +1,7 @@
 import { feedId } from "@/lib/feed-id";
 import { getProducts } from "@/lib/catalog";
 import type { Product } from "@/lib/types";
+import { countryKey } from "@/lib/country-flags";
 import { SITE } from "@/lib/site";
 import { productSeoDescription } from "@/lib/product-description";
 import { googleBrand, googleCategory, googleDescription, googleProductType, googleTitle } from "@/lib/merchant-feed";
@@ -19,11 +20,15 @@ function xml(value: string): string {
     .replace(/'/g, "&apos;");
 }
 
+/** Nacional (incluye colaboraciones «México/USA»): las artesanales de aquí pueden no tener código de barras. */
+const isNational = (p: Product) =>
+  countryKey(p.country ?? "") === "mx" || /m[eé]xico/i.test(p.country ?? "");
+
 const hasImage = (p: Product) => p.image_urls.length > 0 || Boolean(p.image_url);
 
 /**
  * Feed RSS 2.0 de Google Merchant Center con las cervezas activas y con existencia. Con código de barras
- * (`gtin`) se publica; sin él, `identifier_exists` = `no`. Sin foto
+ * (`gtin`) se publica; sin él, `identifier_exists` = `no` solo si es nacional; las importadas sin código no llevan el campo (todas tienen uno). Sin foto
  * no se publica: Merchant Center rechaza los productos sin `image_link`.
  */
 export async function GET() {
@@ -44,7 +49,11 @@ export async function GET() {
         "      <g:availability>in_stock</g:availability>",
         `      <g:price>${p.sale_price.toFixed(2)} MXN</g:price>`,
         brand ? `      <g:brand>${xml(brand)}</g:brand>` : null,
-        p.gtin ? `      <g:gtin>${xml(p.gtin)}</g:gtin>` : "      <g:identifier_exists>no</g:identifier_exists>",
+        p.gtin
+          ? `      <g:gtin>${xml(p.gtin)}</g:gtin>`
+          : isNational(p)
+            ? "      <g:identifier_exists>no</g:identifier_exists>"
+            : null,
         "      <g:condition>new</g:condition>",
         `      <g:google_product_category>${xml(googleCategory(p))}</g:google_product_category>`,
         `      <g:product_type>${xml(googleProductType(p))}</g:product_type>`,
