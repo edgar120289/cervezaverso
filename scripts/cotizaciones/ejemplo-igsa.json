@@ -1,7 +1,7 @@
 {
-  "folio": "COT-2026-001",
+  "folio": "COT-2026-081",
   "fecha": "11 de noviembre de 2026",
-  "vigencia": "7 días naturales",
+  "vigencia": "5 días naturales",
   "logo": "public/img/cervezaverso-logos-v2/logos/horizontal/04-origami.png",
   "emisor": {
     "razon_social": "Cervezaverso S.A.S. de C.V.",
@@ -11,22 +11,40 @@
     "whatsapp": "+52 56 4307 5041",
     "sitio": "www.cervezaverso.com"
   },
-  "cliente": { "nombre": "IGSA", "detalle": [] },
+  "cliente": {
+    "nombre": "IGSA",
+    "detalle": []
+  },
   "iva_pct": 16,
   "ieps_pct": 0,
   "conceptos": [
-    { "nombre": "Cerveza Victoria 355 ml", "detalle": "Cartón · entrega en CDMX", "cantidad": 46, "unidad": "cartones", "precio_neto": 420 },
-    { "nombre": "Cerveza Corona 355 ml", "detalle": "Cartón · entrega en CDMX", "cantidad": 46, "unidad": "cartones", "precio_neto": 420 },
-    { "nombre": "Envío", "detalle": "Entrega programada el 3 de diciembre (máximo 4 de diciembre)", "cantidad": 1, "unidad": "servicio", "precio_neto": 1000 }
+    {
+      "nombre": "Cerveza Victoria 355 ml",
+      "detalle": "Cartón · entrega en CDMX",
+      "cantidad": 46,
+      "unidad": "cartones",
+      "precio_neto": 420
+    },
+    {
+      "nombre": "Cerveza Corona 355 ml",
+      "detalle": "Cartón · entrega en CDMX",
+      "cantidad": 46,
+      "unidad": "cartones",
+      "precio_neto": 420
+    },
+    {
+      "nombre": "Envío",
+      "detalle": "Entrega programada el 3 de diciembre (máximo 4 de diciembre)",
+      "cantidad": 1,
+      "unidad": "servicio",
+      "precio_neto": 1000
+    }
   ],
-  "pagos": [
-    { "porcentaje": 50, "nombre": "Anticipo", "cuando": "Para programar el pedido" },
-    { "porcentaje": 50, "nombre": "Liquidación", "cuando": "A más tardar el 2 de diciembre, antes de la salida del pedido" }
-  ],
+  "pagos": [],
   "comentarios": [
-    "Por el volumen de la compra (92 cartones), solicitamos el 50% de anticipo para programar el pedido y el 50% restante antes de que salga.",
-    "El pedido sale el 3 de diciembre por la mañana; el pago final debe estar acreditado a más tardar el 2 de diciembre.",
-    "La entrega está programada para el 3 de diciembre, o máximo el 4 de diciembre.",
+    "Por el volumen de la compra (92 cartones), solicitamos un anticipo del 50% ($19,820.00) para programar el pedido.",
+    "El 50% restante ($19,820.00) debe estar acreditado a más tardar el 2 de diciembre, antes de la salida del pedido.",
+    "El pedido sale el 3 de diciembre por la mañana; la entrega está programada para el 3 de diciembre, o máximo el 4 de diciembre.",
     "Precios en pesos mexicanos (MXN), con impuestos incluidos. Se emite factura por el total."
   ],
   "banco": {
