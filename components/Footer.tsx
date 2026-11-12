@@ -14,6 +14,7 @@ const SOCIAL_LINKS = [
 const FOOTER_LINKS = [
   { href: "/", label: "Inicio" },
   { href: "/tienda", label: "Tienda" },
+  { href: "/directorio", label: "Todas las cervezas" },
   { href: "/envios", label: "Envíos y pagos" },
   { href: "/faq", label: "Preguntas Frecuentes" },
   { href: "/contacto", label: "Contacto" },
