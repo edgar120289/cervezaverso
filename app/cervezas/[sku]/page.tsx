@@ -14,7 +14,7 @@ import SommelierAudio from "@/components/SommelierAudio";
 import ShareButton from "@/components/ShareButton";
 import { SITE } from "@/lib/site";
 import { productSeoDescription } from "@/lib/product-description";
-import { countryCategoryOf } from "@/lib/seo-categories";
+import { countryCategoryOf, styleCategoryOf } from "@/lib/seo-categories";
 import { jsonLdString, shippingDetailsJsonLd } from "@/lib/structured-data";
 import { googleBrand, googleTitle } from "@/lib/merchant-feed";
 import type { StockStatus } from "@/lib/types";
@@ -97,6 +97,7 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
   };
 
   const category = countryCategoryOf(product);
+  const styleCategory = styleCategoryOf(product);
   const breadcrumbLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -120,6 +121,23 @@ export default async function ProductPage({ params }: PageProps<"/cervezas/[sku]
         <ArrowLeft size={16} />
         Catálogo
       </Link>
+      <nav aria-label="Ruta de navegación" className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 px-3 text-xs text-muted">
+        <Link href="/" className="hover:underline">Inicio</Link>
+        <span aria-hidden>›</span>
+        <Link href="/tienda" className="hover:underline">Tienda</Link>
+        {category && (
+          <>
+            <span aria-hidden>›</span>
+            <Link href={`/catalogo/pais/${category.slug}`} className="hover:underline">Cerveza de {category.name}</Link>
+          </>
+        )}
+        {styleCategory && (
+          <>
+            <span aria-hidden>›</span>
+            <Link href={`/catalogo/estilo/${styleCategory.slug}`} className="hover:underline">{styleCategory.name}</Link>
+          </>
+        )}
+      </nav>
 
       <div className="mt-3 grid gap-6 md:grid-cols-2">
         <div className="rounded-[28px] bg-white p-4 shadow-card">

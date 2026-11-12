@@ -105,3 +105,9 @@ export function productsInStyle(products: Product[], category: StyleCategory): P
     return category.match.test(style) && !category.exclude?.test(style);
   });
 }
+
+/** Categoría de estilo a la que pertenece una cerveza (la primera que coincida), si hay. */
+export function styleCategoryOf(product: Pick<Product, "style">): StyleCategory | undefined {
+  const style = normalize(product.style);
+  return STYLE_CATEGORIES.find((c) => c.match.test(style) && !c.exclude?.test(style));
+}
