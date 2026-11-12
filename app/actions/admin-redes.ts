@@ -104,3 +104,28 @@ export async function estadoMeta(): Promise<EstadoMeta> {
     return { configurado: true, ok: false, error: err instanceof Error ? err.message : "Error desconocido." };
   }
 }
+
+export type ProductoRedes = { sku: string; name: string; sale_price: number; image_url: string };
+
+/** Buscador del generador de piezas: cervezas activas con foto, por nombre o SKU. Solo admins. */
+export async function buscarCervezasParaRedes(query: string): Promise<ProductoRedes[]> {
+  const supabase = await requireAdmin("/admin/redes");
+  const term = String(query ?? "")
+    .replace(/[%_\\,()*]/g, " ")
+    .trim()
+    .slice(0, 60);
+  if (term.length < 2) return [];
+  const { data, error } = await supabase
+    .from("products")
+    .select("sku, name, sale_price, image_url")
+    .eq("is_active", true)
+    .not("image_url", "is", null)
+    .or(`name.ilike.%${term}%,sku.ilike.%${term}%`)
+    .order("name", { ascending: true })
+    .limit(8);
+  if (error) {
+    console.error("[admin] Error al buscar cervezas para redes:", error.message);
+    return [];
+  }
+  return (data ?? []) as ProductoRedes[];
+}

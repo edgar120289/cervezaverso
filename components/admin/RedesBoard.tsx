@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState, useTransition, type ChangeEvent } from "react";
-import { ArrowLeft, ArrowRight, Check, ImageUp, Loader2, Pencil, Plus, Send, Trash2, Undo2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ImageUp, Loader2, Pencil, Plus, Send, Trash2, Undo2, Wand2, X } from "lucide-react";
+import PostGenerator from "@/components/admin/PostGenerator";
 import {
   borrarPublicacion,
   cambiarEstadoPublicacion,
@@ -77,9 +78,26 @@ function Editor({ publicacion, onDone }: { publicacion?: Publicacion; onDone: ()
   const [draft, setDraft] = useState<Draft>(() => draftDe(publicacion));
   const [error, setError] = useState<string | null>(null);
   const [subiendo, setSubiendo] = useState(false);
+  const [generador, setGenerador] = useState(false);
   const [pending, startTransition] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
   const set = (patch: Partial<Draft>) => setDraft((d) => ({ ...d, ...patch }));
+
+  async function subirJpg(blob: Blob): Promise<string> {
+    const supabase = createClient();
+    const path = `${Date.now()}-${crypto.randomUUID()}.jpg`;
+    const { error: upErr } = await supabase.storage
+      .from(REDES_BUCKET)
+      .upload(path, blob, { contentType: "image/jpeg", cacheControl: "31536000", upsert: false });
+    if (upErr) throw upErr;
+    return supabase.storage.from(REDES_BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+
+  async function agregarGenerada(blob: Blob) {
+    if (draft.imagenes.length >= 10) throw new Error("Máximo 10 imágenes por publicación.");
+    const url = await subirJpg(blob);
+    setDraft((d) => ({ ...d, imagenes: [...d.imagenes, url] }));
+  }
 
   async function subir(e: ChangeEvent<HTMLInputElement>) {
     const files = [...(e.target.files ?? [])];
@@ -88,16 +106,9 @@ function Editor({ publicacion, onDone }: { publicacion?: Publicacion; onDone: ()
     setError(null);
     setSubiendo(true);
     try {
-      const supabase = createClient();
       const urls: string[] = [];
       for (const file of files.slice(0, 10 - draft.imagenes.length)) {
-        const blob = await aJpg(file, draft.formato === "historia");
-        const path = `${Date.now()}-${crypto.randomUUID()}.jpg`;
-        const { error: upErr } = await supabase.storage
-          .from(REDES_BUCKET)
-          .upload(path, blob, { contentType: "image/jpeg", cacheControl: "31536000", upsert: false });
-        if (upErr) throw upErr;
-        urls.push(supabase.storage.from(REDES_BUCKET).getPublicUrl(path).data.publicUrl);
+        urls.push(await subirJpg(await aJpg(file, draft.formato === "historia")));
       }
       setDraft((d) => ({ ...d, imagenes: [...d.imagenes, ...urls] }));
     } catch (err) {
@@ -172,6 +183,12 @@ function Editor({ publicacion, onDone }: { publicacion?: Publicacion; onDone: ()
           </button>
         )}
         <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={subir} />
+      </div>
+      <div className="space-y-3">
+        <button type="button" onClick={() => setGenerador((v) => !v)} className={`${btn} bg-canvas`}>
+          <Wand2 size={16} /> {generador ? "Cerrar generador" : "Crear con foto real"}
+        </button>
+        {generador && <PostGenerator formato={draft.formato} onUse={agregarGenerada} />}
       </div>
       <p className="text-xs text-muted">Varias imágenes = carrusel (en ese orden). Mejor en 1080×1350; se convierten a JPG solas.</p>
 
