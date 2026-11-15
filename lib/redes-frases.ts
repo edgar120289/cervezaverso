@@ -1,5 +1,5 @@
 /**
- * Frases permitidas en las piezas de redes que genera `/api/redes/pieza`.
+ * Frases permitidas en las piezas de redes que genera `/redes/pieza`.
  * La ruta es pública (Meta descarga la imagen), así que el texto nunca viene libre en la URL: solo un id de esta lista.
  * `kicker` es la línea chica de arriba y `big` el titular. Máximo ~12 palabras en total.
  */
