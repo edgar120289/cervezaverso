@@ -28,7 +28,7 @@ export const FRASES: Record<string, Frase> = {
   // Humor (una cada 3 días)
   "h-abuelita": { kicker: EN_SITE, big: "Las únicas lágrimas de tu abuelita que sí querías ver." },
   "h-lunes": { kicker: EN_SITE, big: "Negra, amarga y fría. Como los lunes." },
-  "h-vaquita": { kicker: EN_SITE, big: "En el mar quedan menos de diez. Aquí todavía hay." },
+  "h-vaquita": { kicker: EN_SITE, big: "En el mar casi no quedan. Aquí todavía hay." },
   "h-historial": { kicker: EN_SITE, big: "Más oscura que tu historial de búsqueda." },
   "h-conductor": { kicker: EN_SITE, big: "Para el que maneja. Alguien tiene que llegar vivo." },
   "h-santa": { kicker: EN_SITE, big: "Santa sí existe. Mide 330 ml." },
