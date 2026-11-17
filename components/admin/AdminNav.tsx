@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/admin/landing", label: "Landing" },
   { href: "/admin/carga-masiva", label: "Carga masiva" },
   { href: "/admin/redes", label: "Redes" },
+  { href: "/admin/vasos", label: "Vasos" },
 ] as const;
 
 /** Navegación del panel: enlaces tipo píldora, con la sección actual resaltada. */

@@ -1,0 +1,3097 @@
+[
+  {
+    "id": "0c0f42f7-7bde-4821-bda3-266e75c23da7",
+    "name": "1906 BLACK COUPAGE",
+    "style": "DUNKEL BOCK"
+  },
+  {
+    "id": "fd05b28d-9176-410b-afc2-74dc8dbc8508",
+    "name": "1906 LA MILNUEVE ORIGINAL",
+    "style": "HELLES BOCK"
+  },
+  {
+    "id": "d7101f21-f29b-4a08-9e67-c66eb425ef47",
+    "name": "1906 LA PELIRROJA",
+    "style": "IRISH RED ALE"
+  },
+  {
+    "id": "3a9b8047-851d-4931-a269-908c21402ef0",
+    "name": "1906 RED VINTAGE",
+    "style": "DOPPELBOCK"
+  },
+  {
+    "id": "ece626d9-6f82-4e69-9c9f-29f5313eb7ac",
+    "name": "8 BIT BREWING COMPANY FINAL HORIZON",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "ea8747cd-6253-4f5a-becc-306ab4019ba6",
+    "name": "8 BIT BREWING COMPANY SWIRLING ME SOFTLY",
+    "style": "KETTLE SOUR"
+  },
+  {
+    "id": "3630b940-150b-439d-9f27-844f35ecd591",
+    "name": "8 BIT BREWING COMPANY THE NATURE OF REVENGE",
+    "style": "DDH HAZY IPA"
+  },
+  {
+    "id": "f71b6581-64e2-41af-834e-94a991d7cc37",
+    "name": "A. LE COQ IMPERIAL EXTRA DOBLE STOUT",
+    "style": "IMPERIAL EXTRA DOUBLE STOUT"
+  },
+  {
+    "id": "9ba09b55-0671-4838-97f4-48cf3ac2ef61",
+    "name": "AC/DC ROCK OR BUST LATA",
+    "style": "LAGER"
+  },
+  {
+    "id": "d506a59f-f304-4790-b062-79e2a2da5e13",
+    "name": "ALESMITH SPEEDWAY GRAND PRIX ON THE ROAD PAQUETE DE 4 LATAS",
+    "style": "VARIOS ESTILOS"
+  },
+  {
+    "id": "7444ca90-25aa-4a51-afe9-0ebb589789ca",
+    "name": "ALIENS KAAB ALIEN BLOOD",
+    "style": "HIDROMIEL DE JAMAICA"
+  },
+  {
+    "id": "d3362ad1-0e18-4749-8118-f287153debd7",
+    "name": "ASAHI",
+    "style": "LAGER \"SUPER DRY\""
+  },
+  {
+    "id": "519854a0-e40d-4332-9d70-1f508c67df44",
+    "name": "BACCHUS FRAMBOISE",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "505beb53-fddf-4757-baa9-eb935b09dcc4",
+    "name": "BACCHUS FRAMBOZENBIER",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "4e42df17-073d-494c-92a9-d61c55a6852d",
+    "name": "BACCHUS KRIEK",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "2f6992b7-5edb-4a77-948b-3d2cb9a4c5bd",
+    "name": "BALTIKA No.6",
+    "style": "BALTIC PORTER"
+  },
+  {
+    "id": "6c1541ac-9b9c-4286-b4c9-f5084abfcb5d",
+    "name": "BALTIKA No.7",
+    "style": "PALE LAGER"
+  },
+  {
+    "id": "994f494f-0e70-48da-a9d0-bfbdc6bcce7c",
+    "name": "BALTIKA No.9",
+    "style": "IMPERIAL PILSNER"
+  },
+  {
+    "id": "1ff5583d-681a-4fa8-961b-bbc60d6062e4",
+    "name": "BALTIKA RUSSIAN IMPERIAL STOUT",
+    "style": "RUSSIAN IMPERIAL STOUT"
+  },
+  {
+    "id": "8fcf11ee-2f77-457f-ba14-ff514d5eea7d",
+    "name": "BANANA BREAD BOTELLA",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "25e635f4-0e78-48ec-b1fd-4fed1c6edc5b",
+    "name": "BARRIL DELIRIUM RED",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "1805e1a1-6da9-4316-91f2-784ab6370be5",
+    "name": "BARRIL DELIRIUM TREMENS",
+    "style": "BELGIAN BLOND STRONG ALE"
+  },
+  {
+    "id": "c9ca3dad-65fc-4d94-a4c8-656947847d0e",
+    "name": "BARRIL HB OKTOBERFESTBIER",
+    "style": "OKTOBERFEST BIER"
+  },
+  {
+    "id": "4614b9b7-06fe-497c-8335-7254538445ef",
+    "name": "BARRIL PAULANER OKTOBERFEST",
+    "style": "OKTOBERFEST BEER"
+  },
+  {
+    "id": "abd38ec4-970f-44a7-bc95-3df6851d5aca",
+    "name": "BARRIL PAULANER ORIGINAL",
+    "style": "MUNICH HELLES"
+  },
+  {
+    "id": "ad4440fe-0a13-4841-9b9c-6d746bbc8291",
+    "name": "BARRIL PAULANER WEISSBIER",
+    "style": "MUNICH WHEAT BEER"
+  },
+  {
+    "id": "327812d1-6a18-413f-ade9-ce26f2624246",
+    "name": "BAYREUTHER HELL",
+    "style": "HELLES"
+  },
+  {
+    "id": "41b9090c-4785-474a-be9b-62271ca881d9",
+    "name": "BEER ZOMBIES A NIGHTMARE ON HAZE STREET PART 2",
+    "style": "HAZY DOUBLE IPA"
+  },
+  {
+    "id": "ace39a06-d18e-40bf-a242-63ac5068c4a6",
+    "name": "BELCHING BEAVER DEATH BY BLUEBERRY",
+    "style": "WHEAT ALE"
+  },
+  {
+    "id": "5075d37f-5b36-45a2-acb8-f723a38782fc",
+    "name": "BELCHING BEAVER DEFTTONES MILK OF THE MADONNA",
+    "style": "HORCHATA BLONDE ALE"
+  },
+  {
+    "id": "39a31dd7-b95e-4544-abb2-b0218b4f3a75",
+    "name": "BELCHING BEAVER DIA DE LOS DEFTONES",
+    "style": "MEXICAN LAGER CON LIMA"
+  },
+  {
+    "id": "13134934-1768-4f24-a37c-a18a308223dd",
+    "name": "BELCHING BEAVER HOP MAXXING",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "6d0f0a5e-71b4-4393-bce6-4d4baf2c8f87",
+    "name": "BELCHING BEAVER HOP TRAIL",
+    "style": "WEST COAST PILSNER"
+  },
+  {
+    "id": "84be9cf3-f3eb-42aa-a6e8-a34e7bbe5cba",
+    "name": "BELCHING BEAVER MUST BE THE HONEY",
+    "style": "BLONDE ALE"
+  },
+  {
+    "id": "f233dfb9-98d6-4d2c-aab7-bb39e9214883",
+    "name": "BELCHING BEAVER OUTSIDE YOUR MIND",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "3b0f675e-bc28-461e-bbfa-6d29340c4337",
+    "name": "BELCHING BEAVER PEANUT BUTTER",
+    "style": "MILK STOUT"
+  },
+  {
+    "id": "b4ff3bd6-86f1-47c9-bb50-a8d845055ee1",
+    "name": "BELCHING BEAVER STRAWBERRY BLONDE ALE",
+    "style": "BLONDE ALE"
+  },
+  {
+    "id": "3cf3cd25-781e-4a45-9c97-23f2ea84870e",
+    "name": "BELCHING BEAVER TROPICAL TERPS",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "3d4682fd-37c3-4cf7-96c1-8b10239dde31",
+    "name": "BELCHING BEAVER VIVA LA BEAVER",
+    "style": "MEXICAN CHOCOLATE PEANUT BUTTER STOUT"
+  },
+  {
+    "id": "6d4d3227-1622-4294-a089-e48b20271d38",
+    "name": "BELCHING BEAVER X DEFTONES IMPERIAL PHANTOM BRIDE",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "48be00e0-7531-46dc-a1d8-49bbc4d740d1",
+    "name": "BELCHING BEAVER X DEFTONES PHANTOM BRIDE",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "628d38fb-6f74-422c-af3b-3631da889256",
+    "name": "BELHAVEN BEST ETIQUETA AZUL",
+    "style": "SESSION ALE"
+  },
+  {
+    "id": "9261437a-4fb8-4ff0-83fc-3539be056597",
+    "name": "BELHAVEN BLACK ORIGINAL ETIQUETA CAFÉ",
+    "style": "SCOTTISH STOUT NITRO DRAUGHT"
+  },
+  {
+    "id": "cbe1e131-f31b-4122-a40d-49886f59c480",
+    "name": "BELHAVEN MCCALLUM'S ETIQUETA ROJA",
+    "style": "SWEET SCOTTISH STOUT"
+  },
+  {
+    "id": "1232cec1-99b9-4a1b-a06b-a3ad1bdaf903",
+    "name": "BELHAVEN SCOTTISH ALE",
+    "style": "SMOOTH NITRO ALE"
+  },
+  {
+    "id": "46c4b702-9df8-4c09-8370-6286d55de0e9",
+    "name": "BICHOLA CAMINO A LA PALMA",
+    "style": "RUSSIAN IMPERIAL STOUT CON MEZCAL"
+  },
+  {
+    "id": "aabba642-2080-4da2-9ad3-02879ae5d674",
+    "name": "BICHOLA FEEL THE HARZ",
+    "style": "BLACK IPA"
+  },
+  {
+    "id": "d3a0e885-8871-4b79-954a-d7e90411267a",
+    "name": "BIRRA BALADIN ISAAC",
+    "style": "WITBIER"
+  },
+  {
+    "id": "a6a64d21-fce5-4d2c-ad18-2c58caa933e8",
+    "name": "BIRRA BALADIN LIPPA",
+    "style": "IPA"
+  },
+  {
+    "id": "a54179c8-5bdd-4763-92da-a8278b947156",
+    "name": "BIRRA BALADIN METODO CLASSICO",
+    "style": "CHAMPAGNE BRUT"
+  },
+  {
+    "id": "b4ee5542-88e8-443f-b294-a5255575adb2",
+    "name": "BIRRA BALADIN NAZIONALE",
+    "style": "BLONDE"
+  },
+  {
+    "id": "525f6946-0eeb-46f7-9241-7440ee945fbc",
+    "name": "BIRRA BALADIN ROCK N ROLL",
+    "style": "AMERICAN PALE ALE"
+  },
+  {
+    "id": "325fce7c-9151-4d81-aa9b-d8716c3ffbb8",
+    "name": "BIRRA BALADIN SORAYA",
+    "style": "CERVEZA EXPERIMENTAL"
+  },
+  {
+    "id": "70565ea6-d031-4a9e-b8c2-255786533553",
+    "name": "BIRRA BALADIN XYAUYU 2019",
+    "style": "CERVEZA ESPECIAL ENVEJECIDA EN MADERA"
+  },
+  {
+    "id": "c09bf935-d745-4fb8-80dc-4148328b06a0",
+    "name": "BIRRA MORETTI",
+    "style": "PREMIUM LAGER"
+  },
+  {
+    "id": "e17d444c-7366-49f6-b849-989cff0be7cb",
+    "name": "BLUE MOON",
+    "style": "BELGIAN WHITE"
+  },
+  {
+    "id": "1f6b2da6-bf33-47aa-9eab-8cb6eb6fc1f3",
+    "name": "BLUE MOON LIGHT",
+    "style": "CITRUS WHEAT"
+  },
+  {
+    "id": "5595265e-551b-4779-8ff3-a57715e314ee",
+    "name": "BOMBARDIER BOTELLA",
+    "style": "PREMIUM BITTER"
+  },
+  {
+    "id": "ce9825bc-6706-4dc2-ae41-83af6a847cbb",
+    "name": "BOSCOLI CEREZA",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "5b572437-21f9-4714-9c55-5231abb79777",
+    "name": "BOSCOLI FRUTAS DEL BOSQUE",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "115798ca-7162-4ea5-83dd-3318fe019d26",
+    "name": "BOSCOLI MANZANA",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "7b9fcd36-c1ee-4c0d-9e42-fdd481bc6324",
+    "name": "BOTELLA VOLFAS ENGELMAN IMPERIAL PORTERIS",
+    "style": "BALTIC PORTER"
+  },
+  {
+    "id": "8f45ce01-103e-4ed4-9cd2-f0328c8bfd36",
+    "name": "BRASSERIE DU MONT BLANC LA BLANCHE etiqueta azuL, botella chica",
+    "style": "WITBIER/BLANCHE"
+  },
+  {
+    "id": "2f8db373-f9d8-4098-bfd2-9e235ddccfa2",
+    "name": "BRASSERIE DU MONT BLANC LA BLANCHE etiqueta azul, BOTELLA GRANDE",
+    "style": "WITBIER/BLANCHE"
+  },
+  {
+    "id": "69d5770d-457a-452c-883b-d4c900e18bef",
+    "name": "BRASSERIE DU MONT BLANC LA BLONDE ETIQUETA AMARILLA, BOTELLA CHICA",
+    "style": "BLONDE"
+  },
+  {
+    "id": "9d099380-acb3-4619-bf8b-db43ec2183c2",
+    "name": "BRASSERIE DU MONT BLANC LA BLONDE etiqueta amarilla, BOTELLA GRANDE",
+    "style": "BLONDE"
+  },
+  {
+    "id": "f79c03f8-ec63-4a45-87d7-1d855d4dbcb8",
+    "name": "BREWDOG BLACK HEART",
+    "style": "DRAUGHT STOUT"
+  },
+  {
+    "id": "fbe250d8-1e2c-4eb7-b230-d2f8595cd672",
+    "name": "BREWDOG ELVIS JUICE",
+    "style": "GRAPEFRUIT INFUSED IPA"
+  },
+  {
+    "id": "f0af043c-b832-43f3-8bfe-2dbd266eda67",
+    "name": "BREWDOG HAZY JANE",
+    "style": "NEIPA"
+  },
+  {
+    "id": "02a52c84-770b-4ae3-869d-939e63428c21",
+    "name": "BREWDOG PUNK IPA",
+    "style": "POST MODERN CLASSIC"
+  },
+  {
+    "id": "3cf1c01b-6d0d-4622-be84-49b26387ea63",
+    "name": "BREWDOG SHORE LEAVE",
+    "style": "AMBER ALE"
+  },
+  {
+    "id": "4d1be47a-69a0-4bf6-b0a1-6ebb8647b184",
+    "name": "BRUGSE BOK",
+    "style": "BOK"
+  },
+  {
+    "id": "b5ab6f74-d86d-408c-be71-7b1bcb4f4cb6",
+    "name": "BRUGSE ZOT BLONDE",
+    "style": "BLONDE"
+  },
+  {
+    "id": "60019782-cc29-4228-8770-f8a2e92951fa",
+    "name": "BRUGSE ZOT DUBBEL",
+    "style": "DUBBEL"
+  },
+  {
+    "id": "4ef97b0b-ca17-42a6-b152-9c3d255844ac",
+    "name": "BRUGSE ZOT PACK CON COPA",
+    "style": "DOS ESTILOS"
+  },
+  {
+    "id": "5b143dff-516b-4132-83eb-2603d6cdc39d",
+    "name": "BRUJOS & EVERY WHERE SIXES",
+    "style": "WEST COAST INDIA PALE ALE"
+  },
+  {
+    "id": "a0604dd6-9a4a-4658-b660-e71c2eadc3d4",
+    "name": "BRUJOS & FIDENS SIXES",
+    "style": "WEST COAST INDIA PALE ALE"
+  },
+  {
+    "id": "1cfbd6c8-752d-4023-983c-694eb9a9afb2",
+    "name": "BRUJOS & GREEN CHEEK SIXES",
+    "style": "WEST COAST INDIA PALE ALE"
+  },
+  {
+    "id": "d7c52b45-4343-4f62-aa43-15582d9426c3",
+    "name": "BRUJOS APOSTATARUM",
+    "style": "DDH TRIPEL HAZY INDIA PALE ALE"
+  },
+  {
+    "id": "ddd68b42-c89e-449c-ab94-a1a5be1248ec",
+    "name": "BRUJOS AQUEL DEL LUGAR HUNDIDO",
+    "style": "QUADRUPEL HAZY INDIA PALE ALE"
+  },
+  {
+    "id": "5a82a64e-10ab-4623-86d5-2a8e5e79cdce",
+    "name": "BRUJOS EL ABISMO TE LLAMA",
+    "style": "TDH IMPERIAL HAZY INDIA PALE ALE"
+  },
+  {
+    "id": "66954aac-866d-45ee-8385-f9199db6f441",
+    "name": "BRUJOS NATURALEZA",
+    "style": "TRIPEL HAZY INDIA PALE ALE"
+  },
+  {
+    "id": "25a64614-8d69-4ddd-b9bd-d1d4f94096ff",
+    "name": "BRUJOS X ALVARADO STREET LOS VIGILANTES OSCUROS",
+    "style": "TDH TRIPLE HAZY INDIA PALE ALE"
+  },
+  {
+    "id": "99500b74-88db-4d06-a6c0-62972e715206",
+    "name": "BRUJOS X ALVARADO STREET SIXES",
+    "style": "WEST COAST IPA"
+  },
+  {
+    "id": "dfff83b6-90b0-4ed1-b470-c10a9b1993b6",
+    "name": "BRUJOS X LYRIC BREWING COMPANY FROWNING ALL THE TIME",
+    "style": "HAZY DOUBLE IPA"
+  },
+  {
+    "id": "ecf0a22a-8de1-4c40-b97f-f753363cb3f1",
+    "name": "BRUJOS X THE VEIL INFINITUM",
+    "style": "TDH TRIPLE HAZY INDIA PALE ALE BREWED W/ RAW OREGON WILDFLOWER & PEACH BLOSSOM HONEY"
+  },
+  {
+    "id": "c3338454-0434-4d79-82be-11fa10282490",
+    "name": "BUCANERO FUERTE LATA",
+    "style": "PALE LAGER"
+  },
+  {
+    "id": "ed966177-a658-4482-a124-085ff1fe1378",
+    "name": "BUCANERO MALTA",
+    "style": "MALTA SIN ALCOHOL"
+  },
+  {
+    "id": "15e6f192-a485-404e-854c-752c8ba93c58",
+    "name": "BUQUIBICHI BITACHERA",
+    "style": "HAZY INDIA PALE ALE"
+  },
+  {
+    "id": "3fa615ce-a725-4a96-ab96-92a22df1d9d3",
+    "name": "BUQUIBICHI LA REVANCHA DEL DUENDE",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "ef84677f-ccd8-4c9b-8108-69b99aa8397c",
+    "name": "BUQUIBICHI SAHUARIPA",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "c78c4075-abba-4fd2-afda-5a1924feb913",
+    "name": "BUQUIBICHI TALEGA",
+    "style": "COFFEE STOUT"
+  },
+  {
+    "id": "12d7c93b-0027-408a-951a-17d02ece7a1b",
+    "name": "BUQUIBICHI TALEGON CAFÉ",
+    "style": "IMPERIAL COFFEE STOUT CON CAFÉ TOSTADO EN LEÑA DE MEZQUITE"
+  },
+  {
+    "id": "7a6f0c3a-810a-4ccf-bc97-ba0f9455f6da",
+    "name": "BUQUIBICHI X BRUER BICHIS EN EL DESIERTO",
+    "style": "CALIFORNIA IPA"
+  },
+  {
+    "id": "1e75ad30-8e00-4566-8bb7-6173a21ded50",
+    "name": "BUQUIBICHI X CUATRO PALOS PEDAZYTHOS",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "2e8a772d-d375-41cc-8e11-d65fc4b5c3ed",
+    "name": "BUQUIBICHI X MONKEY WAVES EL COYOTE COJO",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "e99b2835-b173-49b4-b21d-020de6e88057",
+    "name": "BUQUIBICHI X WENDLANDT DESERT WHALE",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "ce81fd4c-ec57-492e-90e4-7fea35b1d5c9",
+    "name": "CALAVERA CORAZÓN NEGRO",
+    "style": "IMPERIAL STOUT CON MEZCAL ARTESANAL"
+  },
+  {
+    "id": "be3cf43d-4087-49ab-96e2-249449dee638",
+    "name": "CALAVERA MEXICAN IMPERIAL STOUT",
+    "style": "IMPERIAL STOUT"
+  },
+  {
+    "id": "2dc53aeb-3a83-4251-96bb-ca7e5212036c",
+    "name": "CALAVERA OFRENDA",
+    "style": "TRIPEL CON CALAVERITAS DE AZÚCAR Y CALABAZA EN TACHA"
+  },
+  {
+    "id": "5327ce20-0081-4050-9cd1-d6032f4b7ffe",
+    "name": "CARLSBERG MARSTON'S SKOL SUPER LATA",
+    "style": "LAGER"
+  },
+  {
+    "id": "333e9e22-2d80-49e9-9878-2d653c60c1b5",
+    "name": "CAROLUS AMBRIO",
+    "style": "BELGIAN STRONG ALE"
+  },
+  {
+    "id": "9dde6709-ddfb-46c7-8b79-8f80d3750c12",
+    "name": "CAROLUS CHRISTMAS",
+    "style": "BELGIAN STRONG ALE"
+  },
+  {
+    "id": "dfece919-a84f-496d-95d4-9c9beeb6ef44",
+    "name": "CAROLUS CHRISTMAS BOTELLA CHICA",
+    "style": "BELGIAN STRONG ALE"
+  },
+  {
+    "id": "01a6751d-4656-456d-a025-6f02a7b56209",
+    "name": "CAROLUS CLASSIC",
+    "style": "BELGIAN DARK SPECIAL STRONG ALE"
+  },
+  {
+    "id": "905d476f-e003-4b7f-9c67-6de14cb649c5",
+    "name": "CAROLUS IMPERIAL BLONDE (ROJA)",
+    "style": "BELGIAN BLONDE STRONG ALE"
+  },
+  {
+    "id": "281775e4-052a-41e2-bb08-85420d3b6a3c",
+    "name": "CAROLUS IMPERIAL DARK (AZUL)",
+    "style": "BELGIAN DARK STRONG ALE"
+  },
+  {
+    "id": "be46693c-a28c-43bb-b6db-b50a8752e5c2",
+    "name": "CAROLUS TRIPEL",
+    "style": "TRIPEL"
+  },
+  {
+    "id": "b8097eda-aa5c-43d8-9f66-11e9f80061b2",
+    "name": "CAROLUS WHISKY INFUSED BLOND",
+    "style": "WHISKY INFUSED BLOND"
+  },
+  {
+    "id": "39b275b0-9d5d-44ff-a926-9a9bccd11f4f",
+    "name": "CAROLUS WHISKY INFUSED DARK",
+    "style": "WHISKY INFUSED"
+  },
+  {
+    "id": "d90c554a-a6e5-48f3-b5a5-ea75b793f53d",
+    "name": "CERVEZA DEL PENCO (LATA AMARILLA)",
+    "style": "BLONDE ALE"
+  },
+  {
+    "id": "0e3df3b3-797c-47fd-a068-0d52d0ecdb29",
+    "name": "CERVEZA DEL PENCO COFFEE PORTER",
+    "style": "COFFEE PORTER"
+  },
+  {
+    "id": "423664b2-1324-4391-88fa-6587c2a96d1b",
+    "name": "CERVEZA DEL PENCO LIGHT (LATA BLANCA)",
+    "style": "LIGHT LAGER"
+  },
+  {
+    "id": "64a31068-688d-4893-810d-97185d48060e",
+    "name": "CERVEZA DEL PENCO LIMÓN Y SAL",
+    "style": "LAGER CON LIMÓN, SAL Y CILANTRO"
+  },
+  {
+    "id": "7002e9fa-c3ce-4f3a-ab14-4b7d08a3df39",
+    "name": "COLABORACIÓN DE RÁMURI X SANTA SABINA X FALLING PIANO BREWING CHAPTER II, LA GUERRA DE LOS WAFFLES",
+    "style": "RUSSIAN IMPERIAL STOUT CON WHISKY RÁMURI Y MIEL DE MAPLE"
+  },
+  {
+    "id": "97c5d857-1897-4306-820a-7d6ed3c02d91",
+    "name": "COLIMA CLUB COLIMA KOLYMA",
+    "style": "IMPERIAL STOUT"
+  },
+  {
+    "id": "3ed4e4d2-ff91-45b8-ac43-d1bb9c875d7e",
+    "name": "COLIMA CLUB COLIMA TOLVANERA",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "27ad2215-3fc9-4a66-ada2-871ed4ffb515",
+    "name": "COLIMA COLIMITA LAGER",
+    "style": "DORTMUNDER"
+  },
+  {
+    "id": "7219b7fd-447a-4002-9fb8-c4427e414b4d",
+    "name": "COLIMA COLIMOTA DOCE",
+    "style": "NEW ZEALAND PILS"
+  },
+  {
+    "id": "94aee040-9f8e-4bc4-8892-e4c1a9c05a15",
+    "name": "COLIMA PÁRAMO PALE ALE",
+    "style": "AMERICAN PALE ALE"
+  },
+  {
+    "id": "4b8b3cee-d561-4b7e-80a5-5d55bb13157d",
+    "name": "COLIMA PIEDRA LISA BOTELLA",
+    "style": "SESSION IPA"
+  },
+  {
+    "id": "5c1ec2af-09bf-4f8c-88fb-6fb5722c68f8",
+    "name": "COLIMA TICUS PORTER",
+    "style": "PORTER"
+  },
+  {
+    "id": "47054891-58e5-4f07-a473-3e9edf8dab46",
+    "name": "D'ACHOUFFE CHOUFFE CHERRY",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "cb65682c-5310-4538-9a41-7b669781e3b9",
+    "name": "D'ACHOUFFE CHOUFFE IPA",
+    "style": "TRIPEL"
+  },
+  {
+    "id": "853d95f1-e5ed-4aee-80fb-94feffa6a8f6",
+    "name": "D'ACHOUFFE LA CHOUFFE",
+    "style": "BELGIAN BLOND STRONG ALE"
+  },
+  {
+    "id": "dca19b31-9f7a-45d3-a048-c2b48ae9efd8",
+    "name": "D'ACHOUFFE MC CHOUFFE",
+    "style": "BELGIAN DARK STRONG ALE"
+  },
+  {
+    "id": "ca68dd57-edd3-42c9-8d39-1acb5fef698c",
+    "name": "DE HALVE MAAN ROSÉ DE BRUGES",
+    "style": "FRUITY WHEAT BEER"
+  },
+  {
+    "id": "f2a27c43-c42e-4474-a30e-428dded7ddfd",
+    "name": "DEL LLANO BLUE MARLIN",
+    "style": "AMERICAN WHEAT"
+  },
+  {
+    "id": "b1cb0710-143a-47df-a9e8-d4e15b3f8978",
+    "name": "DEL LLANO GAMBETA",
+    "style": "MEXICAN LAGER"
+  },
+  {
+    "id": "c4fd8481-0afe-4b41-a27e-e5e5a57a6c9f",
+    "name": "DEL LLANO HEIDRUN FREYDIS",
+    "style": "MEAD / HIDROMIEL"
+  },
+  {
+    "id": "f73368ac-e489-4335-b86b-0a8db7db723b",
+    "name": "DEL LLANO HEIDRUN LEIF",
+    "style": "HIDROMIEL/FRUTOS ROJOS"
+  },
+  {
+    "id": "638df7ae-6432-4f0d-a1e9-5cc6483fb67a",
+    "name": "DEL LLANO VIDAR",
+    "style": "BRAGGOT"
+  },
+  {
+    "id": "67ef19ef-ab7a-413c-b3b4-7a606dcc5d12",
+    "name": "DELIRIO",
+    "style": "ALCOHOL FREI"
+  },
+  {
+    "id": "46d6bec1-3cbe-4cca-8fc5-940cd9d277cd",
+    "name": "DELIRIUM CHRISTMAS BOTELLA CHICA",
+    "style": "WINTER ALE"
+  },
+  {
+    "id": "f0b17333-e9c5-4fff-8b57-7bfe88a4d674",
+    "name": "DELIRIUM CHRISTMAS BOTELLA GRANDE",
+    "style": "WINTER ALE"
+  },
+  {
+    "id": "2343ac3e-8a69-4e02-a6a7-effd8c008e8e",
+    "name": "DELIRIUM NOCTURNUM",
+    "style": "BELGIAN DARK STRONG ALE"
+  },
+  {
+    "id": "7858e342-0793-4376-8a5b-4f329f8019bc",
+    "name": "DELIRIUM RED",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "2756bfd0-16c7-4c52-b7c1-407047c8c518",
+    "name": "DELIRIUM TREMENS",
+    "style": "BELGIAN BLOND STRONG ALE"
+  },
+  {
+    "id": "7719a22c-7dcc-44cb-add2-c428ace2b5a0",
+    "name": "DUBUISSON CUVEE DES TROLLS",
+    "style": "BELGIAN BLOND"
+  },
+  {
+    "id": "c666c4ad-3694-4e54-bd13-c2d77ebc981d",
+    "name": "DUFF BEER ETIQUETA ORIGINAL",
+    "style": "LAGER"
+  },
+  {
+    "id": "7b4f4073-9cb3-4e0e-abf4-898a73948a78",
+    "name": "DUFF BEER LATA CHICA ETIQUETA ORIGINAL",
+    "style": "LAGER"
+  },
+  {
+    "id": "e2fb7e1c-6aeb-4917-b34d-bc3ea14b9f5e",
+    "name": "DUVEL 330ML",
+    "style": "BELGIAN STRONG BLONDE"
+  },
+  {
+    "id": "6b3f10bc-4c45-41c8-91c9-6a9604abfd7d",
+    "name": "DUVEL BARREL AGED BATCH Nº 10",
+    "style": "BELGIAN STRONG BLONDE EN BARRICAS DE AGAVE"
+  },
+  {
+    "id": "4fdd7de6-619a-43ed-b696-013b0680af8c",
+    "name": "DUVEL TRIPEL HOP",
+    "style": "TRIPEL HOP CITRA"
+  },
+  {
+    "id": "cddfa7f7-ddde-43ca-a9ae-e8ae735f3cb9",
+    "name": "ERDINGER ALKOHOLFREI",
+    "style": "ALKOHOLFREI"
+  },
+  {
+    "id": "93d44314-eaba-4916-ab59-477071b5400e",
+    "name": "ERDINGER DUNKEL",
+    "style": "DUNKELWEIZEN"
+  },
+  {
+    "id": "d19fee37-3b25-456d-a4f1-84eb04f9adba",
+    "name": "ERDINGER OKTOBERFEST",
+    "style": "WEISSBIER"
+  },
+  {
+    "id": "02046725-3087-4f3f-9a84-d9b67f351b39",
+    "name": "ERDINGER PIKANTUS",
+    "style": "WEIZENBOCK"
+  },
+  {
+    "id": "8bf659de-049d-483e-ae36-ddd6561eae6c",
+    "name": "ERDINGER WEISSBIER",
+    "style": "HEFEWEIZEN"
+  },
+  {
+    "id": "87e79049-5bd1-44ba-860e-fda288b82487",
+    "name": "ESTRELLA GALICIA",
+    "style": "HELLES"
+  },
+  {
+    "id": "ab6314a1-3d79-4f94-950e-9edde7aa2eb0",
+    "name": "ESTRELLA GALICIA 0.0",
+    "style": "SIN ALCOHOL"
+  },
+  {
+    "id": "ae6f295c-e188-45ba-8c70-6d681525546d",
+    "name": "ESTRELLA GALICIA LATA",
+    "style": "HELLES"
+  },
+  {
+    "id": "372f90f6-310b-4e77-a156-aa5e8d5b9e0e",
+    "name": "ESTRELLA GALICIA SIN GLUTEN",
+    "style": "GLUTEN FREE"
+  },
+  {
+    "id": "5273b670-4e4b-4f6e-ad6f-ab108aa72c9e",
+    "name": "EVERY WHERE CHANGING THE POSSIBLE",
+    "style": "DOUBLE DRY-HOPPED HAZY INDIA PALE ALE"
+  },
+  {
+    "id": "f37eb979-2a74-4188-b37b-112586f0772f",
+    "name": "EVERY WHERE CONNECTIVITY",
+    "style": "NEW ZEALAND-STYLE PALE ALE"
+  },
+  {
+    "id": "a76e7637-467a-448f-9739-5db79cec2bdc",
+    "name": "EVERY WHERE EYES WIDE LEAVE",
+    "style": "HAZY INDIA PALE ALE"
+  },
+  {
+    "id": "5cd80f78-c78b-43d3-aa27-1eb9d50a5953",
+    "name": "EVERY WHERE HARMONIOUSLY",
+    "style": "DOUBLE DRY-HOPPED HAZY DOUBLE INDIA PALE ALE"
+  },
+  {
+    "id": "454ad85c-2f69-44d1-b387-7433619156c4",
+    "name": "EVERY WHERE THE SPACE WE LEAVE",
+    "style": "HAZY INDIA PALE ALE"
+  },
+  {
+    "id": "8fbae3e3-e578-4a93-bf2a-0d88ccfd19f4",
+    "name": "EVIL TWIN NYC X RÁMURI EVEN MORE LÁGRIMAS NYC VERSION",
+    "style": "IMPERIAL STOUT WITH CACAO, PEANUT BUTTER, CINNAMON AND CHILES"
+  },
+  {
+    "id": "93d2cbfd-ab9f-4306-8ccf-a123f268afd1",
+    "name": "FAGNES GRIOTTES",
+    "style": "FRUIT BEER /ADJUNTO CEREZA"
+  },
+  {
+    "id": "ae79dcd2-2dfa-48b5-80e1-b72bcbd36954",
+    "name": "FAUNA LAGER MEXICANA",
+    "style": "MEXICAN LAGER"
+  },
+  {
+    "id": "fba7d8df-6f25-42b9-ab15-229ad53dff5a",
+    "name": "FAUNA LITTLE HAZY",
+    "style": "SESSION NEIPA"
+  },
+  {
+    "id": "fbf977ef-9392-4415-951e-45c6ca405992",
+    "name": "FAUNA LYCAN LUPUS",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "b4e43299-dc06-422e-b7c9-0ebad2e69d0d",
+    "name": "FAUNA NELSON DE LA SELVA",
+    "style": "HAZY PALE ALE"
+  },
+  {
+    "id": "d71e63ae-b281-4d29-85fd-e53f06f1f1ca",
+    "name": "FAUNA NOX ARCANA",
+    "style": "IMPERIAL STOUT"
+  },
+  {
+    "id": "22c0aae3-ee27-463c-85d8-44b0c540489b",
+    "name": "FAUNA ORANGE BLOOM",
+    "style": "AMERICAN WHEAT"
+  },
+  {
+    "id": "bac5efbf-8096-455a-bc42-f6c983f9c042",
+    "name": "FAUNA PENELOPE",
+    "style": "COFFEE PORTER"
+  },
+  {
+    "id": "aeea3714-95c3-4ec6-81de-6f85fbe10a03",
+    "name": "FAUNA VI BERLINER",
+    "style": "BERLINER WEISSE CON GUAYABA"
+  },
+  {
+    "id": "7b72144a-3a62-4800-94a1-c42d34221084",
+    "name": "FIRESTONE WALKER MIND HAZE GALAXY BENDER",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "70df555f-31ce-4d59-b0d2-d6ef8a44ae32",
+    "name": "FIRESTONE WALKER PARABOLA 2025",
+    "style": "IMPERIAL STOUT AGED IN BOURBON BARRELS"
+  },
+  {
+    "id": "598c37e1-7d42-445c-911e-ec8546a3708a",
+    "name": "FIRESTONE WALKER PARABOLA 2026",
+    "style": "IMPERIAL STOUT AGED IN BOURBON BARRELS"
+  },
+  {
+    "id": "1f641d1f-b407-4eae-88e2-46e01840fc67",
+    "name": "FIRESTONE WALKER PARAMBURANA 2024",
+    "style": "BARREL-AGED STOUT WITH AMBURANA WOOD"
+  },
+  {
+    "id": "0a184b34-f11a-4633-b814-fbc3211f7473",
+    "name": "FIRESTONE WALKER PFREAL",
+    "style": "WEST COAST IPA"
+  },
+  {
+    "id": "2e3754d4-23c2-43e6-91ac-a20a3f182f04",
+    "name": "FLENSBURGER DUNKEL",
+    "style": "MUNICH DUNKEL"
+  },
+  {
+    "id": "6ff5cb6f-09fd-4c90-9a07-79c4950328d3",
+    "name": "FLENSBURGER GOLD",
+    "style": "LAGER"
+  },
+  {
+    "id": "61752f8f-08ad-4345-a89b-55a170d8912e",
+    "name": "FLENSBURGER PILSENER",
+    "style": "PILSNER"
+  },
+  {
+    "id": "2807e577-16d6-4b17-8346-d12aea291ead",
+    "name": "FLENSBURGER WEIZEN",
+    "style": "WEISSBIER"
+  },
+  {
+    "id": "d8f36310-cb9a-45ac-b784-a8e1c33453ff",
+    "name": "FULLER'S 1845",
+    "style": "ENGLISH STRONG ALE"
+  },
+  {
+    "id": "008ec014-4901-4fbd-96a5-506c2886eca1",
+    "name": "FULLER'S LONDON PORTER",
+    "style": "EXTRA SPECIAL BITTER"
+  },
+  {
+    "id": "52f83590-9e20-4142-9b4b-487419332fde",
+    "name": "FULLER'S LONDON PORTER",
+    "style": "PORTER"
+  },
+  {
+    "id": "49eeff26-e975-4bca-8b4f-c137023e04ff",
+    "name": "FULLER'S LONDON PRIDE",
+    "style": "BITTER"
+  },
+  {
+    "id": "b89d4b06-d593-49c5-bd2f-7275e27358f5",
+    "name": "FULLER'S VINTAGE ALE",
+    "style": "OLD STOCK ALE"
+  },
+  {
+    "id": "44cd6be7-dbb2-4ec8-b2fb-a45d12828d03",
+    "name": "GREAT DIVIDE SAMURAI",
+    "style": "JAPANESE LAGER"
+  },
+  {
+    "id": "94189b79-7e64-4f21-b04e-4d6768b1db1c",
+    "name": "GREAT DIVIDE YETI",
+    "style": "IMPERIAL STOUT"
+  },
+  {
+    "id": "ef1bd73d-800a-4ee3-b921-83929bb73a5b",
+    "name": "GREEN CHEEK X BRUJOS X NORTH PARK CHASE'N WATERFALLS BB",
+    "style": "TDH HAZY IPA"
+  },
+  {
+    "id": "8451bc2e-c487-4938-b31c-2befcf6846ec",
+    "name": "GREEN CHEEK X BRUJOS X NORTH PARK LET'S GO CHASE SOME WATERFALLS!",
+    "style": "TDH HAZY IPA"
+  },
+  {
+    "id": "d0dd3939-de25-41d8-a9d7-efc58ce13185",
+    "name": "GROLSCH LATA",
+    "style": "PREMIUM LAGER"
+  },
+  {
+    "id": "a554aba9-4baa-409a-bcf1-a6a934020696",
+    "name": "GUINNESS DRAUGHT LATA",
+    "style": "DRY STOUT"
+  },
+  {
+    "id": "46898c4f-13f6-4669-b17d-01d2b0af6a1b",
+    "name": "GUINNESS NON ALCOHOLIC",
+    "style": "DRY STOUT"
+  },
+  {
+    "id": "d4b022be-cc73-4692-88e6-377d4db6d6a9",
+    "name": "GUINNESS SPECIAL EXPORT",
+    "style": "FOREIGN STOUT"
+  },
+  {
+    "id": "877786e5-a36b-4bbb-9640-a52bf26a0e77",
+    "name": "GULDEN DRAAK 9000 QUADRUPLE",
+    "style": "BELGIAN QUADRUPEL"
+  },
+  {
+    "id": "533d62c5-3853-4a8d-b57f-65b6e44f2d59",
+    "name": "GULDEN DRAAK BLOND",
+    "style": "BELGIAN STRONG BLONDE ALE"
+  },
+  {
+    "id": "8e015cf0-9219-48c5-bdb7-8c53d53838dd",
+    "name": "GULDEN DRAAK BREWMASTER",
+    "style": "EXTRA STRONG BELGIAN ALE"
+  },
+  {
+    "id": "3d377141-12bf-4b1f-b451-52f0b7fe579a",
+    "name": "GULDEN DRAAK CLASSIC",
+    "style": "BELGIAN STRONG DARK ALE"
+  },
+  {
+    "id": "8aa79def-b11b-4d8a-9093-06f21f19c519",
+    "name": "GULDEN DRAAK CUVÉE PRESTIGE BOURBON",
+    "style": "BOURBON BARREL-AGED BELGIAN STRONG DARK ALE"
+  },
+  {
+    "id": "f59036db-a5f9-47de-8bbb-701fc01b969f",
+    "name": "GULDEN DRAAK CUVÉE PRESTIGE COGNAC",
+    "style": "COGNAC BARREL-AGED BELGIAN STRONG DARK ALE"
+  },
+  {
+    "id": "06a68d93-288c-48a2-ab3d-de8b6ff8b204",
+    "name": "GULDEN DRAAK CUVÉE PRESTIGE LAPHROAIG",
+    "style": "LAPHROAIG BARREL-AGED BELGIAN STRONG DARK ALE"
+  },
+  {
+    "id": "d9d14eb9-e4c1-41e6-a8b9-3e69b77e4511",
+    "name": "GULDEN DRAAK FIRE",
+    "style": "SPICED BELGIAN STRONG DARK ALE"
+  },
+  {
+    "id": "1c12f01b-1087-4ea1-bf9f-81b6f0f35756",
+    "name": "GULDEN DRAAK IMPERIAL STOUT",
+    "style": "BELGIAN IMPERIAL STOUT"
+  },
+  {
+    "id": "246814c6-6e80-4527-95b3-3eac7ded5d30",
+    "name": "GULDEN DRAAK RED",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "66d94176-1ff5-4d26-aa5f-f2a560385856",
+    "name": "GULDEN DRAAK SMOKED",
+    "style": "QUADRUPEL"
+  },
+  {
+    "id": "5d1eae2f-ee19-487e-b7ac-9286c30d71f9",
+    "name": "HACKER PSCHORR OKTOBERFEST",
+    "style": "MÄRZEN"
+  },
+  {
+    "id": "c24b8a65-5f01-48a1-83f4-211c3ca61296",
+    "name": "HANSEENS ARTISANNAL OUDE KRIEK",
+    "style": "LAMBIC KRIEK"
+  },
+  {
+    "id": "aceb2c63-7a4b-4d46-bb3f-8db938fe3eef",
+    "name": "HB DUNKEL",
+    "style": "DUNKEL"
+  },
+  {
+    "id": "c59cc09b-2fd8-4bb3-9d59-d8dbbaca41ae",
+    "name": "HB MÜNCHNER WEISSE",
+    "style": "HEFEWEIZEN"
+  },
+  {
+    "id": "7a6d8f23-d24a-436d-9d04-cf5078116dfe",
+    "name": "HB OKTOBERFEST",
+    "style": "OKTOBERFEST"
+  },
+  {
+    "id": "21b27c79-2903-40f0-9f97-d88e7f391b90",
+    "name": "HB ORIGINAL",
+    "style": "MUNICH HELLES"
+  },
+  {
+    "id": "ff2c55f1-899a-4f88-9997-7cdb9b4cec8c",
+    "name": "HB SCHWARZE WEISSE",
+    "style": "DUNKELWEIZEN"
+  },
+  {
+    "id": "b40c7d5e-d8fe-417d-bc26-d7ae2f4d7631",
+    "name": "HÉRCULES ABUELITO",
+    "style": "DARK STRONG ALE CON CHILE MIXE, CACAO Y CANELA MADURADA EN BARRICAS DE WHISKEY Y RON"
+  },
+  {
+    "id": "03f30078-9269-4956-9075-d3e03ba1b900",
+    "name": "HÉRCULES CABALLO BLANCO",
+    "style": "SUMMER ALE"
+  },
+  {
+    "id": "57bb66c4-54ff-4f90-ad0d-7412b490ad38",
+    "name": "HÉRCULES CANCHITAS",
+    "style": "PALE ALE CON MAIZ"
+  },
+  {
+    "id": "9c50d50c-4312-47d5-b299-aec9a20ad60c",
+    "name": "HERCULES COLABORACIÓN CON CARDERA",
+    "style": "WEST COAST NEW ZEALAND IPA"
+  },
+  {
+    "id": "86256e66-7b26-4d50-819b-1877895cc098",
+    "name": "HERCULES FIESTA EN EL CERRO",
+    "style": "STOUT IMPERIAL MADURADA EN BARRICAS DE TEQUILA CASCAHUIN"
+  },
+  {
+    "id": "981283fd-3f1e-4318-852e-368447cadaf0",
+    "name": "HÉRCULES GODZIÑAS",
+    "style": "HOPPY LAGER CON ARROZ Y MAIZ"
+  },
+  {
+    "id": "38414feb-873d-4daf-a123-4a94bdac8ee3",
+    "name": "HÉRCULES HEFE TECHNIQUES DOPPEL WEIZEN BOCK",
+    "style": "DOPPEL WEIZEN BOCK"
+  },
+  {
+    "id": "39d799cd-59fe-441b-85b1-5caa90295c0c",
+    "name": "HÉRCULES HEFE TECHNIQUES LIECHTES WEISSBIER",
+    "style": "WEISSBIER"
+  },
+  {
+    "id": "8fb132bf-2687-4d65-afd5-a934daefee27",
+    "name": "HÉRCULES HEFE TECHNIQUES WEISSBIER",
+    "style": "WEISSBIER"
+  },
+  {
+    "id": "818b4006-b2e3-42f2-896a-1144b18554c5",
+    "name": "HERCULES HEFE TECHNIQUES WEIZEN BOCK",
+    "style": "WEIZEN BOCK HELL"
+  },
+  {
+    "id": "c802192e-1d60-4658-9fcb-5e1fea5391c4",
+    "name": "HÉRCULES HOMBRE PAJARO",
+    "style": "RYE LAGER"
+  },
+  {
+    "id": "f17f370b-3437-402b-b6e1-90bd6f87f8a9",
+    "name": "HÉRCULES HURACAN",
+    "style": "DOBLE IPA"
+  },
+  {
+    "id": "49fda6ee-87ec-416f-bdf0-c673065a10d1",
+    "name": "HÉRCULES LANZALLAMAS",
+    "style": "RUSSIAN IMPERIAL STOUT"
+  },
+  {
+    "id": "b21b2682-1ac6-4d1d-93cf-b44d9cad87b1",
+    "name": "HÉRCULES MACANUDA",
+    "style": "BROWN ALE"
+  },
+  {
+    "id": "ac9a5fd1-1dc6-4515-9894-974a686dba80",
+    "name": "HÉRCULES PIE GRANDE",
+    "style": "DARK CASCADIAN ALE"
+  },
+  {
+    "id": "d5b0e6ae-f8cf-47f8-b1b5-b7ef91cb9ce9",
+    "name": "HÉRCULES PUEBLITO",
+    "style": "IRISH EXPORT STOUT"
+  },
+  {
+    "id": "f1f60cf2-7ef1-4e93-8ed5-ec57fd533ebe",
+    "name": "HÉRCULES RÁFAGA",
+    "style": "PALE ALE"
+  },
+  {
+    "id": "4a9d5397-bdfb-41b7-9825-9a82d9246f55",
+    "name": "HÉRCULES SÚPER LAGER",
+    "style": "LAGER CON ARROZ DE MORELOS"
+  },
+  {
+    "id": "6914512f-d342-4564-b68d-00c64bca618e",
+    "name": "HÉRCULES SÚPER LUPE",
+    "style": "IPA"
+  },
+  {
+    "id": "48e8aa09-10f2-48b9-a8b7-22c2c077b6ec",
+    "name": "HÉRCULES SÚPER SUR",
+    "style": "NZ PILS"
+  },
+  {
+    "id": "763c541f-f2b9-4ef1-a1a6-050f6e4b0132",
+    "name": "HÉRCULES TEXTILERA",
+    "style": "ITALIAN VIENNA LAGER"
+  },
+  {
+    "id": "8e98f9c3-9c71-455c-987a-45bfe865ebb7",
+    "name": "HITACHINO NEST DAIDAI ALE",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "0313b87a-2484-4a6b-8732-283f5f6784ac",
+    "name": "HITACHINO NEST ESPRESSO STOUT",
+    "style": "COFFEE STOUT"
+  },
+  {
+    "id": "1e5302e3-06ae-41ec-99fa-d0a8b1140c16",
+    "name": "HITACHINO NEST EXTRA HIGH (XH)",
+    "style": "BELGIAN STRONG ALE"
+  },
+  {
+    "id": "8c7aae0a-972d-47c3-8843-07ea92bd9c6e",
+    "name": "HITACHINO NEST JAPANESE CLASSIC ALE",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "3710eb61-6ebf-4967-a716-53a83a7b9c8f",
+    "name": "HITACHINO NEST LAGER (LATA)",
+    "style": "INDIA PALE LAGER"
+  },
+  {
+    "id": "4b72dc78-0c84-434b-8dfa-ea552762b360",
+    "name": "HITACHINO NEST NIPPONIA",
+    "style": "BELGIAN GOLDEN ALE"
+  },
+  {
+    "id": "3e267c82-881e-4d0a-8551-d77b5e66db59",
+    "name": "HITACHINO NEST RED RICE ALE",
+    "style": "RICE ALE"
+  },
+  {
+    "id": "936d9dab-e006-45c2-a3ab-0d63e677fde6",
+    "name": "HITACHINO NEST SAISON DU JAPON",
+    "style": "SAISON"
+  },
+  {
+    "id": "db6ddb54-a57d-4ebe-8553-5bab2a16c2a1",
+    "name": "HITACHINO NEST WHITE ALE",
+    "style": "BELGIAN WHITE ALE"
+  },
+  {
+    "id": "d92a1d23-4677-4fe9-8444-c26ad2baecf5",
+    "name": "HITACHINO NEST YUZU LAGER (LATA)",
+    "style": "LAGER"
+  },
+  {
+    "id": "ef2d55f4-ff8f-4afd-9413-e8ea557347d9",
+    "name": "HOBGOBLIN GOLD BOTELLA",
+    "style": "BLOND ALE"
+  },
+  {
+    "id": "9c01808a-79b5-4b95-8df7-f58f5a9e7902",
+    "name": "HOBGOBLIN GOLD LATA",
+    "style": "BLOND ALE"
+  },
+  {
+    "id": "0aca876c-fbba-4a3c-b078-8d2b8a10d262",
+    "name": "HUMBLE SEA ANCHORMANATEE",
+    "style": "DDH FOGGY IPA"
+  },
+  {
+    "id": "4f170f86-bf3f-4064-bc03-2eea6d4c5464",
+    "name": "HUMBLE SEA BILLIE EELISH",
+    "style": "DDH FOGGY IPA"
+  },
+  {
+    "id": "61768558-a9ac-443e-a9cf-e88ea34eaa41",
+    "name": "HUMBLE SEA BOARDWALK DREAMIN' IPA",
+    "style": "DDH WEST COAST IPA"
+  },
+  {
+    "id": "de62430f-2c11-45de-a3c4-bc4db9a893c0",
+    "name": "HUMBLE SEA BUOYS II MEN",
+    "style": "DDH WEST COAST IPA"
+  },
+  {
+    "id": "968a4cd4-fd9d-4cbe-959c-e4180ccac4c0",
+    "name": "HUMBLE SEA FOGGY BALBOA",
+    "style": "FOGGY DIPA"
+  },
+  {
+    "id": "c1804e6f-f54e-401b-b4e8-309b56c39185",
+    "name": "HUMBLE SEA RAGE AGAINST THE MARINE",
+    "style": "WEST COAST IPA"
+  },
+  {
+    "id": "5a55d362-2d60-487d-8897-b139ea964bac",
+    "name": "HUMBLE SEA SOCK & SANDALS",
+    "style": "DDH FOGGY IPA"
+  },
+  {
+    "id": "bdca77d4-48a0-482a-9ce4-5080789d5f31",
+    "name": "HUMBLE SEA STEVEN SEAGULL",
+    "style": "DDH FOGGY IPA"
+  },
+  {
+    "id": "14c5c0a2-d6c4-43a3-a193-b0833d93669d",
+    "name": "INSURGENTE DRAGULA",
+    "style": "OATMEAL STOUT"
+  },
+  {
+    "id": "1b62a282-7198-46ef-ada0-ca67de41bf64",
+    "name": "INSURGENTE JUAN CORDERO",
+    "style": "PALE ALE"
+  },
+  {
+    "id": "e6492ca3-630f-4287-aa21-3c94f31cc141",
+    "name": "INSURGENTE LA LUPULOSA",
+    "style": "IPA"
+  },
+  {
+    "id": "b24f3fc5-f521-480b-8989-4f3e9236de36",
+    "name": "INSURGENTE SIMCOE DE MAYO",
+    "style": "SESSION IPA CON SIMCOE"
+  },
+  {
+    "id": "cd6df8b2-26a3-43e8-a9bf-bf4d08cc4b7b",
+    "name": "INSURGENTE TRES AMIGOS",
+    "style": "WEST COAST IPA"
+  },
+  {
+    "id": "09032a0d-8fc5-4acb-b713-35f3f6833769",
+    "name": "INSURGENTE X CRAFT GALAXY SERIE BÚHO COSMICO CITRA VOYAGER",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "209d17d7-9d7e-4307-97e2-2de4d51f618d",
+    "name": "INSURGENTE X WENDLANDT X FAUNA TRES AMIGOS",
+    "style": "WEST COAST IPA"
+  },
+  {
+    "id": "77e61bf5-056f-48ae-b513-d102fb198225",
+    "name": "INSURGENTE XAVI",
+    "style": "HAZY PALE ALE"
+  },
+  {
+    "id": "e3687d57-e152-4974-8216-4c6d1e6e1f90",
+    "name": "INTERSTELLAR BLOBZOOLON",
+    "style": "SMOOTHIE FRESA, PLÁTANO, BOMBÓN VEGANO, SABORIZANTE A CHICLE"
+  },
+  {
+    "id": "207a5560-2720-43cb-a915-33c31b82c41d",
+    "name": "INTERSTELLAR CHOCAZÖRG",
+    "style": "SMOOTHIE ZARZAMORA, BARQUILLOS DE HELADO, CHOCOLATE LÍQUIDO HERSHEYS, PALETAS DE HIELO DE GROSELLA"
+  },
+  {
+    "id": "20df3f99-7a1c-443c-a060-23aff95c770c",
+    "name": "INTERSTELLAR COIN DROP",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "3a003114-37a6-4045-9dca-db8dce38427c",
+    "name": "INTERSTELLAR CRYOGENIC SERIES CELESTIAL GROVE",
+    "style": "SPONTANEOUS WILD ALE EN BARRICAS DE VINO TINTO CON PINO"
+  },
+  {
+    "id": "436c7163-5109-425b-a8c9-5c695216e06b",
+    "name": "INTERSTELLAR CRYOGENIC SERIES JAFFACON BOURBON BA",
+    "style": "PASTRY STOUT BOURBON BARREL AGED CON MIEL DE MAPLE CASCARA DE NARANJA Y CACAO"
+  },
+  {
+    "id": "1ff51b0d-0294-40c3-b09b-49463c6053b8",
+    "name": "INTERSTELLAR CRYOGENIC SERIES PRIMORDIAL ENTANGLEMENT",
+    "style": "BLACK BARLEYWINE"
+  },
+  {
+    "id": "7152790b-f0c9-41e3-a2e0-3b1c13a9c0f6",
+    "name": "INTERSTELLAR CRYOGENIC SERIES PTC BOURBON BA",
+    "style": "CZECH DARK LAGER BOURBON BARREL CON ADICION DE VAINAS DE VAINILLA"
+  },
+  {
+    "id": "ea0bcdb1-46f0-41d7-9e2b-2659bd11e01b",
+    "name": "INTERSTELLAR FLÖNG BLORK!",
+    "style": "SMOOTHIE CON FRAMBUESA, HELADO DE VAINILLA Y GALLETAS BARRITAS DE FRESA"
+  },
+  {
+    "id": "122449fc-511f-4d03-a767-f1411ed3724a",
+    "name": "INTERSTELLAR MANGÖTRON",
+    "style": "SMOOTHIE KETTLE SOUR CON MANGO, PIÑA, DULCES SKWINKLES RELLENOS Y CHILITO EN POLVO"
+  },
+  {
+    "id": "c2cb6884-07b2-42f8-8c53-3f46d0892298",
+    "name": "INTERSTELLAR NTC NEGATIVE TEMPERATURE COEFFICIENT",
+    "style": "CZECH PILSNER"
+  },
+  {
+    "id": "9490e0ed-f48f-4f0a-8c43-bc7528488603",
+    "name": "INTERSTELLAR PTC POSITIVE TEMPERATURE COEFFICIENT",
+    "style": "CZECH DARK LAGER"
+  },
+  {
+    "id": "f9e69f1c-b54f-4869-b638-de19999ac007",
+    "name": "INTERSTELLAR QUNIBLŪRT SMOOTHIE",
+    "style": "SMOOTHIE SOUR CON PIÑA MIEL, CREMA DE COCO, HELADO DE COCO Y MARACUYA"
+  },
+  {
+    "id": "0a26d0a4-8042-42dc-87d7-6513bec0bcce",
+    "name": "INTERSTELLAR RÖZGLŪRP",
+    "style": "SMOOTHIE ZARZAMORA, BOMBÓN VEGANO, COCOA Y ESENCIA DE ROSA"
+  },
+  {
+    "id": "78b58357-67c2-41ee-96da-db65aadacf7c",
+    "name": "INTERSTELLAR SOLAR FLARE",
+    "style": "CANDY NEIPA"
+  },
+  {
+    "id": "2e23466c-555f-4cc9-80a0-c88ee0927f52",
+    "name": "INTERSTELLAR STRAWPONOK",
+    "style": "SMOOTHIE KETTLE SOUR CON MAZAPÁN, VAINILLA, FRESAS Y CEREZAS"
+  },
+  {
+    "id": "62196006-703a-4b7a-b1e1-d35b9509b13e",
+    "name": "INTERSTELLAR WILBERFORCE",
+    "style": "NEW ZEALAND IPA"
+  },
+  {
+    "id": "59c4708d-ac79-44f7-addd-79fb471b15ab",
+    "name": "INTERSTELLAR ZESSTINATOR",
+    "style": "SMOOTHIE PIÑA, LIMÓN, MERENGUE VEGANO, GALLETAS MARÍAS"
+  },
+  {
+    "id": "515a9ade-2408-4869-b879-6f5fd2ac3eed",
+    "name": "IRON MAIDEN FEAR OF THE DARK",
+    "style": "ENGLISH STOUT"
+  },
+  {
+    "id": "06f8914f-fdc8-47d4-a355-8b2c41b5234f",
+    "name": "IRON MAIDEN IPA",
+    "style": "IPA"
+  },
+  {
+    "id": "fdec7067-b386-4d9e-adbb-87af8fb93414",
+    "name": "IRON MAIDEN RED N BLACK",
+    "style": "PORTER"
+  },
+  {
+    "id": "95a7e1d9-1608-4112-9712-651f5c4e4ad7",
+    "name": "IRON MAIDEN TROOPER BOX CLÁSICO",
+    "style": "3 LATAS PREMIUM BITTER MÁS 1 VASO"
+  },
+  {
+    "id": "72363f68-b36c-4d6a-bb18-459833a753b6",
+    "name": "IRON MAIDEN TROOPER CLÁSICA",
+    "style": "PREMIUM BITTER"
+  },
+  {
+    "id": "793a44f9-1ee3-40ee-b3fa-d577b6a35ed8",
+    "name": "JABALÍ BOCK",
+    "style": "BOCK"
+  },
+  {
+    "id": "8444cab9-6419-4ebd-a18d-c8cf02c9d442",
+    "name": "JABALÍ HELLESBOCK",
+    "style": "HELLESBOCK"
+  },
+  {
+    "id": "d88faf5b-956b-42d3-bdee-3e2f593a05ed",
+    "name": "JABALÍ IPA",
+    "style": "IPA"
+  },
+  {
+    "id": "a1c63055-572f-4179-a2c6-97fb0af1f03b",
+    "name": "JABALÍ IPA CERVEZOTA",
+    "style": "IPA"
+  },
+  {
+    "id": "9d56db2d-465a-4788-bee9-94d1f3345052",
+    "name": "JABALÍ SALVAJITA",
+    "style": "LAGER"
+  },
+  {
+    "id": "bd780af9-78dc-46b1-a808-467593558164",
+    "name": "JABALÍ STOUT",
+    "style": "STOUT"
+  },
+  {
+    "id": "0ca0cddb-5e06-4ad0-b597-d5aa042c21e6",
+    "name": "JACK STOUT",
+    "style": "STOUT"
+  },
+  {
+    "id": "7f59607b-e771-4a77-9dc0-3f66324dfb9f",
+    "name": "JACK SWEET CHOCOLATE",
+    "style": "SWEET STOUT"
+  },
+  {
+    "id": "7e0a0d7e-151d-4771-91ba-535b50a99b78",
+    "name": "KAPUZINER HEFE-WEISSBIER DUNKEL",
+    "style": "HEFE DUNKEL"
+  },
+  {
+    "id": "8d4f90f8-c92c-43ef-b0d6-4dbf480330da",
+    "name": "KAPUZINER HEFE-WEISSBIER NATURTRÜB",
+    "style": "HEFE WEISSBIER"
+  },
+  {
+    "id": "929a866e-7776-43d2-bf21-5ff3acee45f0",
+    "name": "KARMELITEN ALKOHOLFREI",
+    "style": "ALKOHOLFREI"
+  },
+  {
+    "id": "c5b325b7-8963-4803-87dc-e55283e58dbf",
+    "name": "KARMELITEN KLOSTER DUNKEL",
+    "style": "DUNKEL"
+  },
+  {
+    "id": "ed44313a-ff22-43a0-8ccb-443ecd124043",
+    "name": "KARMELITEN KLOSTER GOLD HELL",
+    "style": "GERMAN HELLES EXPORTBIER"
+  },
+  {
+    "id": "f4eddd09-d9ee-4d84-bcda-92506a20111f",
+    "name": "KARMELITEN KLOSTER WEIZEN",
+    "style": "WEISSBIER"
+  },
+  {
+    "id": "71725023-400a-46fb-8852-05d8d101b9f6",
+    "name": "KASTEEL BARISTA",
+    "style": "QUADRUPEL"
+  },
+  {
+    "id": "b6cc64fd-4e78-4125-8ca4-e68d4caa793d",
+    "name": "KASTEEL BARISTA GRANDE",
+    "style": "QUADRUPEL"
+  },
+  {
+    "id": "2ed6e8e1-3773-4140-8fa6-3defe06b3c31",
+    "name": "KASTEEL CUVÉE DU CHATEAU (ETIQUETA NEGRA)",
+    "style": "BELGIAN DARK STRONG ALE"
+  },
+  {
+    "id": "7b97ee7f-9298-44a3-9f31-2d0e136c7a22",
+    "name": "KASTEEL DONKER (ETIQUETA CAFÉ)",
+    "style": "QUADRUPEL"
+  },
+  {
+    "id": "7c735a7a-be7b-413c-925f-b881494c6fd3",
+    "name": "KASTEEL ROUGE",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "5065886d-f95a-4af5-a79f-ff2860ef68c0",
+    "name": "KASTEEL ROUGE 0.0",
+    "style": "FRUIT BEER 0.0"
+  },
+  {
+    "id": "a92ea791-3394-4017-be19-37fdc9fa052a",
+    "name": "KASTEEL ROUGE GRANDE",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "2b12bc67-c593-48ce-a8a6-c9c989d91dde",
+    "name": "KASTEEL RUBUS FRAMBOISE",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "33d3e0a1-6460-4b44-9e6a-d3ba97f3661f",
+    "name": "KASTEEL RUBUS FRAMBOISE GRANDE",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "dace7d3f-f8d8-4cb2-beec-ac9fd1ef15e1",
+    "name": "KASTEEL TRIGNAC",
+    "style": "TRIPEL AÑEJADA BARRICA DE COGNAC"
+  },
+  {
+    "id": "0d8a607c-f051-4ee8-ab5e-be1ebb6cf3e8",
+    "name": "KASTEEL TRIPEL",
+    "style": "TRIPEL"
+  },
+  {
+    "id": "d1bd8814-6bcf-4992-a9ef-88720227b575",
+    "name": "KASTEEL TROPICAL",
+    "style": "STRONG FRUIT BEER"
+  },
+  {
+    "id": "223d9222-3cbc-4a60-8c0a-2ecf976dfbc7",
+    "name": "KASTEEL TROPICAL 0.0",
+    "style": "NON-ALCOHOLIC FRUIT BEER"
+  },
+  {
+    "id": "d4678c6c-4679-4dc5-95bd-b69544e17751",
+    "name": "KNEE DEEP DOUBLE BREAKING BUD",
+    "style": "WEST COAST STYLE IMPERIAL INDIA PALE ALE"
+  },
+  {
+    "id": "ff6982f0-3a40-4b4c-91f4-7cfefaf0559c",
+    "name": "KNEE DEEP HOPTOLOGIST DIPA",
+    "style": "DOUBLE INDIA PALE ALE"
+  },
+  {
+    "id": "3082f06c-7a53-4a51-b01f-6b1370943657",
+    "name": "KNEE DEEP SIMTRA TRIPLE IPA",
+    "style": "TRIPLE INDIA PALE ALE"
+  },
+  {
+    "id": "5c8a3bc6-e03f-4122-9985-ff1475411f99",
+    "name": "KNEE DEEP SLOOOW MO",
+    "style": "IPA"
+  },
+  {
+    "id": "def2a867-bafa-460b-96a5-e248eebe124b",
+    "name": "KNEE DEEP TAHOE DEEP",
+    "style": "IMPERIAL INDIA PALE ALE"
+  },
+  {
+    "id": "83a219a9-5496-4505-800b-c492faeeaa55",
+    "name": "KOMES BARLEY WINE",
+    "style": "BARLEY WINE"
+  },
+  {
+    "id": "dee93520-e3cb-43df-b238-2c90feaff873",
+    "name": "KOMES IMPERIAL STOUT",
+    "style": "RUSSIAN IMPERIAL STOUT"
+  },
+  {
+    "id": "df57b11f-ea75-4d18-8288-a30a5e191fc3",
+    "name": "KOMES PORTER BALTYCKI",
+    "style": "BALTIC PORTER"
+  },
+  {
+    "id": "5d9bcdea-e02a-4d2a-98fd-e22b1d1fa7b6",
+    "name": "KOMES PORTER BALTYCKI AMBURANA",
+    "style": "BALTIC PORTER AÑEJADA CON MADERA DE AMBURANA DE BOLIVIA"
+  },
+  {
+    "id": "0fe91e07-d3ac-4da3-88b7-50f5f8ead46d",
+    "name": "KOMES PORTER MALINOWY",
+    "style": "PORTER CON JUGO DE FRAMBUESA AÑEJADA CON VAINILLA Y CHILE"
+  },
+  {
+    "id": "a00b04c0-5c87-4b7e-8744-c2ba28d4fede",
+    "name": "KOZEL DARK LATA",
+    "style": "TMAVÝ"
+  },
+  {
+    "id": "9866be8c-2cc2-4d8f-8d9f-27f96f3240a3",
+    "name": "KOZEL PREMIUM LAGER LATA",
+    "style": "SVĚTLÝ"
+  },
+  {
+    "id": "9e6f708e-e2a6-43e8-bac0-9a46121c7455",
+    "name": "KUPA LIMA LIMON HIERBABUENA",
+    "style": "HOLISTIC HARD SELTZER"
+  },
+  {
+    "id": "820e925e-d23a-41d3-a76d-1e43c699fc7c",
+    "name": "KUPA MANGO-MARACUYA",
+    "style": "HOLISTIC HARD SELTZER"
+  },
+  {
+    "id": "057fe5dc-a50b-4010-9f75-96d453de65c4",
+    "name": "KUPA MANZANA VERDE-LIMÓN-JENGIBRE",
+    "style": "HOLISTIC HARD SELTZER"
+  },
+  {
+    "id": "36a53cb5-7dd1-4418-9222-9a54c728c75e",
+    "name": "KUPA TAMARINDO-CHAMOY",
+    "style": "HOLISTIC HARD SELTZER"
+  },
+  {
+    "id": "c82b2bc4-7776-424c-898d-f414e012433c",
+    "name": "LA PATRONA CAROL",
+    "style": "WINTER ALE"
+  },
+  {
+    "id": "c5c8410a-4692-4f04-b6b1-14f5dc17a642",
+    "name": "LAGUINAS TROOPER",
+    "style": "WEST COAST IPA"
+  },
+  {
+    "id": "8e752054-4e4e-41a2-8cec-f493a5400494",
+    "name": "LAGUNITAS TROOPER",
+    "style": "WEST COAST IPA"
+  },
+  {
+    "id": "ccaa69c5-93d9-418d-99dd-2fd23a0fc738",
+    "name": "LATA HOBGOBLIN RUBY WYCHWOOD",
+    "style": "PREMIUM BITTER"
+  },
+  {
+    "id": "2a254331-d1d5-4b7c-a289-c0dec57a5d33",
+    "name": "LATA VOLFAS ENGELMAN BALTIC PORTER",
+    "style": "BALTIC PORTER"
+  },
+  {
+    "id": "fe9ab5cc-471d-4b6d-8e05-cc7589e76f77",
+    "name": "LINDEMANS APPLE",
+    "style": "LAMBIC"
+  },
+  {
+    "id": "f4c858d9-ca0e-4d17-bf96-7e9f6945de75",
+    "name": "LINDEMANS CASSIS",
+    "style": "LAMBIC"
+  },
+  {
+    "id": "3d6ad570-376b-4806-bce9-5b28dc62d963",
+    "name": "LINDEMANS FARO",
+    "style": "LAMBIC"
+  },
+  {
+    "id": "726a0584-0727-41b8-b3df-a60fedbd70e4",
+    "name": "LINDEMANS FRAMBOISE",
+    "style": "LAMBIC"
+  },
+  {
+    "id": "09bdeba8-bed5-4088-b04d-f3d89a4e872f",
+    "name": "LINDEMANS GUEUZE",
+    "style": "LAMBIC"
+  },
+  {
+    "id": "d043030d-b28d-4eb8-a9a4-56928d23b9f6",
+    "name": "LINDEMANS KRIEK",
+    "style": "LAMBIC"
+  },
+  {
+    "id": "bf8cc7e9-fea7-4d7b-a18b-4e86022bf990",
+    "name": "LINDEMANS KRIEK 0,0 %",
+    "style": "LAMBIC ALCOHOL FREE"
+  },
+  {
+    "id": "3fe42122-160a-46bf-a998-2f47d8cbc33d",
+    "name": "LINDEMANS PAQUETE",
+    "style": "LAMBIC Y STRONG FRUIT BEER"
+  },
+  {
+    "id": "d819e6f2-daa9-49bb-a435-7a2f6aaf2355",
+    "name": "LINDEMANS PECHERESSE",
+    "style": "LAMBIC"
+  },
+  {
+    "id": "c18f0a99-7584-4d43-9383-ad6cc31dd847",
+    "name": "LINDEMANS PECHERESSE 0,0 %",
+    "style": "LAMBIC ALCOHOL FREE"
+  },
+  {
+    "id": "9ff5140f-8ee9-4a55-99e5-d5fb711fc3a9",
+    "name": "LINDEMANS STRAWBERRY",
+    "style": "LAMBIC"
+  },
+  {
+    "id": "ee6a5d13-5eb3-411d-b44d-23466834a62e",
+    "name": "LINDEMANS TAROT D'OR",
+    "style": "STRONG FRUIT BEER"
+  },
+  {
+    "id": "b6171ba2-5810-4bf6-bf96-14b1ee55a012",
+    "name": "LINDEMANS TAROT NOIR",
+    "style": "STRONG FRUIT BEER"
+  },
+  {
+    "id": "e1328d71-7d0a-4e12-9d77-58829e7eea7d",
+    "name": "LUCKY BUDDHA",
+    "style": "LAGER"
+  },
+  {
+    "id": "7fa6128e-bbd8-434b-8188-3aedad2790af",
+    "name": "LUPULUS HIBERNATUS",
+    "style": "WINTER ALE"
+  },
+  {
+    "id": "006bc093-239b-46f0-a6a2-d37beceaa79c",
+    "name": "MAHOU 0.0",
+    "style": "SIN ALCOHOL"
+  },
+  {
+    "id": "2969a804-0665-46a9-8789-e1f0aace8d7a",
+    "name": "MAHOU 5 ESTRELLAS",
+    "style": "PALE LAGER"
+  },
+  {
+    "id": "f12bcd12-293d-46c8-a177-fe5e452db0d1",
+    "name": "MAHOU MAESTRA DUNKEL",
+    "style": "DUNKEL"
+  },
+  {
+    "id": "41437302-ae45-4a1d-a154-6f1b9aafdec4",
+    "name": "MAHOU SIN GLUTEN",
+    "style": "SIN GLUTEN"
+  },
+  {
+    "id": "f55aebc9-e63a-4fcd-adf2-e06151642db9",
+    "name": "MAISEL & FRIENDS BAVARIA ALE",
+    "style": "WEIZENBOCK"
+  },
+  {
+    "id": "0d2335ee-35c8-4d0a-a2d4-7680297b9473",
+    "name": "MAISEL & FRIENDS CHOCOLATE BOCK",
+    "style": "CHOCOLATE BOCK"
+  },
+  {
+    "id": "8d40ce2a-552a-4a70-b456-426bf7b65a45",
+    "name": "MASON ALE WORKS BRIDE OF DANKENSTEIN",
+    "style": "WEST COAST IPA"
+  },
+  {
+    "id": "b7883039-9bb0-4238-9f2a-384952813246",
+    "name": "MASON ALE WORKS HARD LUCK",
+    "style": "RED ALE"
+  },
+  {
+    "id": "67b66275-fec6-4b04-9b0c-a911ce785456",
+    "name": "MASON ALE WORKS INFINITY HAZE",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "a0fb1b3a-1159-45f2-a817-d6111cef26a6",
+    "name": "MASON ALE WORKS INNER MONSTER",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "b8aee7f9-514e-4b33-8722-b7e246012f2d",
+    "name": "MASON ALE WORKS POINT BLANK",
+    "style": "WEST COAST IPA"
+  },
+  {
+    "id": "1d674ba8-c8a7-47a5-a8b9-d994294ffec2",
+    "name": "MASON ALE WORKS TALONS OF FURY",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "f7da1389-302c-48fe-882b-6b781bbd51a1",
+    "name": "MCEWAN'S CHAMPION",
+    "style": "SCOTCH ALE"
+  },
+  {
+    "id": "e34c68ab-eaa0-45e1-9d7b-868cfd009a80",
+    "name": "MCEWAN'S CHAMPION EXPORT LATA",
+    "style": "ORIGINAL SCOTTISH"
+  },
+  {
+    "id": "1526409d-d4df-41dd-a363-5f7578d5e3e8",
+    "name": "MILLER HIGH LIFE CAGUAMITA",
+    "style": "LAGER AMERICANA"
+  },
+  {
+    "id": "dab1b32c-c8a6-4a0a-8472-e7e2813b6d43",
+    "name": "MINERVA CERO",
+    "style": "AMERICAN PALE ALE"
+  },
+  {
+    "id": "c035d10c-58a0-4770-8f04-aee284479fb6",
+    "name": "MINERVA COLONIAL",
+    "style": "KOLSCH"
+  },
+  {
+    "id": "71ba29d2-2ab4-44cd-9ad8-b37f84bf5f0b",
+    "name": "MINERVA DIOSA BLANCA",
+    "style": "WITBIER"
+  },
+  {
+    "id": "4d90a8a2-20bc-4616-aa78-8076afd652e6",
+    "name": "MINERVA DUO PACK NAVIDEÑA",
+    "style": "DOBLE STOUT CON CHOCOLATE Y STRONG ALE"
+  },
+  {
+    "id": "4ebee7b2-d7a4-49f4-939d-d7f7dc2390b4",
+    "name": "MINERVA IPA",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "d2db30f7-bfb4-4703-a418-44e31cc595e6",
+    "name": "MINERVA ITA",
+    "style": "IMPERIAL TEQUIAGAVE ALE"
+  },
+  {
+    "id": "7b149046-a018-4f8f-ab88-a95416bbe585",
+    "name": "MINERVA MEXICAN LAGER LIGHT",
+    "style": "LAGER LIGHT"
+  },
+  {
+    "id": "d1a68969-0c8a-4fec-9b7d-a4060cf83937",
+    "name": "MINERVA NAVIDEÑA CAJA ROJA",
+    "style": "STRONG ALE"
+  },
+  {
+    "id": "b986e678-dc56-47e1-a215-850747574b2f",
+    "name": "MINERVA NAVIDEÑA CAJA VERDE",
+    "style": "DOBLE STOUT CON CHOCOLATE Y MAZAPÁN"
+  },
+  {
+    "id": "ede44b26-4a33-4e3e-b59b-71d5132e4ead",
+    "name": "MINERVA PALE ALE",
+    "style": "PALE ALE"
+  },
+  {
+    "id": "7a122c11-2d3b-4454-9ee7-f88b1a91f920",
+    "name": "MINERVA SAN CRISTOBAL",
+    "style": "NEIPA"
+  },
+  {
+    "id": "c91d5ba8-b770-457e-bd86-97d3a5f10feb",
+    "name": "MINERVA STOUT",
+    "style": "SWEET STOUT"
+  },
+  {
+    "id": "92e044ca-b9af-4548-8558-cf27bf59368c",
+    "name": "MINERVA VIENA",
+    "style": "VIENNA"
+  },
+  {
+    "id": "08bdcf5b-785f-4ecc-95a6-4d3472dc16b4",
+    "name": "MÖNCHSHOF BOCKBIER",
+    "style": "BOCKBIER"
+  },
+  {
+    "id": "13d5fb01-5e25-44da-b1d2-77bffe330902",
+    "name": "MÖNCHSHOF ORIGINAL",
+    "style": "PILS"
+  },
+  {
+    "id": "0692e5a8-c9ad-4a28-bc5e-eee49c8a69ed",
+    "name": "MÖNCHSHOF SCHWARZBIER",
+    "style": "SCHWARZBIER"
+  },
+  {
+    "id": "e8037828-6875-46e7-a49b-f4fa78855849",
+    "name": "MONGOZO BANANA",
+    "style": "FRUIT BEER GLUTEN FREE"
+  },
+  {
+    "id": "2eb7315e-e30c-4738-bce0-bd96ca9f0fc4",
+    "name": "MONGOZO COCO",
+    "style": "FRUIT BEER GLUTEN FREE"
+  },
+  {
+    "id": "6f11b7b4-a275-4235-a3cc-3cefec3f8f29",
+    "name": "MONGOZO MANGO",
+    "style": "FRUIT BEER GLUTEN FREE"
+  },
+  {
+    "id": "30c41c12-ed11-4c0f-9e83-7f5e3864a520",
+    "name": "MONKEY WAVES 1.44 MB",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "b60ee71a-96c9-46c7-8db0-b71d1c12118c",
+    "name": "MONKEY WAVES BABUINO SÁNCHEZ",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "9aa39e47-cf32-4765-bf1d-3e406aed9de2",
+    "name": "MONKEY WAVES CHIDO POR EL AÑO",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "7d9cbe18-44cc-4546-92bd-9dfb7c6821f4",
+    "name": "MONKEY WAVES CHOCO CHOCO",
+    "style": "STOUT CON CHOCOLATE Y COCO"
+  },
+  {
+    "id": "2c83b645-98dc-4ee3-8dba-4012a15084ea",
+    "name": "MONKEY WAVES CHOCO COCO",
+    "style": "STOUT CON CHOCOLATE Y COCO"
+  },
+  {
+    "id": "247cabd7-2c42-4b0d-a60d-d0be3ab23651",
+    "name": "MONKEY WAVES COCK NORRIS",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "e4618d26-63d2-44fd-b9f0-31a4aabee7d1",
+    "name": "MONKEY WAVES DE LAS MONTAÑAS",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "3fe7a85f-b708-48e3-8f4f-3d5a0d5fa025",
+    "name": "MONKEY WAVES DUCK FACE",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "ddef5714-81c3-46df-898d-9848c7bfadc2",
+    "name": "MONKEY WAVES EL AGUILA!",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "41a5a09b-6f6f-4a88-848f-a9a15a95096e",
+    "name": "MONKEY WAVES EL GENELAL",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "50439153-1459-4770-b461-fb95c4cb0495",
+    "name": "MONKEY WAVES ESLABÓN POR ESLABÓN",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "e8e1b061-5c77-4bf4-8652-288e9d44c2ed",
+    "name": "MONKEY WAVES HAMMER TIME",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "748add5c-2293-414c-a910-fb8fe57e3f32",
+    "name": "MONKEY WAVES IMPRESHIONANTI",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "9222e4f0-4b8c-4cee-94f4-6c8e45a878b0",
+    "name": "MONKEY WAVES LA BODA DEL HUITLACOCHE",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "28b62dd3-06c8-4934-b51b-5a3906190b34",
+    "name": "MONKEY WAVES LA HORA PICO",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "5a8675da-a5b3-4f7e-838b-746325932e29",
+    "name": "MONKEY WAVES LA NOCHE EN QUE CHICAGO SE MURIÓ",
+    "style": "AMERICAN STOUT"
+  },
+  {
+    "id": "f465e7d3-3192-4b98-889b-620124ecdb07",
+    "name": "MONKEY WAVES LA RISA EN VACACIONES 9",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "4450fa25-48d0-4973-9fad-1a081fa5459f",
+    "name": "MONKEY WAVES LA RODILLA",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "d6421781-1115-4b54-be0a-db0118c92117",
+    "name": "MONKEY WAVES LOCO EN EL COCO",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "0e87ac72-ba84-4df6-99a8-48275b25cb85",
+    "name": "MONKEY WAVES LOS CACHIRULES",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "76369608-7881-4000-8a0d-7b4167cd1336",
+    "name": "MONKEY WAVES LOS LADRIDOS DEL NORTE",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "d4ed1eb0-80fb-402b-8170-f2632a3e7fac",
+    "name": "MONKEY WAVES LOS TEME-GUAU-RIOS",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "2b7e59a6-6896-4ec4-9203-9853835c1622",
+    "name": "MONKEY WAVES MI COMPA EL ALUCIN",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "7241e900-065d-47e5-932c-dc9a45c62411",
+    "name": "MONKEY WAVES MIS OJOS LLOLAN POL TI",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "b666057e-f1e0-4498-b630-0547d6dfd182",
+    "name": "MONKEY WAVES NO ERA PENAL",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "ca194e6c-4e30-4ab9-b89d-b0ddb4e45e67",
+    "name": "MONKEY WAVES PA MI JEFITA",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "98476a4a-aacd-4181-90b7-632f59f265ed",
+    "name": "MONKEY WAVES PETER LA ANGUILA",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "9767a685-bb73-4835-9aa9-4cfeb53ea7fd",
+    "name": "MONKEY WAVES QUE RICA ESTA LA MANZANA",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "dcc7298c-ec64-4537-8e96-9d2b864e9bed",
+    "name": "MONKEY WAVES SHAQUILLE MANDRIL",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "b927c2c1-8ad5-4469-94c4-678684b8a7a6",
+    "name": "MONKEY WAVES SHEEP HAPPENS",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "42b68e07-c4aa-4aa4-8a2a-1c73498cddf3",
+    "name": "MONKEY WAVES SIN PALITA",
+    "style": "STOUT CON AVELLANA Y VAINILLA"
+  },
+  {
+    "id": "71e8207d-70ce-4484-b00c-fa85dc2c9abb",
+    "name": "MONKEY WAVES SOLO PARA MUJERES",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "2035df2e-94ca-402a-abb6-164a21c426e9",
+    "name": "MONKEY WAVES TRAVESAÑO",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "36f788a0-3a80-45a3-83dc-0518b93f3942",
+    "name": "MONKISH DDH ISLAND",
+    "style": "DDH PALE ALE"
+  },
+  {
+    "id": "1e45ada3-eb04-4189-99b6-7a94fca168cd",
+    "name": "MONKISH EYE LINE",
+    "style": "DDH INDIA PALE ALE"
+  },
+  {
+    "id": "c637e09f-df16-42de-99b5-770249bb1d32",
+    "name": "MONKISH MONK STYLE PROVERBS PLUS",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "57fd4236-7e20-431b-af4c-ac6ecd7fe8c6",
+    "name": "MONKISH WEST COAST BLOOM",
+    "style": "WEST COAST INDIA PALE ALE"
+  },
+  {
+    "id": "20035c38-7238-4075-8014-3915c74a377e",
+    "name": "MONKISH WEST COAST FLAVOR",
+    "style": "WEST COAST INDIA PALE ALE"
+  },
+  {
+    "id": "fd8105b8-9a9f-48ab-97b9-e1d45561ee3c",
+    "name": "MORENOS WARPED",
+    "style": "DDH IPA TURBIA AMARILLO, CITRA, GALAXY & EL DORADO HOPS"
+  },
+  {
+    "id": "cbea768f-55de-4918-ad4b-3ae92f68337a",
+    "name": "MOTORHEAD DANCING WITH THE DEVIL",
+    "style": "STOUT"
+  },
+  {
+    "id": "db3dd300-0339-4e15-973c-6f93f4035c37",
+    "name": "MOTORHEAD OVERKILL",
+    "style": "PILSNER"
+  },
+  {
+    "id": "85ed1156-3d34-4cb1-a6be-7e7eb7f99d2b",
+    "name": "MOTORHEAD ROAD CREW",
+    "style": "AMERICAN PALE ALE"
+  },
+  {
+    "id": "ae603f23-f726-449a-bc8d-5df8c076006c",
+    "name": "NORTH COAST ACME",
+    "style": "AMERICAN LAGER"
+  },
+  {
+    "id": "1515fb40-dea0-4852-80ba-5c9a19893cd7",
+    "name": "NORTH COAST BERLINER WEISSE TART CHERRY",
+    "style": "BERLINER WEISSE"
+  },
+  {
+    "id": "1b7d5193-37e5-47df-9d61-6b43de94eddc",
+    "name": "NORTH COAST BROTHER THELONIOUS",
+    "style": "BELGIAN STYLE ABBEY ALE"
+  },
+  {
+    "id": "83f2f2e9-d93a-434a-b177-e9f57d3476bb",
+    "name": "NORTH COAST FOGGY DAY",
+    "style": "IPA"
+  },
+  {
+    "id": "da30a932-b1a5-4bb2-afcc-9d6f16d03c2b",
+    "name": "NORTH COAST OLD RASPUTIN BOTELLA RUSSIAN IMPERIAL STOUT 355ML",
+    "style": "RUSSIAN IMPERIAL STOUT"
+  },
+  {
+    "id": "f9598387-b959-4a9d-9569-387e7ee97832",
+    "name": "NORTH COAST OLD RASPUTIN BOURBON BARREL AGED",
+    "style": "RUSSIAN IMPERIAL STOUT AÑEJADA EN BARRICAS DE BOURBON"
+  },
+  {
+    "id": "f36918ac-ee87-48b7-bf02-cc607bb0bee5",
+    "name": "NORTH COAST OLD RASPUTIN LATÓN RUSSIAN IMPERIAL STOUT",
+    "style": "RUSSIAN IMPERIAL STOUT"
+  },
+  {
+    "id": "76749c5a-8c68-430e-abff-c66719d049cd",
+    "name": "NORTH COAST OLD STOCK ALE 2025",
+    "style": "OLD STOCK ALE"
+  },
+  {
+    "id": "a0d5b743-b799-41b8-aa6a-fd912045c8dc",
+    "name": "NORTH COAST PACIFIC MAGIC LATA",
+    "style": "IPA"
+  },
+  {
+    "id": "051f6c02-7158-45bd-9811-077b00419666",
+    "name": "OLD MILWAUKEE SIN ALCOHOL",
+    "style": "LOW ALCOHOL"
+  },
+  {
+    "id": "38615835-b209-4746-94fe-dc09917df10e",
+    "name": "OMNIPOLLO NOA PECAN MUD CAKE",
+    "style": "IMPERIAL PASTRY STOUT"
+  },
+  {
+    "id": "32963052-2f48-4b1b-9aa6-55ba286cefe6",
+    "name": "ORVAL",
+    "style": "BELGIAN PALE ALE"
+  },
+  {
+    "id": "bc75ef12-9964-4f42-9d8f-ab9cbbe09cce",
+    "name": "PALMA CRISTAL",
+    "style": "PALE LAGER"
+  },
+  {
+    "id": "59a4f3d7-d3a1-4956-b3b1-78596b51d5fc",
+    "name": "PAQUETE BOSCOLI 4 MÁS COPA",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "ae78b2cf-7c99-4330-808b-037c5ac2bfa6",
+    "name": "PAQUETE CAROLUS 5 MÁS COPA",
+    "style": "VARIOS ESTILOS"
+  },
+  {
+    "id": "677dd595-6128-416b-8394-5001f81929fb",
+    "name": "PAQUETE DELIRIUM 4 MÁS COPA",
+    "style": "VARIOS ESTILOS"
+  },
+  {
+    "id": "7b025969-d8dd-4cd7-ac90-f1e719049147",
+    "name": "PAQUETE ERDINGER 2 MÁS VASO",
+    "style": "VARIOS ESTILOS"
+  },
+  {
+    "id": "b1787685-d499-4abf-bb25-eae7d92026b9",
+    "name": "PAQUETE GRANDE KASTEEL 2 MÁS 2 COPAS",
+    "style": "DIFERENTES ESTILOS"
+  },
+  {
+    "id": "bf45635b-8a6b-433a-ab00-533a5346db57",
+    "name": "PAQUETE KASTEEL 4 MÁS COPA",
+    "style": "VARIOS ESTILOS"
+  },
+  {
+    "id": "94c4bb8c-2b15-455c-b01f-aa256733f66d",
+    "name": "PAQUETE LUCKY BUDDHA 6 BOTELLAS MÁS 2 VASOS",
+    "style": "LAGER"
+  },
+  {
+    "id": "1bf08384-3c77-4e6d-a8be-f0d940c090d8",
+    "name": "PAQUETE MINERVA EDICION FUTBOLERA 2026 1 VASO Y 6 BOTELLAS",
+    "style": "VARIOS ESTILOS"
+  },
+  {
+    "id": "f302a45d-1701-45ca-93a6-88ee27292a0a",
+    "name": "PARANOIA ALCOHOL FREE (ETIQUETA AMARILLA)",
+    "style": "ALCOHOL FREI"
+  },
+  {
+    "id": "fe83caa7-0184-4cef-aa5b-52d148d1a568",
+    "name": "PARANOIA ORIGINAL HOPPY (ETIQUETA MORADA)",
+    "style": "HAZY HOPPY"
+  },
+  {
+    "id": "5ce03c25-352c-422b-b488-81f7cd39e258",
+    "name": "PAULANER DUNKEL",
+    "style": "DUNKELWEIZEN"
+  },
+  {
+    "id": "dcd06e6a-b493-4974-bc0b-8c8a3430ee1e",
+    "name": "PAULANER OKTOBERFESTBIER",
+    "style": "OKTOBERFEST"
+  },
+  {
+    "id": "b79779b8-c987-4da1-af43-f09a41669560",
+    "name": "PAULANER ORIGINAL",
+    "style": "MUNICH HELLES"
+  },
+  {
+    "id": "c044b8b8-25af-478a-b231-993f9225f8e3",
+    "name": "PAULANER SALVATOR",
+    "style": "DOPPELBOCK"
+  },
+  {
+    "id": "b9d757b0-ec09-49a8-b303-9d94b4e7fa06",
+    "name": "PAULANER WEISSBIER",
+    "style": "MUNICH WHEAT BEER"
+  },
+  {
+    "id": "8c5b163f-8be1-47bb-8b54-1f37acaff82d",
+    "name": "PÈRE NOËL",
+    "style": "WINTER ALE"
+  },
+  {
+    "id": "e2135aa0-bb31-4621-a202-114e8d6c034a",
+    "name": "PERONI",
+    "style": "PREMIUM LAGER"
+  },
+  {
+    "id": "c5aa6895-7563-4084-8b7b-3ccaea0e625e",
+    "name": "PERONI 0.0",
+    "style": "BEBIDA DE MALTA NO ALCOHÓLICA"
+  },
+  {
+    "id": "802753dc-85e3-4f33-b60a-5499e48128af",
+    "name": "PILSNER URQUELL BOTELLA CHICA",
+    "style": "PILSNER"
+  },
+  {
+    "id": "05881353-14cc-461e-8977-406bc7be822d",
+    "name": "PILSNER URQUELL LATA",
+    "style": "PILSNER"
+  },
+  {
+    "id": "13503e21-c02d-4d45-974c-300bdf8c7ef7",
+    "name": "PULQUE PENCA LARGA AVENA",
+    "style": "PULQUE"
+  },
+  {
+    "id": "16360b79-ce1a-4667-896a-f37b75d8c1ca",
+    "name": "PULQUE PENCA LARGA GUAYABA",
+    "style": "PULQUE"
+  },
+  {
+    "id": "2e24c9bc-3385-4b1a-b9e3-ae8940cca945",
+    "name": "PULQUE PENCA LARGA MARACUYA",
+    "style": "PULQUE"
+  },
+  {
+    "id": "a32bc638-80db-4440-9fdf-b49f610087ad",
+    "name": "PULQUE PENCA LARGA NATURAL",
+    "style": "PULQUE"
+  },
+  {
+    "id": "e97fad73-44f6-42ac-adda-8272f2d09077",
+    "name": "PULQUE PENCA LARGA PIÑA COLADA",
+    "style": "PULQUE"
+  },
+  {
+    "id": "38a98c2c-7934-4005-8117-8f5637aed0c7",
+    "name": "PULQUE PENCA LARGA UVA",
+    "style": "PULQUE"
+  },
+  {
+    "id": "288515e7-efdf-487f-9e87-097309d22ba7",
+    "name": "QUILMES",
+    "style": "PALE LAGER"
+  },
+  {
+    "id": "ed5f840d-32b7-4d04-a916-66b961ed76f4",
+    "name": "RÁMURI JOLLY SPLASH WATERMELON",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "f09979ef-1a83-4d90-a03c-281451272fec",
+    "name": "RÁMURI LÁGRIMAS DE AVELLANA",
+    "style": "AVELLANA STOUT"
+  },
+  {
+    "id": "833b38d8-b75a-4c07-82cb-e0803d3c5638",
+    "name": "RÁMURI LÁGRIMAS DE CACAHUATE",
+    "style": "PEANUT BUTTER STOUT"
+  },
+  {
+    "id": "914b5be5-c748-4a96-82eb-f3f3165c6b7b",
+    "name": "RÁMURI LÁGRIMAS DE MI ABUELITA",
+    "style": "RUSSIAN IMPERIAL STOUT"
+  },
+  {
+    "id": "51395b48-f4a1-40b5-a517-9ef3d728e7b5",
+    "name": "RÁMURI LÁGRIMAS NEGRAS",
+    "style": "IMPERIAL CACAO STOUT"
+  },
+  {
+    "id": "cac4d3e3-0bae-4998-9828-c12df82454f2",
+    "name": "RÁMURI ODIN",
+    "style": "IMPERIAL COFFEE STOUT"
+  },
+  {
+    "id": "ccba1c9b-76d7-402b-8b95-1d2a4f532bea",
+    "name": "REY ÁRBOL ANTHONY HOPDAIN",
+    "style": "DDH TRIPLE IPA BRUMOSA"
+  },
+  {
+    "id": "fa71d7e9-faa4-481c-95cd-2ba1b31337eb",
+    "name": "REY ÁRBOL BAMBÚ",
+    "style": "IPA BRUMOSA SIN ALCOHOL"
+  },
+  {
+    "id": "d9817200-076d-4145-a29c-ab3ff69ee525",
+    "name": "REY ARBOL BETULA EL COLOSO SEPTIMO ANIVERSARIO",
+    "style": "STOUT IMPERIAL CON NIBS DE CACAO ENVEJECIDA 700 DIAS EN BARRICAS DE RON JAMAICANO"
+  },
+  {
+    "id": "ea592b48-1a18-4d33-ac78-ae4f57c65a62",
+    "name": "REY ARBOL BETULITA",
+    "style": "STOUT CREMOSA CON HIGO"
+  },
+  {
+    "id": "3149e023-6f13-44cf-a84b-8d494457c543",
+    "name": "REY ÁRBOL DIXSON GREENBERG",
+    "style": "CAFÉ CON CHOCOLATE STOUT"
+  },
+  {
+    "id": "beaf1f3b-32be-445e-8569-329ced2d86ae",
+    "name": "REY ÁRBOL JACARANDA",
+    "style": "SOUR ALE CON MORA AZUL Y VAINILLA"
+  },
+  {
+    "id": "590d174f-b0bf-4dac-ac2a-97cf32a4898d",
+    "name": "REY ÁRBOL OLIVO",
+    "style": "ITALIAN PILSNER"
+  },
+  {
+    "id": "e84ef86b-9058-4dc6-9fe8-811c2a1fa3e6",
+    "name": "REY ÁRBOL THE HOPSONS",
+    "style": "DDH DOBLE IPA BRUMOSA"
+  },
+  {
+    "id": "c8f7b6fd-b47e-4c1b-9462-ebc869ec906b",
+    "name": "REY ARBOL VIEJO PARDO",
+    "style": "BROWN ALE CON AVELLANA"
+  },
+  {
+    "id": "7d4a9eae-efde-471b-a2e6-5182c3d6f138",
+    "name": "REY ARBOL VIEJO PARDO EMBRUJADO",
+    "style": "BROWN ALE CON CALABAZA"
+  },
+  {
+    "id": "3b3b4932-8a6c-462a-897c-6cea08fde8fb",
+    "name": "REY ÁRBOL X BEERMEX X YAKIMA CHIEF HOPS X XAKUA LOS LUPULARIOS",
+    "style": "DDH WEST COAST IPA"
+  },
+  {
+    "id": "f65f3a9a-f524-4608-98ee-1b2cfddc10c8",
+    "name": "RODENBACH GRAND CRU",
+    "style": "SOUR FLANDERS RED ALE"
+  },
+  {
+    "id": "1079195a-dd25-4dd5-8184-12f58527aa5e",
+    "name": "SAMICHLAUS BARRIQUE",
+    "style": "BARREL AGED DOPPELBOCK"
+  },
+  {
+    "id": "8f1bef1d-7c79-4e5d-be62-f94ddab5aa3e",
+    "name": "SAMICHLAUS CLASSIC 330 ML",
+    "style": "DOPPELBOCK"
+  },
+  {
+    "id": "590e9d61-d0fe-4594-8f22-9179444e471e",
+    "name": "SAMICHLAUS SCHWARZES",
+    "style": "DOPPELBOCK"
+  },
+  {
+    "id": "fe21c905-cb21-4133-bc0a-0dc606920103",
+    "name": "SAMUEL ADAMS BOSTON LAGER LATA",
+    "style": "VIENNA"
+  },
+  {
+    "id": "1d072526-2aa9-49c7-9e0d-4528d58e38b6",
+    "name": "SAMUEL SMITH APRICOT",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "13b92838-28ca-4dbd-878a-58e8b82d4758",
+    "name": "SAMUEL SMITH CHERRY",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "bfb03fae-3509-4abb-a71b-4be6e0b0efc7",
+    "name": "SAMUEL SMITH CHOCOLATE ORGANIC STOUT",
+    "style": "SWEET STOUT"
+  },
+  {
+    "id": "5a585a58-da18-48c3-bcc1-5fe9f2dd8a5c",
+    "name": "SAMUEL SMITH IMPERIAL STOUT",
+    "style": "IMPERIAL STOUT"
+  },
+  {
+    "id": "5b4c279f-f8d6-4664-9bd3-848994884976",
+    "name": "SAMUEL SMITH RASPBERRY",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "4e794ceb-1cf9-4d98-96cd-892e277e33f8",
+    "name": "SAMUEL SMITH STRAWBERRY",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "e44c43c1-b1f3-4f27-8e1c-2c2ba7c85bf1",
+    "name": "SANTA SABINA ¿QUIERES UN GLOBO?",
+    "style": "IMPERIAL STOUT CON PALETA PAYASO"
+  },
+  {
+    "id": "1d0f9eb4-3b9b-4c9a-8bef-25b361706f78",
+    "name": "SANTA SABINA ANY FLAVOUR YOU LIKE",
+    "style": "RITUAL IMPERIAL VAINILLA, PINEAPPLE STOUT"
+  },
+  {
+    "id": "93e042bb-602a-405a-a159-886255afb231",
+    "name": "SANTA SABINA BANANA PECAN",
+    "style": "RITUAL IMPERIAL BANANA PECAN STOUT"
+  },
+  {
+    "id": "1196b597-275b-42d9-9ae9-168714da47b8",
+    "name": "SANTA SABINA CEREMONIA",
+    "style": "WEST COAST IPA"
+  },
+  {
+    "id": "e9ea67b2-a447-482d-ba94-86da85b97a76",
+    "name": "SANTA SABINA CHOCOBANANA DE OLLA",
+    "style": "STOUT CON PLÁTANO Y CHOCOLATE"
+  },
+  {
+    "id": "b1a80b60-752d-470a-8ef4-9cecdb341ffa",
+    "name": "SANTA SABINA COOL KIDS DRINK",
+    "style": "DOUBLE HAZY LATTE MATCHA IPA"
+  },
+  {
+    "id": "6a8ae224-c0fd-4a7b-a051-0cb5c2bd1836",
+    "name": "SANTA SABINA DON ALEJANDRO MANGO",
+    "style": "SOUR DE MANGO"
+  },
+  {
+    "id": "eaee1633-d443-4cfa-a8b5-97f51a1bcb4a",
+    "name": "SANTA SABINA HOP HOP HURRA LATA",
+    "style": "IPA SIN FILTRAR"
+  },
+  {
+    "id": "ce9c6b97-141f-48b9-a8fc-55dd1352a77c",
+    "name": "SANTA SABINA LOS DEGENERADOS DEL PIGMENTO",
+    "style": "BLACK IPA"
+  },
+  {
+    "id": "d583853e-099e-4743-9841-06ac7b087f81",
+    "name": "SANTA SABINA NARANJITA DE OLLA",
+    "style": "STOUT CON NARANJA"
+  },
+  {
+    "id": "4f2579bb-ceb8-489c-af41-0ee2ab90989d",
+    "name": "SANTA SABINA PUMPKIN DE OLLA",
+    "style": "PUMPKIN DE OLLA"
+  },
+  {
+    "id": "7968ba49-5d0c-414f-bcae-627d264aa12e",
+    "name": "SANTA SABINA ROSALIA FRAMBUESA",
+    "style": "SOUR ALE CON FRAMBUESA REFERMENTADA CON LEVADURA DE CHAMPAÑA"
+  },
+  {
+    "id": "9c3cc0e5-aa90-42c0-867b-cd00c5ef8821",
+    "name": "SANTA SABINA ROSALIA FRAMBUESA CON MENTA",
+    "style": "SOUR ALE CON FRAMBUESA Y MENTA REFERMENTADA CON LEVADURA DE CHAMPAÑA"
+  },
+  {
+    "id": "65482a27-4787-4089-9e6b-ff4a92f51de0",
+    "name": "SANTA SABINA SEAGULL PATROL",
+    "style": "NEW ZEALAND PILSNER"
+  },
+  {
+    "id": "554f2084-5b69-47cc-ba30-c05258ec6cdf",
+    "name": "SANTA SABINA STOUT DE OLLA",
+    "style": "EXPORT STOUT"
+  },
+  {
+    "id": "58fd7cf9-d5c2-4f59-ada0-0f82caec2ac3",
+    "name": "SANTA SABINA SUERITO MALDITO",
+    "style": "LAGER CON LIMÓN Y SAL"
+  },
+  {
+    "id": "e85a71d3-62f5-4177-94e4-3f8b92b8fee4",
+    "name": "SANTA SABINA TÍA HOPS",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "22601756-9a05-44cd-b45a-8df32042acfa",
+    "name": "SCHLENKERLA A LA GRODZISKIE",
+    "style": "GRODZISKIE"
+  },
+  {
+    "id": "b574c0dc-ff01-4e66-be8d-1e1d5d02b003",
+    "name": "SCHLENKERLA ERLE",
+    "style": "SCHWARZBIER"
+  },
+  {
+    "id": "0ae09333-cffa-431b-ab4b-5fa2b797e29e",
+    "name": "SCHLENKERLA MÄRZEN",
+    "style": "MÄRZEN"
+  },
+  {
+    "id": "ec5d08eb-b6f3-4745-b0e7-ecaa5e7b066f",
+    "name": "SCHLENKERLA RAUCHBIER HELLES MÄRZEN UNFI",
+    "style": "HELLES MÄRZEN UNFILTRIERT"
+  },
+  {
+    "id": "2d4bad8a-3578-4d30-b628-d29b707dc0ae",
+    "name": "SCHLENKERLA RAUCHBIER MÄRZEN CLÁSICA",
+    "style": "MÄRZEN"
+  },
+  {
+    "id": "6bdf1d1b-07a4-44eb-be67-464377b034b5",
+    "name": "SCHLENKERLA RAUCHBIER MÄRZEN UNFILTRIERT",
+    "style": "MÄRZEN UNFILTRIERT"
+  },
+  {
+    "id": "37032d06-b560-4778-83ad-cc1fc463cb8f",
+    "name": "SCHLENKERLA WEICHSEL",
+    "style": "ROTBIER (RED LAGER)"
+  },
+  {
+    "id": "94111a78-ac67-4e4f-8e0d-d1fbb4b49ca2",
+    "name": "SCHÖFFERHOFER DUNKEL",
+    "style": "DUNKEL HEFEWEIZEN"
+  },
+  {
+    "id": "f4d40309-18cd-4e8a-bf49-ad61da903e63",
+    "name": "SCHÖFFERHOFER GRAPEFRUIT",
+    "style": "WHEAT BEER TORONJA"
+  },
+  {
+    "id": "07e84ac3-7ca0-4fdd-bc3b-814319b65062",
+    "name": "SCHÖFFERHOFER NATURTRÜB",
+    "style": "HEFEWEIZEN"
+  },
+  {
+    "id": "60f976c9-a3dd-4fb2-9a8a-4c5683d7d4b2",
+    "name": "SCHÖFFERHOFER PACK 2 MÁS VASO",
+    "style": "2 BOTELLAS Y VASO"
+  },
+  {
+    "id": "d52e04a7-b1cf-48fe-8e90-c728cac3d423",
+    "name": "SCHÖFFERHOFER PIÑA (LATA)",
+    "style": "HEFEWEIZEN BIER JUICY PINEAPPLE"
+  },
+  {
+    "id": "1b720010-a908-4ac8-933d-47c919ca2b73",
+    "name": "SCHÖFFERHOFER SANDÍA MENTA",
+    "style": "HEFEWEIZEN VER WATERMELON MINT"
+  },
+  {
+    "id": "a8a99ef7-b5c6-4222-be2b-706cce702358",
+    "name": "SCHTAZTTEK LA MUNDIALISTA",
+    "style": "LAGER"
+  },
+  {
+    "id": "973f9139-f51e-4158-b6da-0accc905894d",
+    "name": "SHEPHERD NEAME CHRISTMAS ALE",
+    "style": "CHRISTMAS ALE"
+  },
+  {
+    "id": "8f44a17d-a49e-4b34-8388-d12c68df6fd1",
+    "name": "SHEPHERD NEAME DOUBLE STOUT",
+    "style": "DOUBLE STOUT"
+  },
+  {
+    "id": "e380742b-8811-4cf6-bff0-bef6513b2d66",
+    "name": "SHEPHERD NEAME INDIA PALE ALE",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "3dcda329-52b4-4562-b591-5a7cd37fb615",
+    "name": "SIERRA NEVADA ATOMIC TORPEDO (LATÓN)",
+    "style": "IMPERIAL IPA"
+  },
+  {
+    "id": "2e10f372-8945-4480-a549-5beba5eb8f27",
+    "name": "SIERRA NEVADA MANGO LITTLE THING IPA",
+    "style": "TROPICAL HAZY IPA"
+  },
+  {
+    "id": "b8abdc7f-5f48-4d5c-8bfc-cd76c35ef70a",
+    "name": "SIERRA NEVADA NARWHAL",
+    "style": "IMPERIAL STOUT"
+  },
+  {
+    "id": "5c5d4c53-abc5-4510-a1b3-e092b07e3d4c",
+    "name": "SIERRA NEVADA PALE ALE",
+    "style": "PALE ALE"
+  },
+  {
+    "id": "a98273e5-5c68-43ce-9d2c-4c6b997c829e",
+    "name": "SIERRA NEVADA PILS LATA",
+    "style": "PILS"
+  },
+  {
+    "id": "dae0e026-0f5b-4693-b76b-cda3d37241e6",
+    "name": "SIERRA NEVADA TORPEDO",
+    "style": "EXTRA IPA"
+  },
+  {
+    "id": "aa039367-f2e6-4704-a306-1c0fa5c4fda0",
+    "name": "ST. BERNARDUS ABT 12 MAGNUM 2025",
+    "style": "QUADRUPEL"
+  },
+  {
+    "id": "bea9f231-5e0d-4acf-8c0f-a58d85f84509",
+    "name": "ST. BERNARDUS CHRISTMAS ALE",
+    "style": "QUADRUPEL"
+  },
+  {
+    "id": "5be0bd83-f3e5-4d74-8601-e82062aa837a",
+    "name": "ST. PETER'S CREAM STOUT",
+    "style": "STOUT"
+  },
+  {
+    "id": "b2a8f9b7-cf68-4b60-9d66-0dfb4afebfcd",
+    "name": "ST. PETER'S HONEY PORTER",
+    "style": "PORTER"
+  },
+  {
+    "id": "e00a05b8-62d4-4275-a98d-2f165bea4081",
+    "name": "ST. PETER'S INDIA PALE ALE",
+    "style": "IPA"
+  },
+  {
+    "id": "17330b14-92a2-4fa1-a9bc-335bef04b99b",
+    "name": "ST. PETER'S MIDSUMMER ALE",
+    "style": "ENGLISH PALE ALE"
+  },
+  {
+    "id": "69459547-8d22-42ad-82a6-6dbb914374a0",
+    "name": "ST. PETER'S OLD STYLE PORTER",
+    "style": "PORTER"
+  },
+  {
+    "id": "1ee91974-bb18-4692-816a-c56b416fc3a2",
+    "name": "ST. PETER'S WHISKY BEER",
+    "style": "GOLDEN ALE CON WHISKY THE ENGLISH"
+  },
+  {
+    "id": "937ffb2f-f0fd-4435-99c4-75274b0a0c6a",
+    "name": "ST. PETER'S WITHOUT 0.0 GOLD",
+    "style": "ALCOHOLFREE"
+  },
+  {
+    "id": "fe14ac13-69d9-48da-8fd0-1c836aeeba9a",
+    "name": "ST. PETER'S WITHOUT 0.0 ORGANIC PALE ALE",
+    "style": "ALCOHOLFREE"
+  },
+  {
+    "id": "8d0445f5-d448-4174-b964-dfd475317999",
+    "name": "ST. PETER'S WITHOUT 0.0 ORIGINAL",
+    "style": "ALCOHOLFREE"
+  },
+  {
+    "id": "4937d7df-67cb-43ec-a809-7d1a16353168",
+    "name": "STELLA ARTOIS",
+    "style": "PALE LAGER"
+  },
+  {
+    "id": "e5b25ce4-16c2-49c4-a63b-da9d510d382a",
+    "name": "STONE & CORONADO BREWING CO. MAGICAL MYTHICAL TOUR",
+    "style": "DOUBLE IPA"
+  },
+  {
+    "id": "5ab4777c-6792-4441-a989-68fccf440395",
+    "name": "STONE BREWING DELICIOUS",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "6b3be897-10a5-4632-8b5a-d579eb381c5c",
+    "name": "STONE BREWING FEAR.MOVIE.LIONS",
+    "style": "HAZY DIPA"
+  },
+  {
+    "id": "8faa651d-d686-41e0-a5d3-9f9af211030b",
+    "name": "STONE BREWING HAZY IPA",
+    "style": "HAZY IPA"
+  },
+  {
+    "id": "b1bb56de-1bf7-4414-98f1-bc0fbcf2c98e",
+    "name": "STONE BREWING IPA",
+    "style": "IPA"
+  },
+  {
+    "id": "f3881f40-be67-4856-9698-4c6344558fa2",
+    "name": "STONE ENJOY BY SERIES FRUITY FRESH IPA",
+    "style": "IPA"
+  },
+  {
+    "id": "eb4d6b98-7ba0-41b8-95d1-3df7575dea9d",
+    "name": "STORMTROOPER GIFT PACK DE COLECCIÓN 4 LATAS MÁS VASO",
+    "style": "CITRA IPA, CRAFT PALE ALE, IPA, HELLES LAGER"
+  },
+  {
+    "id": "256aa635-1488-4a6c-925c-5774df31cb9f",
+    "name": "STRAFFE HENDRIK HERITAGE AÑO 2023",
+    "style": "QUADRUPEL"
+  },
+  {
+    "id": "977aaf37-ca34-439c-b683-9c40d4223b78",
+    "name": "STRAFFE HENDRIK PACK CON COPA",
+    "style": "4 BOTELLAS"
+  },
+  {
+    "id": "4477e563-d6af-4b67-9f29-173f7ef7b80e",
+    "name": "STRAFFE HENDRIK QUADRUPEL BOTELLA CHICA",
+    "style": "QUADRUPEL"
+  },
+  {
+    "id": "340cab43-8f6d-465d-b846-dc434ead9d2c",
+    "name": "STRAFFE HENDRIK TRIPEL",
+    "style": "TRIPEL"
+  },
+  {
+    "id": "b844187a-fbe4-4215-ab00-d97bb84d029d",
+    "name": "STRAFFE HENDRIK WILD AÑO 2025",
+    "style": "TRIPEL"
+  },
+  {
+    "id": "649c3267-467e-4af7-ac0e-357abce4d5af",
+    "name": "STRAFFE HENDRIK XMAS BLEND",
+    "style": "BLEND DE QUADRUPEL"
+  },
+  {
+    "id": "144fa9e9-d411-468b-9934-08cf4088436a",
+    "name": "TEMPUS CREAM STOUT",
+    "style": "STOUT"
+  },
+  {
+    "id": "7a082528-a0b6-4332-b7e5-55d63abf20cf",
+    "name": "TEMPUS DOBLE MALTA",
+    "style": "ALTBIER"
+  },
+  {
+    "id": "2a2ce977-5799-491d-a3f6-6812536a8f48",
+    "name": "TEMPUS DORADA",
+    "style": "BLOND ALE"
+  },
+  {
+    "id": "fc631f1b-8b4d-46a9-bfa4-cd5aa11c357f",
+    "name": "TETE DE MORT TRIPLE RED",
+    "style": "TRIPEL"
+  },
+  {
+    "id": "35fc8891-c293-4304-9b80-82e6934c886f",
+    "name": "TOPPLING GOLIATH CYBER SUE",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "caa60efe-1452-41a4-8f64-572887952a48",
+    "name": "TOPPLING GOLIATH CYBER SUE LATÓN (MORADO)",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "81d209d8-ba5c-4ab1-9747-8d8b2884d0bd",
+    "name": "TOPPLING GOLIATH DOUBLE DRY PSEUDO SUE (ROJA)",
+    "style": "DOUBLE DRY HOP PALE ALE"
+  },
+  {
+    "id": "386f9501-1376-4590-9fc9-864eb3c65890",
+    "name": "TOPPLING GOLIATH HAZY DAY SUE (AZUL)",
+    "style": "INDIA PALE ALE"
+  },
+  {
+    "id": "10b431b1-f617-424b-a7d1-c45b73e3c6f1",
+    "name": "TOPPLING GOLIATH KING SUE (AMARILLA)",
+    "style": "DOUBLE INDIA PALE ALE"
+  },
+  {
+    "id": "d074e96a-33c1-45a8-b5bd-106fbc367825",
+    "name": "TOPPLING GOLIATH PSEUDO SUE KRUSH",
+    "style": "DOUBLE DRY HOP PALE ALE"
+  },
+  {
+    "id": "f6e7700b-6f7d-4cdb-bed0-86d9550559f6",
+    "name": "TOPPLING GOLIATH PSEUDO SUE PALE ALE",
+    "style": "PALE ALE"
+  },
+  {
+    "id": "daf39d06-db4f-4704-8780-d8064c9164e1",
+    "name": "TOPPLING GOLIATH PSEUDO SUE PALE ALE LATÓN (VERDE)",
+    "style": "PALE ALE"
+  },
+  {
+    "id": "cf3b68ae-9541-4035-bb6f-e978db67ef6d",
+    "name": "TRAPPIST WESTVLETEREN 12",
+    "style": "QUADRUPEL"
+  },
+  {
+    "id": "95296a9d-808a-42b5-8e04-72c7fce51942",
+    "name": "TRES AMIGOS",
+    "style": "WEST COAST IPA"
+  },
+  {
+    "id": "5f953684-d628-4ded-b664-e19c88f575e1",
+    "name": "TSINGTAO IPA",
+    "style": "IPA"
+  },
+  {
+    "id": "92457eea-a596-497e-86b8-ce357a47ba72",
+    "name": "TSINGTAO PREMIUM LAGER",
+    "style": "LAGER"
+  },
+  {
+    "id": "306e7d0f-dc5c-401c-879e-8982899c2f5a",
+    "name": "TUCHER BAJUVATOR",
+    "style": "DOPPELBOCK"
+  },
+  {
+    "id": "ae33875a-647f-4422-8330-9dd6755d7814",
+    "name": "VAL-DIEU FRUITEE",
+    "style": "FRUIT BEER"
+  },
+  {
+    "id": "56e81caa-5daa-49b3-8417-e7562206a53c",
+    "name": "VELTINS GREVENSTEINER BOTELLA",
+    "style": "LANDBIER"
+  },
+  {
+    "id": "20ac7fc7-8545-410d-8fd8-ed0647de54c4",
+    "name": "VELTINS PILSENER BOTELLA",
+    "style": "GERMAN PILSNER"
+  },
+  {
+    "id": "da27ae05-6af5-424f-99ae-98ea861da36d",
+    "name": "VELTINS PILSENER LATA",
+    "style": "GERMAN PILSNER"
+  },
+  {
+    "id": "87924fd1-971c-4a68-b1da-ea846edb118e",
+    "name": "VOCATION HILLTOP",
+    "style": "LAGER"
+  },
+  {
+    "id": "61012e30-5859-47d6-91ec-fcd76111e7ed",
+    "name": "VOCATION LATA AMARILLA HOP, SKIP & JUICE",
+    "style": "HAZY PALE ALE"
+  },
+  {
+    "id": "132db330-cd29-4b4e-bb58-d0853366132d",
+    "name": "VOCATION LATA BLANCA PERFECT STORM",
+    "style": "NEW ENGLAND PALE ALE"
+  },
+  {
+    "id": "8e7e556d-a441-4cf0-bc66-a46e2f353892",
+    "name": "VOCATION LATA NARANJA LOVE & HATE",
+    "style": "NEIPA"
+  },
+  {
+    "id": "fedf8587-7863-48ab-9d67-7723d9c764a6",
+    "name": "VOCATION LATA NEGRA LIFE & DEATH",
+    "style": "IPA"
+  },
+  {
+    "id": "18aba9b4-715d-41a6-9e6e-0c78bb5af415",
+    "name": "VOCATION LATA ROSA TOUCAN TROPIC",
+    "style": "DDH IPA"
+  },
+  {
+    "id": "ad124cbb-ec36-4870-bbe1-dc0b6d0c3c5e",
+    "name": "VOLFAS ENGELMAN ALCOHOL FREE",
+    "style": "PALE LAGER ALCOHOL FREE"
+  },
+  {
+    "id": "5e938dad-723b-4b39-8918-984e91314eaa",
+    "name": "VOLFAS ENGELMAN APA",
+    "style": "AUSTRALIAN PALE ALE"
+  },
+  {
+    "id": "8818aa21-663d-4c22-ba8c-65d00b99fff6",
+    "name": "VOLFAS ENGELMAN BALTA PINTA",
+    "style": "HEFEWEIZEN"
+  },
+  {
+    "id": "72940937-5302-4c06-8e42-681229d11953",
+    "name": "VOLFAS ENGELMAN BLANC",
+    "style": "WHEAT ALE"
+  },
+  {
+    "id": "8e192872-8109-4e41-b2ed-9002b3cd3c3f",
+    "name": "VOLFAS ENGELMAN IPA",
+    "style": "IPA"
+  },
+  {
+    "id": "92f8ae25-2683-4c97-9aaa-368eb3d25ba4",
+    "name": "VOLFAS ENGELMAN KRIEK",
+    "style": "CHERRY KRIEK"
+  },
+  {
+    "id": "50962440-47f6-4a88-8dce-14276b2e5617",
+    "name": "VOLFAS ENGELMAN MANGO MILKSHAKE PALE ALE",
+    "style": "MILKSHAKE IPA"
+  },
+  {
+    "id": "86feb341-0f3a-4496-8f38-9cec95249865",
+    "name": "VOLFAS ENGELMAN NEIPA",
+    "style": "NEIPA"
+  },
+  {
+    "id": "7d04c9d1-fb67-4b54-bc6b-11b466c5f39c",
+    "name": "WEIHENSTEPHANER DUNKEL HEFEWEISSBIER",
+    "style": "DUNKELWEIZEN"
+  },
+  {
+    "id": "cac0ab30-28cd-4b1a-a21b-c0890b57347e",
+    "name": "WEIHENSTEPHANER FESTBIER",
+    "style": "LAGER"
+  },
+  {
+    "id": "9137722a-9101-4e80-b8df-4711adce7a9a",
+    "name": "WEIHENSTEPHANER HEFEWEISSBIER",
+    "style": "HEFEWEIZEN"
+  },
+  {
+    "id": "0c6bebc7-797e-4e3f-95e8-6645cfc4f029",
+    "name": "WEIHENSTEPHANER HEFEWEISSBIER ALKOHOLFREI",
+    "style": "NON-ALCOHOLIC WHEAT BEER"
+  },
+  {
+    "id": "d3eca630-7056-46fa-8dd0-d96ef6f1f1fd",
+    "name": "WEIHENSTEPHANER KORBINIAN",
+    "style": "DOPPELBOCK"
+  },
+  {
+    "id": "be6d674f-c3a4-4bba-b563-1b5bb03aa96b",
+    "name": "WEIHENSTEPHANER KRISTALLWEISSBIER",
+    "style": "KRISTALLWEIZEN"
+  },
+  {
+    "id": "c07402eb-8d53-410a-9b76-63fc31296f8f",
+    "name": "WEIHENSTEPHANER ORIGINAL HELLES",
+    "style": "HELLES"
+  },
+  {
+    "id": "355178c4-6a04-4561-9a70-845053229688",
+    "name": "WEIHENSTEPHANER PILS",
+    "style": "GERMAN PILS"
+  },
+  {
+    "id": "d21c7f25-9bda-40e4-ade1-1baf4de189ed",
+    "name": "WEIHENSTEPHANER VITUS",
+    "style": "WEIZENBOCK"
+  },
+  {
+    "id": "53526401-30ee-4dc2-8a07-765d9a69ea7a",
+    "name": "WENDLANDT COOL CRUSTY",
+    "style": "WEST COAST PILSNER"
+  },
+  {
+    "id": "139f22a4-0b80-42c4-a912-fb0351035d72",
+    "name": "WENDLANDT FOCA PARLANTE",
+    "style": "STOUT"
+  },
+  {
+    "id": "d5c48d29-f8b5-455f-a068-dd5803e558b5",
+    "name": "WENDLANDT GOL DE ORO",
+    "style": "BLONDE ALE"
+  },
+  {
+    "id": "21ae8b56-0b53-461a-b9c0-5016ff7b137e",
+    "name": "WENDLANDT HARRY POLANCO",
+    "style": "RED ALE"
+  },
+  {
+    "id": "418fb15f-77d1-4db5-91d2-e9a3ca159513",
+    "name": "WENDLANDT LATA PERRO DEL MAR",
+    "style": "IPA"
+  },
+  {
+    "id": "756a6910-e419-48e3-8abf-e92d9f7b81ce",
+    "name": "WENDLANDT PERRO DEL CERRO",
+    "style": "DOBLE IPA"
+  },
+  {
+    "id": "0e35fb9d-6237-46e8-9ba5-df566c5f6681",
+    "name": "WENDLANDT PERRO DEL MAR",
+    "style": "IPA"
+  },
+  {
+    "id": "4dc63860-8592-4400-8f93-2960ffd90c4e",
+    "name": "WENDLANDT PERRO LITE",
+    "style": "SESSION IPA"
+  },
+  {
+    "id": "35ff6f0f-3e93-4de4-a105-4b06794f8466",
+    "name": "WENDLANDT PERRO LITE BOTELLA",
+    "style": "SESSION IPA"
+  },
+  {
+    "id": "9b277871-743a-4169-b4a8-35653466a1cf",
+    "name": "WENDLANDT PERRO LITE LATA",
+    "style": "SESSION IPA"
+  },
+  {
+    "id": "baf2528d-de08-4fd1-91a4-525f3c6f217f",
+    "name": "WENDLANDT VAQUITA MARINA",
+    "style": "PALE ALE"
+  },
+  {
+    "id": "49ca785e-c3e9-43b6-8b51-6a982e66e449",
+    "name": "WYCHWOOD HOBGOBLIN IPA",
+    "style": "IPA"
+  },
+  {
+    "id": "e4163594-8390-4b71-907c-b363c8b98f2b",
+    "name": "WYCHWOOD HOBGOBLIN IPA LATA",
+    "style": "IPA"
+  },
+  {
+    "id": "cd0e7f67-44b7-4282-97a0-aa5e6bdd2296",
+    "name": "WYCHWOOD HOBGOBLIN RUBY BOTELLA",
+    "style": "PREMIUM BITTER"
+  },
+  {
+    "id": "ce422853-0566-41fe-9849-0285b5e5326c",
+    "name": "WYCHWOOD HOBGOBLIN SESSION IPA",
+    "style": "SESSION IPA"
+  },
+  {
+    "id": "63e01dc2-67b6-4eab-b4e0-e5eb940eba24",
+    "name": "WYCHWOOD KING GOBLIN",
+    "style": "ENGLISH STRONG ALE"
+  },
+  {
+    "id": "0329242b-66eb-4722-a720-1f8ffd68ec9a",
+    "name": "XAKUA CHOCOLATE STOUT",
+    "style": "STOUT CON CHOCOLATE MEXICANO"
+  },
+  {
+    "id": "9ffac808-b9cc-4999-98b0-45a6f47b7233",
+    "name": "XAKUA XAKUTELLA",
+    "style": "CHOCO AVELLANA STOUT"
+  },
+  {
+    "id": "6661f690-60ef-4285-bff3-1964b2064d21",
+    "name": "ZORRA BERRY SUMMER ALE LATA",
+    "style": "BERRY SUMMER ALE"
+  },
+  {
+    "id": "cfd80a5c-6fe9-4955-8d54-5365681e2698",
+    "name": "ZORRA GERMAN PILS",
+    "style": "GERMAN PILS LAGER"
+  },
+  {
+    "id": "ba1b1996-1356-4fb0-84a2-fa26a019832c",
+    "name": "ZORRA IMPERIAL PEANUT STOUT LATA",
+    "style": "IMPERIAL PEANUT STOUT"
+  },
+  {
+    "id": "1dd29e83-67c9-4473-8f7e-803c2e552a8c",
+    "name": "ZORRA MOLE NEGRO",
+    "style": "IMPERIAL STOUT CON INGREDIENTES DE MOLE NEGRO"
+  },
+  {
+    "id": "ce690624-6f3b-4805-bd4e-02bf6fb61a06",
+    "name": "ZORRA RYE SESSION IPA LATA (ETIQUETA VERDE CLARO )",
+    "style": "RYE SESSION IPA"
+  },
+  {
+    "id": "ca110ddf-22c3-4860-a73f-b4b6bdbca186",
+    "name": "ZORRA TERROIR 2025",
+    "style": "IMPERIAL STOUT REFERMENTADA CON MOSTO DE UVA CABERNET SAUVIGNON"
+  }
+]
