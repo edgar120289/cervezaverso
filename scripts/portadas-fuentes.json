@@ -1,0 +1,62 @@
+{
+  "buscar": {
+    "inglaterra-fuller-s-esb-500": "La foto actual es de Fuller's London Porter, no de ESB"
+  },
+  "ajustes": {
+    "alemania-paulaner-dunkel-500": [
+      "blanco"
+    ],
+    "austria-samichlaus-schwarzes-330": [
+      "blanco"
+    ],
+    "belgica-paquete-carolus-5-mas-copa-330": [
+      "completa"
+    ],
+    "lituania-volfas-engelman-balta-pinta-568": [
+      "completa"
+    ],
+    "lituania-volfas-engelman-ipa-568": [
+      "completa"
+    ],
+    "lituania-volfas-engelman-kriek-568": [
+      "completa"
+    ],
+    "china-lucky-buddha-330": [
+      "blanco",
+      "principal"
+    ],
+    "inglaterra-vocation-lata-amarilla-hop-skip-juice-440": [
+      "principal"
+    ]
+  },
+  "fuentes": {
+    "espana-mahou-sin-gluten-330": {
+      "url": "https://www.mahou.es/wp-content/uploads/2024/10/mahou_sin_gluten_xl_2024.png",
+      "origen": "Sitio oficial de Mahou"
+    },
+    "belgica-delirium-red-330": {
+      "url": "https://www.delirium.be/themes/custom/delirium/assets/img/beers/beer_delirium_red_bottle.png?v=1",
+      "origen": "Sitio oficial de Delirium (Huyghe)"
+    },
+    "usa-sierra-nevada-atomic-torpedo-laton-578": {
+      "url": "https://webadmin.sierranevada.com/wp-content/uploads/2022/11/ATT192.png",
+      "origen": "Sitio oficial de Sierra Nevada (lata de 19.2 oz)"
+    },
+    "escocia-brewdog-black-heart-440": {
+      "url": "https://brewdog.com/cdn/shop/files/Black_Heart_PDP1_1.png?v=1792663301",
+      "origen": "Tienda oficial de BrewDog (lata de 440 ml)"
+    },
+    "belgica-kasteel-rouge-0-0-330": {
+      "url": "https://www.vanhonsebrouck.be/wp-content/uploads/2024/07/Kasteel-Rouge-00-fles-tilted.png",
+      "origen": "Sitio oficial de Van Honsebrouck (cervecería)"
+    },
+    "usa-toppling-goliath-hazy-day-sue-azul-355": {
+      "url": "https://images.squarespace-cdn.com/content/v1/5ddd3e912a0cba70b8e4b4f8/971b0b21-0b59-4cdf-8c94-64cbd37478b5/HazyDaySue_CANS.BeerBook.png?format=1500w",
+      "origen": "Sitio oficial de Toppling Goliath (Beer Book)"
+    },
+    "alemania-kapuziner-hefe-weissbier-dunkel-500": {
+      "url": "https://www.kapuziner-weissbier.de/fileadmin/user_upload/assets/biere/kap-hefe-dunkel.png",
+      "origen": "Sitio oficial de Kapuziner Weißbier"
+    }
+  }
+}
