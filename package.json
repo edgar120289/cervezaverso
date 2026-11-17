@@ -10,7 +10,8 @@
     "import:monasterio": "tsx --env-file-if-exists=.env.local scripts/import-monasterio.ts",
     "typecheck": "tsc --noEmit",
     "optimizar:marca": "tsx scripts/optimizar-marca.ts",
-    "miniaturas:productos": "tsx --env-file-if-exists=.env.local scripts/miniaturas-productos.ts"
+    "miniaturas:productos": "tsx --env-file-if-exists=.env.local scripts/miniaturas-productos.ts",
+    "vasos": "tsx --env-file-if-exists=.env.local scripts/vasos-asignar.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

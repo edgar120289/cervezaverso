@@ -1,0 +1,2 @@
+# Respaldos de datos: viven en el repo, nunca en el despliegue.
+respaldos/
