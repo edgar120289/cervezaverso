@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "optimizar:marca": "tsx scripts/optimizar-marca.ts",
     "miniaturas:productos": "tsx --env-file-if-exists=.env.local scripts/miniaturas-productos.ts",
-    "vasos": "tsx --env-file-if-exists=.env.local scripts/vasos-asignar.ts"
+    "vasos": "tsx --env-file-if-exists=.env.local scripts/vasos-asignar.ts",
+    "portadas": "tsx --env-file-if-exists=.env.local scripts/portadas.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
