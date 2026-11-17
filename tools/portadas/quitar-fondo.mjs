@@ -1,6 +1,6 @@
-// Proceso aparte para @imgly/background-removal-node (lo lanza scripts/portadas.ts).
-// Va separado porque la librería trae su propio sharp/libvips y, cargado junto al sharp del
-// proyecto en el mismo proceso, Node se cae. Protocolo: una línea JSON por petición en stdin
+// Proceso aparte para @imgly/background-removal-node (lo lanza portadas.ts).
+// Va separado porque la librería trae su propio sharp/libvips y, cargado junto al sharp de
+// portadas.ts en el mismo proceso, Node se cae. Protocolo: una línea JSON por petición en stdin
 // ({ id, input, output }: rutas de PNG) y una línea JSON por respuesta en stdout ({ id, error? }).
 import { readFile, writeFile } from "node:fs/promises";
 import { createInterface } from "node:readline";

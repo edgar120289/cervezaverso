@@ -1,2 +1,5 @@
 # Respaldos de datos: viven en el repo, nunca en el despliegue.
 respaldos/
+
+# Herramientas locales con su propio package.json (portadas): nunca en el despliegue.
+tools/
