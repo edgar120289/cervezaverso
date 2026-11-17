@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Herramientas locales con su propio package.json (tools/portadas).
+    "tools/**",
   ]),
 ]);
 

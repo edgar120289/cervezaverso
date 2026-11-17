@@ -1,5 +1,13 @@
 {
-  "buscar": {},
+  "buscar": {
+    "inglaterra-iron-maiden-trooper-box-clasico-500": "Al quitar el fondo quedan rayas en los bordes de la caja",
+    "mexico-jabali-ipa-330": "Escalada ×2.9: la etiqueta se ve borrosa a tamaño de ficha",
+    "mexico-schtazttek-la-mundialista-355": "Al quitar el fondo se corta la parte superior de la lata",
+    "inglaterra-hobgoblin-gold-lata-500": "Escalada ×2.8: se ve borrosa a tamaño de ficha",
+    "mexico-buquibichi-sahuaripa-355": "Escalada ×2.9: se ve borrosa a tamaño de ficha y quedan gotas cortadas en el borde",
+    "mexico-buquibichi-talega-355": "Al quitar el fondo quedan gotas cortadas en el borde de la lata (visible en la ficha)",
+    "mexico-buquibichi-bitachera-355": "Al quitar el fondo quedan gotas cortadas en el borde de la lata (visible en la ficha)"
+  },
   "ajustes": {
     "alemania-paulaner-dunkel-500": [
       "blanco"
@@ -55,6 +63,10 @@
     "alemania-kapuziner-hefe-weissbier-dunkel-500": {
       "url": "https://www.kapuziner-weissbier.de/fileadmin/user_upload/assets/biere/kap-hefe-dunkel.png",
       "origen": "Sitio oficial de Kapuziner Weißbier"
+    },
+    "usa-lagunitas-trooper-355": {
+      "url": "https://images.ctfassets.net/i7zgaf2y0ts9/6CZaljh5JmLesllXGi3uqJ/9213e0f900517ebb8bafe598876b7b16/TrooperIPA_12oz_Can_Dry-689x1024.png",
+      "origen": "Sitio oficial de Lagunitas (lata de 12 oz)"
     }
   }
 }

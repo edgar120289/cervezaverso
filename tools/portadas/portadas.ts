@@ -1,13 +1,19 @@
 /**
- * Fase 1 del plan de fotos: portadas uniformes (botella o lata de frente, fondo blanco,
- * 1200x1200, producto centrado al ~85 % de alto, WebP 90).
+ * Portadas uniformes (botella o lata de frente, fondo blanco, 1200x1200, producto centrado al
+ * ~85 % de alto, WebP 90). Herramienta local con su propio package.json: no entra a Vercel.
  *
- * Uso (todo local hasta `--subir`; `--dir` cambia la carpeta de trabajo):
+ * Uso (desde tools/portadas, tras `npm install`; todo local hasta `--subir`; `--dir` cambia la
+ * carpeta de trabajo):
  *   npm run portadas -- --respaldo                 # respaldos/portadas_antes_fase1.json (activas)
- *   npm run portadas -- --procesar [--solo a,b,c]  # descarga y procesa; NO toca la base ni Storage
+ *   npm run portadas -- --procesar [--solo a,b,c]  # cervezas sin procesar o en 'revisar'; NO toca la base
+ *        [--todas]                                 # …o todas las activas
  *   npm run portadas -- --comparar                 # <dir>/comparacion.html (antes | después)
  *   npm run portadas -- --subir [--solo a,b,c]     # sube archivos NUEVOS y actualiza la portada
  *   npm run portadas -- --revertir                 # regresa image_urls[1] a portada_original
+ *
+ * Estados: 'normalizada' (foto buena o reemplazo oficial), 'nueva' (no tenía foto),
+ * 'baja_res' (original de 350–599 px escalada con lanczos y enfoque suave) y 'revisar'
+ * (se queda como estaba: menos de 350 px, sin foto o descartada a ojo en `buscar`).
  *
  * Reglas de reversibilidad:
  * - Nunca borra ni sobrescribe en Storage: sube `<sku>/portada-vN.webp` (+ `-480.webp`) con el
@@ -15,11 +21,10 @@
  * - Antes de cambiar una cerveza guarda su `image_url` en `portada_original` (solo la primera vez).
  * - Solo cambia el primer elemento de `image_urls` (el trigger copia la portada a `image_url`).
  *
- * Fotos de reemplazo y las que hay que buscar: scripts/portadas-fuentes.json.
- * Quitar el fondo usa @imgly/background-removal-node, que NO está en package.json (pesa cientos
- * de MB y no debe entrar al build de Vercel): instálalo con
- *   npm i --no-save @imgly/background-removal-node
- * Requiere NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en .env.local.
+ * Fotos de reemplazo (mín. 800 px de alto), descartes y ajustes por SKU: tools/portadas/fuentes.json.
+ * Quitar el fondo usa @imgly/background-removal-node (en el package.json de esta carpeta, nunca
+ * en el del sitio). Requiere NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en el
+ * .env.local de la raíz del proyecto.
  */
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -28,11 +33,14 @@ import path from "node:path";
 import { createInterface } from "node:readline";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import sharp from "sharp";
-import { productThumbPath } from "../lib/product-images";
-import { PRODUCT_IMAGE_BUCKET } from "../lib/validation";
 
-const BACKUP_FILE = path.join("respaldos", "portadas_antes_fase1.json");
-const SOURCES_FILE = path.join("scripts", "portadas-fuentes.json");
+const HERE = import.meta.dirname;
+const ROOT = path.resolve(HERE, "..", "..");
+const BACKUP_FILE = path.join(ROOT, "respaldos", "portadas_antes_fase1.json");
+const SOURCES_FILE = path.join(HERE, "fuentes.json");
+/** Iguales a PRODUCT_IMAGE_BUCKET y productThumbPath del sitio (lib/validation, lib/product-images). */
+const PRODUCT_IMAGE_BUCKET = "product-images";
+const productThumbPath = (objectPath: string) => objectPath.replace(/\.[a-z0-9]+$/i, "") + "-480.webp";
 
 const SIZE = 1200;
 /** Caja donde cabe el producto: 85 % del lienzo (mismo margen en todas). */
@@ -40,7 +48,11 @@ const BOX = Math.round(SIZE * 0.85);
 const QUALITY = 90;
 const THUMB = 480;
 const THUMB_QUALITY = 82;
+/** Desde este alto la foto se normaliza sin más; entre MIN_SCALED_HEIGHT y este, escalada ('baja_res'). */
 const MIN_SOURCE_HEIGHT = 600;
+const MIN_SCALED_HEIGHT = 350;
+/** Una foto de reemplazo de la web debe medir al menos esto de alto. */
+const MIN_REPLACEMENT_HEIGHT = 800;
 const CONCURRENCY = 4;
 
 type Row = {
@@ -52,7 +64,7 @@ type Row = {
   portada_estado: string | null;
 };
 
-type Estado = "normalizada" | "nueva" | "revisar";
+type Estado = "normalizada" | "nueva" | "baja_res" | "revisar";
 type Fondo = "transparente" | "blanco" | "fondo";
 
 type Resultado = {
@@ -63,10 +75,12 @@ type Resultado = {
   fondo?: Fondo;
   fuente?: string;
   original?: { width: number; height: number };
+  /** Cuánto se amplió el producto para llenar la caja (> 1 = escalado). */
+  escala?: number;
 };
 
 type Fuentes = {
-  /** sku → motivo: la foto actual no sirve (vaso servido, varias botellas, ambiente…). */
+  /** sku → motivo: la foto actual no sirve (vaso servido, varias botellas, borrosa al escalar…). */
   buscar: Record<string, string>;
   /** sku → foto de reemplazo encontrada en la web y de dónde salió. */
   fuentes: Record<string, { url: string; origen: string }>;
@@ -216,17 +230,17 @@ function boundingBox(raw: Raw): { left: number; top: number; width: number; heig
 }
 
 /**
- * Quitar el fondo corre en otro proceso (scripts/portadas-quitar-fondo.mjs): la librería trae su
+ * Quitar el fondo corre en otro proceso (quitar-fondo.mjs): la librería trae su
  * propio sharp/libvips y, cargado junto al del proyecto en el mismo proceso, Node se cae.
  */
 let worker: { send: (input: string, output: string) => Promise<void>; stop: () => void } | null = null;
 
 function backgroundWorker() {
   if (worker) return worker;
-  if (!existsSync(path.join("node_modules", "@imgly", "background-removal-node"))) {
-    throw new Error("Falta @imgly/background-removal-node: npm i --no-save @imgly/background-removal-node");
+  if (!existsSync(path.join(HERE, "node_modules", "@imgly", "background-removal-node"))) {
+    throw new Error("Falta @imgly/background-removal-node: corre npm install en tools/portadas");
   }
-  const child = spawn(process.execPath, [path.join("scripts", "portadas-quitar-fondo.mjs")], {
+  const child = spawn(process.execPath, [path.join(HERE, "quitar-fondo.mjs")], {
     stdio: ["pipe", "pipe", "inherit"],
   });
   const pending = new Map<number, { resolve: () => void; reject: (error: Error) => void }>();
@@ -317,7 +331,7 @@ function keepMainObject(raw: Raw): Raw {
 export async function normalizeCover(
   input: Buffer,
   ajustes: Ajuste[] = [],
-): Promise<{ full: Buffer; thumb: Buffer; fondo: Fondo; width: number; height: number }> {
+): Promise<{ full: Buffer; thumb: Buffer; fondo: Fondo; width: number; height: number; escala: number }> {
   const source = await toRaw(input);
   const fondo = ajustes.includes("blanco") || ajustes.includes("completa") ? "blanco" : classify(source);
   let cutout: Raw;
@@ -343,10 +357,13 @@ export async function normalizeCover(
   const canvas = sharp({ create: { width: SIZE, height: SIZE, channels: 3, background: "#ffffff" } })
     .composite([{ input: cropped.data, left, top }])
     .flatten({ background: "#ffffff" });
-  const flat = await canvas.png().toBuffer();
+  const escala = Math.round((cropped.info.height / box.height) * 100) / 100;
+  let flat = await canvas.png().toBuffer();
+  // Ampliada: enfoque suave para compensar el lanczos, sin inventar detalle.
+  if (escala > 1.05) flat = await sharp(flat).sharpen({ sigma: 0.7, m1: 0.5, m2: 1 }).png().toBuffer();
   const full = await sharp(flat).webp({ quality: QUALITY }).toBuffer();
   const thumb = await sharp(flat).resize(THUMB, THUMB).webp({ quality: THUMB_QUALITY }).toBuffer();
-  return { full, thumb, fondo, width: source.width, height: source.height };
+  return { full, thumb, fondo, width: source.width, height: source.height, escala };
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -418,9 +435,12 @@ function readResults(dir: string): Record<string, Resultado> {
   return existsSync(resultsFile(dir)) ? JSON.parse(readFileSync(resultsFile(dir), "utf8")) : {};
 }
 
-async function processAll(supabase: SupabaseClient, dir: string, only: Set<string> | null) {
+async function processAll(supabase: SupabaseClient, dir: string, only: Set<string> | null, all: boolean) {
   const { buscar, fuentes, ajustes } = readSources();
-  const rows = (await activeRows(supabase)).filter((row) => !only || only.has(row.sku));
+  // Por defecto, solo lo pendiente: cervezas nuevas (sin estado) y las que siguen en 'revisar'.
+  const rows = (await activeRows(supabase)).filter((row) =>
+    only ? only.has(row.sku) : all || !row.portada_estado || row.portada_estado === "revisar",
+  );
   mkdirSync(path.join(dir, "antes"), { recursive: true });
   mkdirSync(path.join(dir, "despues"), { recursive: true });
   const results = readResults(dir);
@@ -445,14 +465,21 @@ async function processAll(supabase: SupabaseClient, dir: string, only: Set<strin
       const original = { width: meta.width ?? 0, height: meta.height ?? 0 };
       // EXIF puede girar la foto: el alto real es el lado vertical después de rotar.
       const realHeight = (meta.orientation ?? 1) >= 5 ? original.width : original.height;
-      if (realHeight < MIN_SOURCE_HEIGHT) {
+      if (fuente && realHeight < MIN_REPLACEMENT_HEIGHT) {
+        results[row.sku] = { ...base, motivo: `Reemplazo de ${realHeight} px de alto (mín. ${MIN_REPLACEMENT_HEIGHT})`, original, fuente: sourceUrl };
+        return;
+      }
+      if (realHeight < MIN_SCALED_HEIGHT) {
         results[row.sku] = { ...base, motivo: `Original de ${realHeight} px de alto`, original, fuente: sourceUrl };
         return;
       }
-      const { full, thumb, fondo } = await normalizeCover(input, ajustes[row.sku]);
+      const { full, thumb, fondo, escala } = await normalizeCover(input, ajustes[row.sku]);
       writeFileSync(path.join(dir, "despues", `${row.sku}.webp`), full);
       writeFileSync(path.join(dir, "despues", `${row.sku}-480.webp`), thumb);
-      results[row.sku] = { ...base, estado: fuente ? "nueva" : "normalizada", fondo, original, fuente: sourceUrl };
+      const estado: Estado = fuente
+        ? row.image_url ? "normalizada" : "nueva"
+        : realHeight < MIN_SOURCE_HEIGHT ? "baja_res" : "normalizada";
+      results[row.sku] = { ...base, estado, fondo, original, escala, fuente: sourceUrl };
     } catch (error) {
       results[row.sku] = { ...base, motivo: `Error: ${(error as Error).message}`, fuente: sourceUrl ?? undefined };
     } finally {
@@ -464,7 +491,9 @@ async function processAll(supabase: SupabaseClient, dir: string, only: Set<strin
 
   const values = rows.map((row) => results[row.sku]);
   const count = (estado: Estado) => values.filter((value) => value?.estado === estado).length;
-  console.log(`Procesadas ${rows.length}: normalizadas ${count("normalizada")}, nuevas ${count("nueva")}, revisar ${count("revisar")}`);
+  console.log(
+    `Procesadas ${rows.length}: normalizadas ${count("normalizada")}, nuevas ${count("nueva")}, baja_res ${count("baja_res")}, revisar ${count("revisar")}`,
+  );
   console.log(`Resultados en ${resultsFile(dir)}. Nada se escribió en la base ni en Storage.`);
 }
 
@@ -484,7 +513,7 @@ function compare(dir: string, only: Set<string> | null) {
         result.estado !== "revisar"
           ? `<img src="despues/${encodeURIComponent(result.sku)}.webp" alt="">`
           : `<div class="vacio">${escapeHtml(result.motivo ?? "Revisar")}</div>`;
-      const detail = [result.estado, result.fondo, result.original && `${result.original.width}×${result.original.height}`]
+      const detail = [result.estado, result.fondo, result.original && `${result.original.width}×${result.original.height}`, result.escala && `×${result.escala}`]
         .filter(Boolean)
         .join(" · ");
       return `<figure><figcaption><b>${escapeHtml(result.name)}</b><br>${escapeHtml(detail)}</figcaption><div class="par"><div class="antes">${before}</div><div class="despues">${after}</div></div></figure>`;
@@ -613,7 +642,7 @@ async function revert(supabase: SupabaseClient) {
   const { data, error } = await supabase
     .from("products")
     .select("id, sku, image_url, image_urls, portada_original, portada_estado")
-    .in("portada_estado", ["normalizada", "nueva", "revisar"]);
+    .in("portada_estado", ["normalizada", "nueva", "baja_res", "revisar"]);
   if (error) throw error;
   let reverted = 0;
   let failed = 0;
@@ -644,7 +673,7 @@ async function main() {
   const supabase = client();
   if (args.has("--respaldo")) return backup(supabase);
   if (args.has("--procesar")) {
-    await processAll(supabase, dir, only);
+    await processAll(supabase, dir, only, args.has("--todas"));
     worker?.stop();
     return;
   }
