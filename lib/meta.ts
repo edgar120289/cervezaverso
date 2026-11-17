@@ -61,11 +61,28 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 async function esperarContenedor(id: string, token: string) {
   for (let i = 0; i < 10; i++) {
     const { status_code } = await graph<{ status_code?: string }>("GET", id, { fields: "status_code" }, token);
-    if (status_code === "FINISHED" || status_code === undefined) return;
+    // Solo FINISHED cuenta como listo: sin estado (undefined) Meta aún no termina y publicar da «Media ID is not available».
+    if (status_code === "FINISHED") return;
     if (status_code === "ERROR" || status_code === "EXPIRED") throw new MetaError(`Instagram no pudo procesar la imagen (${status_code}).`);
     await sleep(2000);
   }
   throw new MetaError("Instagram tardó demasiado en procesar las imágenes.");
+}
+
+/** media_publish con reintentos: Meta a veces responde «Media ID is not available» aunque el contenedor ya esté FINISHED. */
+async function publicarContenedor(igId: string, creationId: string, token: string): Promise<string> {
+  let ultimo: unknown;
+  for (let i = 0; i < 4; i++) {
+    try {
+      const { id } = await graph<{ id: string }>("POST", `${igId}/media_publish`, { creation_id: creationId }, token);
+      return id;
+    } catch (e) {
+      ultimo = e;
+      if (!(e instanceof Error) || !/not available|not ready|processing/i.test(e.message)) throw e;
+      await sleep(3000);
+    }
+  }
+  throw ultimo;
 }
 
 /** Publica una imagen o un carrusel (2 a 10) en Instagram. Devuelve el id de la publicación. */
@@ -90,8 +107,7 @@ export async function publicarInstagram(cuenta: MetaCuenta, imagenes: string[], 
     ));
   }
   await esperarContenedor(creationId, token);
-  const { id } = await graph<{ id: string }>("POST", `${cuenta.igId}/media_publish`, { creation_id: creationId }, token);
-  return id;
+  return publicarContenedor(cuenta.igId, creationId, token);
 }
 
 /** Publica en la página de Facebook: una foto o varias en una sola publicación. */
@@ -122,8 +138,7 @@ export async function publicarHistoriaInstagram(cuenta: MetaCuenta, imagen: stri
   const token = cuenta.pageToken;
   const { id: creationId } = await graph<{ id: string }>("POST", `${cuenta.igId}/media`, { image_url: imagen, media_type: "STORIES" }, token);
   await esperarContenedor(creationId, token);
-  const { id } = await graph<{ id: string }>("POST", `${cuenta.igId}/media_publish`, { creation_id: creationId }, token);
-  return id;
+  return publicarContenedor(cuenta.igId, creationId, token);
 }
 
 /** Historia de la página de Facebook: se sube la foto sin publicar y luego se manda a photo_stories. */
