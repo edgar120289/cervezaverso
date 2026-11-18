@@ -32,9 +32,10 @@ const HELP_LINKS = [
  * Lo que acepta el checkout: Checkout Pro de Mercado Pago sin exclusiones (tarjetas Visa,
  * Mastercard y American Express, efectivo en OXXO y SPEI) y transferencia SPEI directa.
  * SVG locales en public/pagos/; SPEI va como texto porque no hay logo oficial en SVG.
+ * En móvil miden 18 px de alto para que los 6 quepan en una línea a 360 px; desde sm, 24 px.
  */
 const PAYMENT_LOGOS = [
-  { src: "/pagos/mercadopago.svg", alt: "Mercado Pago", width: 35 },
+  { src: "/pagos/mercadopago.svg", alt: "Mercado Pago", width: 98 },
   { src: "/pagos/visa.svg", alt: "Visa", width: 74 },
   { src: "/pagos/mastercard.svg", alt: "Mastercard", width: 39 },
   { src: "/pagos/americanexpress.svg", alt: "American Express", width: 24 },
@@ -66,14 +67,14 @@ function PaymentMethods() {
   return (
     <div>
       <p className="text-xs font-semibold text-muted">Pagos seguros con</p>
-      <ul className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-2" aria-label="Métodos de pago aceptados">
+      <ul className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-2 sm:gap-x-2.5" aria-label="Métodos de pago aceptados">
         {PAYMENT_LOGOS.map((logo) => (
-          <li key={logo.src} className="flex h-6 items-center">
+          <li key={logo.src} className="flex h-[18px] items-center sm:h-6">
             {/* eslint-disable-next-line @next/next/no-img-element -- SVG local de 24 px; no necesita optimización */}
-            <img src={logo.src} alt={logo.alt} width={logo.width} height={24} className="h-6 w-auto" loading="lazy" />
+            <img src={logo.src} alt={logo.alt} width={logo.width} height={24} className="h-[18px] w-auto sm:h-6" loading="lazy" />
           </li>
         ))}
-        <li className="flex h-6 items-center rounded border border-black/15 px-1.5 text-[11px] font-bold tracking-wide text-black/70">
+        <li className="flex h-[18px] items-center rounded border border-black/15 px-1 text-[10px] font-bold tracking-wide text-black/70 sm:h-6 sm:px-1.5 sm:text-[11px]">
           SPEI
         </li>
       </ul>
