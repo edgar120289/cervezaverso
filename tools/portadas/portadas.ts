@@ -5,6 +5,7 @@
  * Uso (desde tools/portadas, tras `npm install`; todo local hasta `--subir`; `--dir` cambia la
  * carpeta de trabajo):
  *   npm run portadas -- --respaldo                 # respaldos/portadas_antes_fase1.json (activas)
+ *        [--solo a,b,c] [--salida respaldos/x.json] # …o solo esos SKU, en otro archivo
  *   npm run portadas -- --procesar [--solo a,b,c]  # cervezas sin procesar o en 'revisar'; NO toca la base
  *        [--todas]                                 # …o todas las activas
  *   npm run portadas -- --comparar                 # <dir>/comparacion.html (antes | después)
@@ -410,21 +411,26 @@ async function pool<T>(items: T[], worker: (item: T) => Promise<void>, size = CO
 // Comandos
 // ---------------------------------------------------------------------------------------------
 
-async function backup(supabase: SupabaseClient) {
-  if (existsSync(BACKUP_FILE) && !process.argv.includes("--forzar")) {
-    console.error(`Ya existe ${BACKUP_FILE}; no se sobrescribe (usa --forzar si de verdad quieres reemplazarlo).`);
+/** Con `--solo`, respalda solo esos SKU (activos o no); `--salida` cambia el archivo. */
+async function backup(supabase: SupabaseClient, only: Set<string> | null) {
+  const salida = argValue("--salida");
+  const file = salida ? path.resolve(ROOT, salida) : BACKUP_FILE;
+  if (existsSync(file) && !process.argv.includes("--forzar")) {
+    console.error(`Ya existe ${file}; no se sobrescribe (usa --forzar si de verdad quieres reemplazarlo).`);
     process.exit(1);
   }
-  const { data, error } = await supabase
-    .from("products")
-    .select("id, sku, name, image_url, image_urls")
-    .eq("is_active", true)
-    .order("name")
-    .order("id");
+  let query = supabase.from("products").select("id, sku, name, image_url, image_urls");
+  query = only ? query.in("sku", [...only]) : query.eq("is_active", true);
+  const { data, error } = await query.order("name").order("id");
   if (error) throw error;
-  mkdirSync(path.dirname(BACKUP_FILE), { recursive: true });
-  writeFileSync(BACKUP_FILE, JSON.stringify(data, null, 2) + "\n", "utf8");
-  console.log(`Respaldo: ${data.length} cervezas activas en ${BACKUP_FILE}`);
+  if (only && data.length !== only.size) {
+    const found = new Set(data.map((row) => row.sku));
+    console.error(`No se encontraron: ${[...only].filter((sku) => !found.has(sku)).join(", ")}`);
+    process.exit(1);
+  }
+  mkdirSync(path.dirname(file), { recursive: true });
+  writeFileSync(file, JSON.stringify(data, null, 2) + "\n", "utf8");
+  console.log(`Respaldo: ${data.length} cervezas en ${file}`);
 }
 
 function resultsFile(dir: string) {
@@ -671,7 +677,7 @@ async function main() {
 
   if (args.has("--comparar")) return compare(dir, only);
   const supabase = client();
-  if (args.has("--respaldo")) return backup(supabase);
+  if (args.has("--respaldo")) return backup(supabase, only);
   if (args.has("--procesar")) {
     await processAll(supabase, dir, only, args.has("--todas"));
     worker?.stop();
