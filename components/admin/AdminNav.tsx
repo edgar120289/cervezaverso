@@ -15,34 +15,57 @@ const LINKS = [
 ] as const;
 
 /** Navegación del panel: enlaces tipo píldora, con la sección actual resaltada. */
-export default function AdminNav({ porEnviar = 0 }: { porEnviar?: number }) {
+export default function AdminNav({
+  porEnviar = 0,
+  pendientes = 0,
+}: {
+  porEnviar?: number;
+  pendientes?: number;
+}) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Secciones del panel" className="flex flex-wrap items-center gap-1.5">
+    <nav
+      aria-label="Secciones del panel"
+      className="flex flex-wrap items-center gap-1.5"
+    >
       {LINKS.map(({ href, label }) => {
         const current =
-          href === "/admin" ? pathname === href || pathname.startsWith("/admin/productos") : pathname.startsWith(href);
+          href === "/admin"
+            ? pathname === href || pathname.startsWith("/admin/productos")
+            : pathname.startsWith(href);
         return (
-          <Link
-            key={href}
-            href={href}
-            aria-current={current ? "page" : undefined}
-            className={`inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold transition-colors ${
-              current ? "bg-black text-white" : "text-black/70 hover:bg-black/10 hover:text-black"
-            }`}
-          >
-            {label}
-            {href === "/admin/pedidos" && porEnviar > 0 && (
-              <span
-                className="ml-2 inline-flex min-w-6 items-center justify-center rounded-full bg-danger px-1.5 text-xs font-bold text-white"
-                title={`${porEnviar} por enviar`}
+          <span key={href} className="inline-flex items-center gap-1">
+            <Link
+              href={href}
+              aria-current={current ? "page" : undefined}
+              className={`inline-flex min-h-11 items-center rounded-full px-4 text-sm font-semibold transition-colors ${
+                current
+                  ? "bg-black text-white"
+                  : "text-black/70 hover:bg-black/10 hover:text-black"
+              }`}
+            >
+              {label}
+              {href === "/admin/pedidos" && porEnviar > 0 && (
+                <span
+                  className="ml-2 inline-flex min-w-6 items-center justify-center rounded-full bg-danger px-1.5 text-xs font-bold text-white"
+                  title={`${porEnviar} por enviar`}
+                >
+                  {porEnviar}
+                  <span className="sr-only"> por enviar</span>
+                </span>
+              )}
+            </Link>
+            {href === "/admin" && pendientes > 0 && (
+              <Link
+                href="/admin?estado=pending"
+                className="inline-flex min-h-8 items-center rounded-full bg-danger px-2.5 text-xs font-bold text-white"
+                title="Cervezas nuevas ocultas hasta que las actives"
               >
-                {porEnviar}
-                <span className="sr-only"> por enviar</span>
-              </span>
+                {pendientes} pendientes sin activar
+              </Link>
             )}
-          </Link>
+          </span>
         );
       })}
     </nav>
