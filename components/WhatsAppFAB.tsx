@@ -1,11 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { CONTACT } from "@/lib/site";
 import { WhatsAppIcon } from "./SocialIcons";
 
 
 export default function WhatsAppFAB() {
+  const pathname = usePathname();
+  // Nada flota sobre el formulario de pago.
+  if (pathname.startsWith("/checkout")) return null;
   return (
     <motion.a
       href={CONTACT.whatsappUrl}

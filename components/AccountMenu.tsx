@@ -7,24 +7,34 @@ import { AnimatePresence, motion } from "framer-motion";
 import { LayoutDashboard, LogOut, User, UserRound } from "lucide-react";
 import { useAccount } from "@/lib/account-context";
 
-const iconButtonClass =
-  "relative flex h-11 w-11 items-center justify-center rounded-full text-black/70 transition-colors hover:bg-black/5";
+/** Píldora de PC: borde del color de marca, mismo ancho mínimo con y sin sesión (no mueve el header). */
+const pillClass =
+  "relative flex min-h-11 min-w-[7.5rem] items-center justify-center gap-2 rounded-full border border-accent px-4 text-sm font-semibold text-accent transition-colors hover:bg-accent/[0.06]";
+/** Celular: solo ícono, 44 px. */
+const iconClass = "relative flex h-11 w-11 items-center justify-center rounded-full text-accent transition-colors hover:bg-accent/[0.06]";
 
-function SessionDot() {
-  return <span aria-hidden className="absolute right-2 top-2 h-2 w-2 rounded-pill border-2 border-white bg-accent" />;
+/** Punto morado: solo si hay algo nuevo (premio sin canjear o pedidos recién ligados). */
+function NewsDot() {
+  return <span aria-hidden className="absolute right-1 top-1 h-2.5 w-2.5 rounded-pill border-2 border-white bg-accent" />;
+}
+
+function Initial({ name }: { name: string }) {
+  return (
+    <span aria-hidden className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold uppercase text-white">
+      {name.charAt(0) || "?"}
+    </span>
+  );
 }
 
 const ADMIN_LINKS = [{ href: "/admin", label: "Panel de Administración", icon: LayoutDashboard }];
 const CLIENT_LINKS = [{ href: "/cuenta", label: "Mi cuenta", icon: UserRound }];
 
-/** "edgar@correo.com" → "edgar" */
-function displayName(email: string | undefined): string {
-  return email?.split("@")[0] ?? "";
-}
-
-/** Ícono de perfil del header: enlace a /login sin sesión; con sesión, menú con saludo, accesos y cerrar sesión. */
-export default function AccountMenu() {
-  const { user, role, signOut } = useAccount();
+/**
+ * Cuenta en el header. Sin sesión: «Entrar» (PC) o ícono (celular) a /login.
+ * Con sesión: «Mi cuenta» con la inicial (PC) o solo la inicial (celular), con menú.
+ */
+export default function AccountMenu({ compact = false }: { compact?: boolean }) {
+  const { user, role, signOut, displayName, hasNews } = useAccount();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -54,12 +64,9 @@ export default function AccountMenu() {
 
   if (!user) {
     return (
-      <Link
-        href="/login"
-        aria-label="Iniciar sesión"
-        className={iconButtonClass}
-      >
-        <User size={20} />
+      <Link href="/login" aria-label={compact ? "Entrar a tu cuenta" : undefined} className={compact ? iconClass : pillClass}>
+        <User size={compact ? 22 : 18} aria-hidden />
+        {!compact && "Entrar"}
       </Link>
     );
   }
@@ -71,13 +78,14 @@ export default function AccountMenu() {
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
-        aria-label="Menú de cuenta"
+        aria-label={hasNews ? "Mi cuenta, tienes novedades" : "Mi cuenta"}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        className={`${iconButtonClass} ${isOpen ? "bg-black/5" : ""}`}
+        className={`${compact ? iconClass : `${pillClass} pl-1.5`} ${isOpen ? "bg-accent/[0.06]" : ""}`}
       >
-        <User size={20} />
-        <SessionDot />
+        <Initial name={displayName} />
+        {!compact && "Mi cuenta"}
+        {hasNews && <NewsDot />}
       </button>
 
       <AnimatePresence>
@@ -90,7 +98,7 @@ export default function AccountMenu() {
             transition={{ duration: 0.18, ease: "easeOut" }}
             className="absolute right-0 top-[calc(100%+10px)] w-60 origin-top-right rounded-[22px] bg-white p-1.5 shadow-card ring-1 ring-black/5"
           >
-            <p className="truncate px-3.5 pb-1.5 pt-2 text-sm font-semibold">Hola, {displayName(user.email)}</p>
+            <p className="truncate px-3.5 pb-1.5 pt-2 text-sm font-semibold">Hola, {displayName}</p>
             {links.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}

@@ -17,6 +17,7 @@ import type { PedidoDetalle } from "@/lib/types";
 
 const resultadoSchema = z.object({
   status: z.enum(["acreditado", "ya_acreditado", "no_pagado", "no_encontrado", "sin_cuenta"]),
+  botellas: z.number().optional(),
   email: z.string().optional(),
   nombre: z.string().optional(),
   total: z.number().optional(),
@@ -28,20 +29,22 @@ const resultadoSchema = z.object({
  * que cruce. Es idempotente (`acreditar_botellas` marca el pedido), así que puede
  * llamarse desde el cambio de estado del admin y, después, desde el webhook de Mercado Pago.
  */
-export async function procesarPedidoPagado(pedidoId: string): Promise<void> {
+export async function procesarPedidoPagado(pedidoId: string): Promise<number> {
   const { data, error } = await createAdminClient().rpc("acreditar_botellas", { p_pedido_id: pedidoId });
   if (error) {
     console.error("[lealtad] Error al acreditar botellas:", error.message);
-    return;
+    return 0;
   }
   const parsed = resultadoSchema.safeParse(data);
   if (!parsed.success) {
     console.error("[lealtad] Respuesta inesperada de acreditar_botellas.");
-    return;
+    return 0;
   }
 
   const { email, nombre, premios } = parsed.data;
-  if (parsed.data.status !== "acreditado" || !email) return;
+  if (parsed.data.status !== "acreditado") return 0;
+  const botellas = parsed.data.botellas ?? 0;
+  if (!email) return botellas;
 
   for (const premio of premios) {
     const mensaje = premioDesbloqueadoEmail({
@@ -52,6 +55,7 @@ export async function procesarPedidoPagado(pedidoId: string): Promise<void> {
     });
     await sendEmail({ to: email, ...mensaje });
   }
+  return botellas;
 }
 
 /** Resta las botellas que sumó un pedido ahora cancelado (idempotente en SQL). */

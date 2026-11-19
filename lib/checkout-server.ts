@@ -134,7 +134,8 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
     .insert({
       user_id: user?.id ?? null,
       cliente_nombre: direccion.nombre_completo,
-      cliente_email: email,
+      // Con sesión, el correo de la cuenta (así el pedido queda ligado a ella).
+      cliente_email: user?.email ?? email,
       cliente_telefono: direccion.telefono,
       metodo_envio,
       // Sólo se envía con transferencia: con Mercado Pago aplica el valor por defecto de la columna.
@@ -173,7 +174,7 @@ export async function registrarPedido(input: unknown): Promise<RegistroResult> {
   return {
     ok: true,
     pedidoId: pedido.id,
-    email,
+    email: user?.email ?? email,
     nombre: direccion.nombre_completo,
     telefono: direccion.telefono,
     lineas: lineas.map(({ sku, nombre, precio_unitario, cantidad }) => ({ sku, nombre, precio_unitario, cantidad })),

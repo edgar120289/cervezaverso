@@ -25,13 +25,13 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
 
   return (
     <header className="sticky top-0 z-40 px-4 pt-4">
-      {/* Móvil: hamburguesa | logotipo al centro | carrito. Desde md: logotipo, buscador, cuenta y carrito. */}
-      <div className="relative mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-full bg-white/80 px-3 py-2 shadow-card backdrop-blur-lg md:flex md:justify-between md:px-4">
-        <div className="md:hidden">
+      {/* Móvil: hamburguesa, logotipo, búsqueda, cuenta y carrito. Desde md: logotipo, menú, buscador, cuenta y carrito. */}
+      <div className="relative mx-auto flex max-w-6xl items-center gap-1 rounded-full bg-white/80 px-2 py-2 shadow-card backdrop-blur-lg sm:px-3 md:justify-between md:gap-3 md:px-4">
+        <div className="shrink-0 md:hidden">
           <MobileMenu />
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 py-0.5 md:pr-2">
+        <div className="mr-auto flex shrink-0 items-center gap-2 py-0.5 md:mr-0 md:pr-2">
           <MultiverseLogo images={logoImages} size={40} priority />
           {/* El PNG trae ~34% de margen transparente a la izquierda; se recorta para que el logotipo quede pegado al tarro. */}
           <Link
@@ -68,14 +68,14 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
           })}
         </nav>
 
-        <div className="flex items-center justify-end gap-1.5 md:flex-1">
+        <div className="flex items-center justify-end gap-1 md:flex-1 md:gap-1.5">
           <div className="hidden w-full justify-end md:flex">
             {/* useSearchParams: el buscador se hidrata aparte para no volver dinámico todo el layout. */}
             <Suspense fallback={null}>
               <HeaderSearch />
             </Suspense>
           </div>
-          <nav aria-label="Cuenta y carrito" className="flex items-center gap-1.5">
+          <nav aria-label="Cuenta y carrito" className="flex items-center gap-0.5 md:gap-1.5">
             <div className="hidden md:block">
               <AccountMenu />
             </div>
@@ -89,6 +89,9 @@ export default function Header({ logoImages }: { logoImages: string[] }) {
             >
               {searchOpen ? <X size={20} /> : <Search size={20} />}
             </button>
+            <div className="md:hidden">
+              <AccountMenu compact />
+            </div>
             <button
               type="button"
               onClick={openDrawer}

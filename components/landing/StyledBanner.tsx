@@ -183,7 +183,7 @@ function Banner({
         <div aria-hidden className="absolute inset-0 z-0" style={{ backgroundColor: `rgb(0 0 0 / ${style.overlay / 100})` }} />
       )}
       <div
-        className={`relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-5 ${
+        className={`relative z-10 mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)] gap-4 px-5 @min-[608px]:gap-8 ${
           card
             ? `h-full max-h-full py-6 @min-[992px]:grid-cols-2 @min-[992px]:grid-rows-1 @min-[992px]:items-center ${
                 hasText ? "grid-rows-[auto_minmax(0,1fr)]" : "grid-rows-[minmax(0,1fr)]"

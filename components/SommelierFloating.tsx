@@ -11,7 +11,8 @@ import { useSommelier } from "./SommelierProvider";
 const MESSAGES = ["¿Qué cerveza elegir?", "Yo te ayudo a elegir cerveza"];
 const SWAP_MS = 4000;
 /** Solo donde se compra. El estado del quiz vive en `SommelierProvider` (layout), así que sobrevive a la navegación. */
-const FLOATING_ROUTES = ["/tienda", "/carrito", "/checkout"];
+// Nunca en /checkout: nada flota sobre el formulario de pago.
+const FLOATING_ROUTES = ["/tienda", "/carrito"];
 
 /** Sommelier flotante estilo chatbot: alterna dos frases y abre el quiz al pulsarlo. */
 export default function SommelierFloating() {

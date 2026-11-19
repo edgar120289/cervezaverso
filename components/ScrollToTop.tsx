@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 const SHOW_AFTER_PX = 400;
 
@@ -10,6 +11,7 @@ const SHOW_AFTER_PX = 400;
 export default function ScrollToTop() {
   const reduceMotion = useReducedMotion();
   const [visible, setVisible] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > SHOW_AFTER_PX);
@@ -20,7 +22,7 @@ export default function ScrollToTop() {
 
   return (
     <AnimatePresence>
-      {visible && (
+      {visible && !pathname.startsWith("/checkout") && (
         <motion.button
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" })}
