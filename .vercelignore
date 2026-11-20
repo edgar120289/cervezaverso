@@ -3,3 +3,6 @@ respaldos/
 
 # Herramientas locales con su propio package.json (portadas): nunca en el despliegue.
 tools/
+
+# Capturas de revisión: viven en el repo, nunca en el despliegue.
+docs/
