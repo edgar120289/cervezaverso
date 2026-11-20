@@ -18,3 +18,23 @@ export async function requireAdmin(next = "/admin") {
 
   return supabase;
 }
+
+/** Como requireAdmin, pero también devuelve el correo del admin (autor en la bitácora de pedidos). */
+export async function requireAdminUser(next = "/admin") {
+  const supabase = await requireAdmin(next);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return { supabase, email: user?.email ?? "admin" };
+}
+
+/** Para Route Handlers del panel: true solo con sesión de admin (sin redirigir). */
+export async function isAdminSession(): Promise<boolean> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { data: profile } = await supabase.from("users").select("role").eq("id", user.id).single();
+  return profile?.role === "admin";
+}

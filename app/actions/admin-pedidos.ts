@@ -2,7 +2,8 @@
 
 import { refresh } from "next/cache";
 import { z } from "zod";
-import { requireAdmin } from "@/lib/admin-auth";
+import { requireAdminUser } from "@/lib/admin-auth";
+import { registrarBitacora } from "@/lib/pedido-admin";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { notificarEstadoPedido, procesarPedidoPagado, revertirPedidoCancelado } from "@/lib/lealtad-server";
 import { ESTADOS_PEDIDO } from "@/lib/types";
@@ -18,13 +19,14 @@ export async function cambiarEstadoPedido(id: string, estado: string): Promise<P
   const parsed = schema.safeParse({ id, estado });
   if (!parsed.success) return { ok: false, error: "Datos inválidos." };
 
-  await requireAdmin("/admin/pedidos");
+  const { email: autor } = await requireAdminUser("/admin/pedidos");
   const admin = createAdminClient();
   const { data: previo } = await admin.from("pedidos").select("estado").eq("id", parsed.data.id).maybeSingle();
   // Cancelar un Pendiente pasa por la función SQL que también devuelve el uso del cupón.
   if (parsed.data.estado === "Cancelado" && previo?.estado === "Pendiente") {
     const cancelado = await cancelarPendiente(parsed.data.id);
     if (!cancelado.ok) return cancelado;
+    await registrarBitacora(parsed.data.id, "Estado", "Pendiente → Cancelado", autor);
     await notificarEstadoPedido(parsed.data.id, "Cancelado");
     refresh();
     return { ok: true };
@@ -40,6 +42,9 @@ export async function cambiarEstadoPedido(id: string, estado: string): Promise<P
   }
   if (!data?.length) return { ok: false, error: "No se encontró el pedido." };
 
+  if (previo?.estado !== parsed.data.estado) {
+    await registrarBitacora(parsed.data.id, "Estado", `${previo?.estado ?? "?"} → ${parsed.data.estado}`, autor);
+  }
   if (ESTADOS_PAGADOS.includes(parsed.data.estado)) await procesarPedidoPagado(parsed.data.id);
   if (parsed.data.estado === "Cancelado") await revertirPedidoCancelado(parsed.data.id);
   // Correo solo si el estado realmente cambió (evita duplicados al reseleccionar el mismo).
@@ -69,9 +74,10 @@ export async function cancelarPedidoPendiente(id: string): Promise<PedidoEstadoR
   const parsed = z.uuid().safeParse(id);
   if (!parsed.success) return { ok: false, error: "Datos inválidos." };
 
-  await requireAdmin("/admin/pedidos");
+  const { email: autor } = await requireAdminUser("/admin/pedidos");
   const result = await cancelarPendiente(parsed.data);
   if (!result.ok) return result;
+  await registrarBitacora(parsed.data, "Estado", "Pendiente → Cancelado", autor);
 
   await notificarEstadoPedido(parsed.data, "Cancelado");
   refresh();
@@ -82,10 +88,11 @@ export async function cancelarPedidoPendiente(id: string): Promise<PedidoEstadoR
 export async function reenviarCorreoPedido(id: string): Promise<PedidoEstadoResult> {
   const parsed = z.uuid().safeParse(id);
   if (!parsed.success) return { ok: false, error: "Datos inválidos." };
-  await requireAdmin("/admin/pedidos");
+  const { email: autor } = await requireAdminUser("/admin/pedidos");
   const { data } = await createAdminClient().from("pedidos").select("estado").eq("id", parsed.data).maybeSingle();
   if (!data) return { ok: false, error: "No existe el pedido." };
   const enviado = await notificarEstadoPedido(parsed.data, data.estado);
+  if (enviado) await registrarBitacora(parsed.data, "Correo", `Reenvío del correo «${data.estado}»`, autor);
   return enviado ? { ok: true } : { ok: false, error: `No se pudo enviar (el estado «${data.estado}» no tiene correo, o falló el envío).` };
 }
 
@@ -103,7 +110,7 @@ const guiaSchema = z.object({
 export async function guardarGuia(input: { id: string; paqueteria: string; guia: string; guia_url?: string }): Promise<PedidoEstadoResult> {
   const parsed = guiaSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "Datos inválidos." };
-  await requireAdmin("/admin/pedidos");
+  const { email: autor } = await requireAdminUser("/admin/pedidos");
   const admin = createAdminClient();
   const { id, paqueteria, guia, guia_url } = parsed.data;
   const { data, error } = await admin
@@ -113,6 +120,7 @@ export async function guardarGuia(input: { id: string; paqueteria: string; guia:
     .select("estado");
   if (error || !data?.length) return { ok: false, error: "No se pudo guardar la guía." };
   const estado = data[0].estado as string;
+  await registrarBitacora(id, "Guía", `${paqueteria} · ${guia}`, autor);
   if (estado === "Pagado") return cambiarEstadoPedido(id, "Enviado");
   if (estado === "Enviado") {
     const enviado = await notificarEstadoPedido(id, "Enviado");

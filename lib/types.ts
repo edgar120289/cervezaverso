@@ -91,7 +91,7 @@ export type Direccion = {
 /** Copia de la dirección guardada en el pedido (no cambia si luego se edita la libreta). */
 export type DireccionEnvio = Omit<Direccion, "id" | "predeterminada">;
 
-type PedidoItem = {
+export type PedidoItem = {
   id: string;
   product_id: string | null;
   sku: string;
@@ -99,6 +99,8 @@ type PedidoItem = {
   precio_unitario: number;
   cantidad: number;
   importe: number;
+  /** Renglón agregado después de crear el pedido (migración 036). */
+  agregado?: boolean;
 };
 
 export type PedidoDetalle = Pedido & {
@@ -120,5 +122,7 @@ export type PedidoDetalle = Pedido & {
   paqueteria?: string | null;
   guia?: string | null;
   guia_url?: string | null;
+  botellas_acreditadas?: number | null;
+  botellas_acreditadas_at?: string | null;
   pedido_items: PedidoItem[];
 };

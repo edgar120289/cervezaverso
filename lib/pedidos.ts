@@ -24,4 +24,4 @@ export function folio(id: string): string {
 // `*` en vez de la lista de columnas: incluye promo_code/descuento (migración 004)
 // cuando existen, sin romper la página si la migración aún no se aplicó.
 export const PEDIDO_DETALLE_COLUMNS =
-  "*, pedido_items (id, product_id, sku, nombre, precio_unitario, cantidad, importe)";
+  "*, pedido_items (id, product_id, sku, nombre, precio_unitario, cantidad, importe, agregado)";

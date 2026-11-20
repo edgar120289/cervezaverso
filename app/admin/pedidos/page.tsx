@@ -2,6 +2,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { formatMXN } from "@/lib/pricing";
 import { ESTADO_BADGE, formatFecha } from "@/lib/pedidos";
+import { requireAdmin } from "@/lib/admin-auth";
+import { pedidosConPagoPendiente } from "@/lib/pedido-admin";
 import PedidoEstadoSelect from "@/components/admin/PedidoEstadoSelect";
 import { ESTADOS_PEDIDO, type EstadoPedido, type Pedido } from "@/lib/types";
 
@@ -18,6 +20,7 @@ export default async function AdminPedidosPage({
   const estadoActivo = isEstado(estado) ? estado : null;
 
   const supabase = await createClient();
+  await requireAdmin("/admin/pedidos");
   let query = supabase
     .from("pedidos")
     .select("id, cliente_nombre, cliente_email, fecha, total, estado")
@@ -26,6 +29,7 @@ export default async function AdminPedidosPage({
 
   const { data, error } = await query;
   const pedidos = (data ?? []) as Pedido[];
+  const conPendiente = await pedidosConPagoPendiente(pedidos.map((p) => p.id));
 
   const filtros: { label: string; href: string; activo: boolean }[] = [
     { label: "Todos", href: "/admin/pedidos", activo: estadoActivo === null },
@@ -96,6 +100,9 @@ export default async function AdminPedidosPage({
                 >
                   {pedido.estado}
                 </span>
+                {conPendiente.has(pedido.id) && (
+                  <span className="w-fit rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">Pago adicional pendiente</span>
+                )}
                 <PedidoEstadoSelect id={pedido.id} estado={pedido.estado} />
               </div>
               <p className="text-right font-semibold tabular-nums">
