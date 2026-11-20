@@ -15,7 +15,7 @@ export function emailLayout({ title, bodyHtml }: { title: string; bodyHtml: stri
 <body style="margin:0;padding:24px 12px;background:${CANVAS};font-family:Inter,Arial,sans-serif;color:#000;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fff;border-radius:28px;overflow:hidden;">
-      <tr><td style="background:${ACCENT};padding:24px 32px;color:#fff;font-size:20px;font-weight:700;letter-spacing:-0.03em;">${esc(SITE.name)}</td></tr>
+      <tr><td style="background:#fff;padding:20px 32px 16px;border-bottom:4px solid ${ACCENT};"><a href="${SITE.url}" style="text-decoration:none;"><img src="${SITE.url}/img/email/logo-cervezaverso.png" width="200" height="57" alt="${esc(SITE.name)}" style="display:block;border:0;width:200px;height:auto;max-width:100%;"></a></td></tr>
       <tr><td style="padding:32px;">
         <h1 style="margin:0 0 16px;font-size:24px;letter-spacing:-0.04em;">${esc(title)}</h1>
         ${bodyHtml}
@@ -196,5 +196,38 @@ export function avisoPedidoAdminEmail(motivo: MotivoAvisoAdmin, data: AvisoAdmin
     "",
     `Panel: ${data.adminUrl}`,
   ].join("\n");
+  return { subject, html, text };
+}
+
+export type PedidoActualizadoInput = {
+  nombre: string;
+  folio: string;
+  total: string;
+  pagado: string;
+  /** Monto ya formateado si queda algo por pagar. */
+  pendiente?: string;
+  pedidoUrl: string;
+};
+
+/** Correo «Actualizamos tu pedido»: va con el PDF del pedido adjunto. */
+export function pedidoActualizadoEmail({ nombre, folio, total, pagado, pendiente, pedidoUrl }: PedidoActualizadoInput) {
+  const subject = `Actualizamos tu pedido #${folio} · ${SITE.name}`;
+  const html = emailLayout({
+    title: "Actualizamos tu pedido",
+    bodyHtml: `
+      <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Hola ${esc(nombre)}, hicimos cambios en tu pedido. Te compartimos el detalle actualizado en el PDF adjunto.</p>
+      <p style="margin:0 0 24px;padding:16px;border-radius:20px;background:${CANVAS};font-size:14px;line-height:1.8;">
+        Pedido <strong>#${esc(folio)}</strong><br>Total: <strong>${esc(total)}</strong><br>Pagado: <strong>${esc(pagado)}</strong>${
+          pendiente ? `<br><span style="color:#b45309;">Pendiente por pagar: <strong>${esc(pendiente)}</strong></span>` : ""
+        }
+      </p>
+      ${pendiente ? `<p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:${MUTED};">Para el saldo pendiente, escríbenos por WhatsApp y te compartimos los datos de pago.</p>` : ""}
+      <a href="${esc(pedidoUrl)}" style="display:inline-block;padding:14px 28px;border-radius:9999px;background:${ACCENT};color:#fff;font-weight:600;text-decoration:none;">Ver mi pedido</a>`,
+  });
+  const text = `Hola ${nombre}, hicimos cambios en tu pedido #${folio}. El detalle va en el PDF adjunto.
+Total: ${total} · Pagado: ${pagado}${pendiente ? ` · Pendiente: ${pendiente}` : ""}
+Ver pedido: ${pedidoUrl}
+
+${HEALTH_NOTICE}`;
   return { subject, html, text };
 }

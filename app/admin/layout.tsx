@@ -33,7 +33,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="mb-4 text-2xl font-semibold tracking-tight">Panel de Administración</h1>
-      <div className="mb-8 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div className="mb-8 flex flex-wrap items-end gap-x-3 gap-y-2">
         <AdminNav porEnviar={porEnviar ?? 0} pendientes={pendientes ?? 0} />
         <div className="ml-auto">
           <SignOutButton variant="outline" />

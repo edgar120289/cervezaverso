@@ -1,14 +1,18 @@
 import "server-only";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendEmail } from "@/lib/email/resend";
+import { sendEmail, type EmailAttachment } from "@/lib/email/resend";
+import { getPedidoCompleto } from "@/lib/pedido-admin";
+import { nombreArchivoPdf, renderPedidoPdf } from "@/lib/pdf/pedido-pdf";
 import {
   avisoPedidoAdminEmail,
   esEstadoConCorreo,
   estadoPedidoEmail,
+  pedidoActualizadoEmail,
   premioDesbloqueadoEmail,
   type MotivoAvisoAdmin,
 } from "@/lib/email/templates";
+import { resumirPagos } from "@/lib/pedido-pagos";
 import { formatMXN, PAYMENT_METHODS, type PaymentMethod } from "@/lib/pricing";
 import { folio, PEDIDO_DETALLE_COLUMNS } from "@/lib/pedidos";
 import { getShippingZone } from "@/lib/shipping-zones";
@@ -46,6 +50,14 @@ export async function procesarPedidoPagado(pedidoId: string): Promise<number> {
   const botellas = parsed.data.botellas ?? 0;
   if (!email) return botellas;
 
+  await enviarPremios(email, nombre, premios);
+  return botellas;
+}
+
+type Premio = { nivel: number; code: string; label: string };
+
+/** Correo «Premio desbloqueado» por cada nivel cruzado. */
+export async function enviarPremios(email: string, nombre: string | undefined, premios: Premio[]) {
   for (const premio of premios) {
     const mensaje = premioDesbloqueadoEmail({
       nombre: nombre ?? "cervecero",
@@ -55,7 +67,71 @@ export async function procesarPedidoPagado(pedidoId: string): Promise<number> {
     });
     await sendEmail({ to: email, ...mensaje });
   }
-  return botellas;
+}
+
+const sincronizacionSchema = z.object({
+  status: z.string(),
+  diferencia: z.number().optional(),
+  email: z.string().optional(),
+  nombre: z.string().optional(),
+  premios: z.array(z.object({ nivel: z.number(), code: z.string(), label: z.string() })).default([]),
+});
+
+/**
+ * Ajusta las botellas de un pedido ya acreditado que cambió (sincronizar_botellas_pedido, migración 036)
+ * y manda los premios que cruce. Devuelve la diferencia aplicada (0 si no hubo cambio).
+ */
+export async function sincronizarBotellasPedido(pedidoId: string): Promise<number> {
+  const { data, error } = await createAdminClient().rpc("sincronizar_botellas_pedido", { p_pedido_id: pedidoId });
+  if (error) {
+    console.error("[lealtad] Error al sincronizar botellas:", error.message);
+    return 0;
+  }
+  return procesarSincronizacion(data);
+}
+
+/** Lee la respuesta de sincronizar_botellas_pedido (también viene dentro de editar_pedido) y manda premios. */
+export async function procesarSincronizacion(data: unknown): Promise<number> {
+  const parsed = sincronizacionSchema.safeParse(data);
+  if (!parsed.success || parsed.data.status !== "ajustado") return 0;
+  if (parsed.data.email && parsed.data.premios.length) await enviarPremios(parsed.data.email, parsed.data.nombre, parsed.data.premios);
+  return parsed.data.diferencia ?? 0;
+}
+
+/** PDF del pedido listo para adjuntar. Nunca lanza: sin PDF, el correo sale igual. */
+export async function pdfAdjuntoPedido(pedidoId: string): Promise<EmailAttachment[]> {
+  try {
+    const data = await getPedidoCompleto(pedidoId);
+    if (!data) return [];
+    const pdf = await renderPedidoPdf(data);
+    return [{ filename: nombreArchivoPdf(pedidoId), content: pdf.toString("base64") }];
+  } catch (err) {
+    console.error("[pdf] No se pudo generar el PDF del pedido:", err instanceof Error ? err.message : err);
+    return [];
+  }
+}
+
+/** Correo «Actualizamos tu pedido» con el PDF; destinatario = correo del pedido. */
+export async function mensajePedidoActualizado(pedidoId: string) {
+  const data = await getPedidoCompleto(pedidoId);
+  if (!data) return null;
+  const { pedido, pagos } = data;
+  const resumen = resumirPagos(Number(pedido.total), pagos);
+  const mensaje = pedidoActualizadoEmail({
+    nombre: pedido.cliente_nombre,
+    folio: folio(pedido.id),
+    total: formatMXN(Number(pedido.total)),
+    pagado: formatMXN(resumen.recibido),
+    pendiente: resumen.pendiente > 0 ? formatMXN(resumen.pendiente) : undefined,
+    pedidoUrl: `${SITE.url}/pedido/${pedido.id}`,
+  });
+  return { to: pedido.cliente_email, ...mensaje };
+}
+
+export async function notificarPedidoActualizado(pedidoId: string): Promise<boolean> {
+  const mensaje = await mensajePedidoActualizado(pedidoId);
+  if (!mensaje) return false;
+  return sendEmail({ ...mensaje, attachments: await pdfAdjuntoPedido(pedidoId) });
 }
 
 /** Resta las botellas que sumó un pedido ahora cancelado (idempotente en SQL). */
@@ -84,7 +160,9 @@ export async function notificarEstadoPedido(pedidoId: string, estado: string): P
     pedidoUrl: `${SITE.url}/pedido/${data.id}`,
     guia: data.guia ? { paqueteria: data.paqueteria ?? "Paquetería", numero: data.guia, url: data.guia_url } : null,
   });
-  return sendEmail({ to: data.cliente_email, ...mensaje });
+  // «Recibimos tu pago» y «Va en camino» llevan el PDF del pedido.
+  const attachments = estado === "Cancelado" ? [] : await pdfAdjuntoPedido(pedidoId);
+  return sendEmail({ to: data.cliente_email, ...mensaje, attachments });
 }
 
 /**
