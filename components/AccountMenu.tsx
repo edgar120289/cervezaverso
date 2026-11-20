@@ -9,7 +9,7 @@ import { useAccount } from "@/lib/account-context";
 
 /** Píldora de PC: borde del color de marca, mismo ancho mínimo con y sin sesión (no mueve el header). */
 const pillClass =
-  "relative flex min-h-11 min-w-[7.5rem] items-center justify-center gap-2 rounded-full border border-accent px-4 text-sm font-semibold text-accent transition-colors hover:bg-accent/[0.06]";
+  "relative flex min-h-11 shrink-0 whitespace-nowrap min-w-[7.5rem] items-center justify-center gap-2 rounded-full border border-accent px-4 text-sm font-semibold text-accent transition-colors hover:bg-accent/[0.06]";
 /** Celular: solo ícono, 44 px. */
 const iconClass = "relative flex h-11 w-11 items-center justify-center rounded-full text-accent transition-colors hover:bg-accent/[0.06]";
 
