@@ -55,7 +55,7 @@ export function GoogleSignInButton({ next, className = "" }: { next: string; cla
         type="button"
         onClick={signIn}
         disabled={loading}
-        className={`flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/15 bg-white px-4 text-sm font-semibold transition-colors hover:bg-canvas active:scale-[0.98] disabled:opacity-60 ${className}`}
+        className={`flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/15 bg-white px-3.5 text-sm font-semibold transition-colors hover:bg-canvas active:scale-[0.98] disabled:opacity-60 ${className}`}
       >
         <GoogleIcon size={18} />
         {loading ? "Conectando…" : "Continuar con Google"}

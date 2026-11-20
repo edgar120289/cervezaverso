@@ -25,14 +25,13 @@ begin
   with ligados as (
     update public.pedidos
        set user_id = p_user_id
-     where user_id is null
+     where user_id is null                    -- ya ligados (p. ej. a mano) no se tocan
+       and botellas_acreditadas_at is null    -- ya acreditados no se tocan
        and lower(cliente_email) = lower(v_email)
-    returning id, estado, botellas_acreditadas_at
+    returning id, estado
   )
   select coalesce(array_agg(id), '{}'),
-         coalesce(array_agg(id) filter (
-           where estado in ('Pagado', 'Enviado', 'Entregado') and botellas_acreditadas_at is null
-         ), '{}')
+         coalesce(array_agg(id) filter (where estado in ('Pagado', 'Enviado', 'Entregado')), '{}')
     into v_ligados, v_por_acreditar
     from ligados;
 

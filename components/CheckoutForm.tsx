@@ -379,15 +379,18 @@ export default function CheckoutForm({
               </button>
             </p>
           ) : (
-            <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-[20px] bg-accent/[0.06] px-4 py-2">
-              <p className="mr-auto text-sm font-semibold text-black/80">Suma botellas a tus premios</p>
-              <GoogleSignInButton next="/checkout" />
-              <Link
-                href="/login?next=/checkout"
-                className="inline-flex min-h-11 items-center px-1 text-sm font-semibold text-accent hover:underline"
-              >
-                Entrar con correo
-              </Link>
+            <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-[20px] bg-accent/[0.06] px-3 py-2">
+              <p className="mr-auto whitespace-nowrap text-sm font-semibold text-black/80">Suma botellas a tus premios</p>
+              {/* Botón y enlace juntos: si no cabe la fila, bajan los dos (en celular, el enlace bajo el botón). */}
+              <div className="flex flex-wrap items-center gap-x-1">
+                <GoogleSignInButton next="/checkout" className="whitespace-nowrap" />
+                <Link
+                  href="/login?next=/checkout"
+                  className="inline-flex min-h-11 items-center whitespace-nowrap px-2 text-sm font-semibold text-accent hover:underline"
+                >
+                  Entrar con correo
+                </Link>
+              </div>
             </div>
           )}
 
