@@ -10,6 +10,7 @@ import { METODO_PAGO_LABEL, METODOS_PAGO_PEDIDO } from "@/lib/pedido-pagos";
 import { enlacePdfFirmado } from "@/lib/pedido-share";
 import { formatMXN } from "@/lib/pricing";
 import { normalCase } from "@/lib/text-case";
+import { conLogoEmbebido } from "@/lib/email/logo-preview";
 import {
   mensajePedidoActualizado,
   pdfAdjuntoPedido,
@@ -268,7 +269,7 @@ export async function vistaPreviaCorreoPedido(
   await requireAdmin(RUTA);
   const mensaje = await mensajePedidoActualizado(pedidoId);
   if (!mensaje) return { ok: false, error: "No existe el pedido." };
-  return { ok: true, to: mensaje.to, subject: mensaje.subject, html: mensaje.html };
+  return { ok: true, to: mensaje.to, subject: mensaje.subject, html: await conLogoEmbebido(mensaje.html) };
 }
 
 /** Manda al cliente (correo del pedido) «Actualizamos tu pedido» con el PDF adjunto. */
