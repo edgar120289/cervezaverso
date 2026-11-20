@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { obtenerSugerenciasPedido } from "@/app/actions/sugerencias";
@@ -19,6 +19,22 @@ import ProductImage from "@/components/ProductImage";
 export default function CartSuggestions({ onNavigate }: { onNavigate?: () => void }) {
   const { items, addItem } = useCart();
   const [suggestions, setSuggestions] = useState<Product[] | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  // Se piden cuando la sección está por verse: abrir el carrito no compite con lo que ya está en pantalla.
+  const [nearView, setNearView] = useState(false);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || nearView) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) setNearView(true);
+      },
+      { rootMargin: "400px 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [nearView]);
 
   // Misma clave = misma consulta: cambiar cantidades no vuelve a pedir sugerencias.
   const ids = items.map((item) => item.product.id).sort();
@@ -26,11 +42,12 @@ export default function CartSuggestions({ onNavigate }: { onNavigate?: () => voi
   const key = JSON.stringify([ids, styles]);
 
   useEffect(() => {
+    if (!nearView) return;
     let cancelled = false;
     const [excludeIds, wantedStyles] = JSON.parse(key) as [string[], string[]];
     obtenerSugerenciasPedido({ styles: wantedStyles, excludeIds })
       .then((products) => {
-        if (!cancelled) setSuggestions(products);
+        if (!cancelled) startTransition(() => setSuggestions(products));
       })
       .catch(() => {
         if (!cancelled) setSuggestions([]);
@@ -38,12 +55,12 @@ export default function CartSuggestions({ onNavigate }: { onNavigate?: () => voi
     return () => {
       cancelled = true;
     };
-  }, [key]);
+  }, [key, nearView]);
 
   if (suggestions !== null && suggestions.length === 0) return null;
 
   return (
-    <section aria-labelledby="cart-suggestions-title" className="space-y-2">
+    <section ref={sectionRef} aria-labelledby="cart-suggestions-title" className="space-y-2">
       <h2 id="cart-suggestions-title" className="px-1 text-base font-semibold tracking-tight">
         Agrega una más
       </h2>

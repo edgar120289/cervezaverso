@@ -2,9 +2,11 @@
 
 import {
   createContext,
+  startTransition,
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -82,7 +84,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const lastRefresh = useRef(0);
   const itemsRef = useRef<CartItem[]>([]);
   const lastRemovedRef = useRef<RemovedLine | null>(null);
-  useEffect(() => {
+  // Antes que los efectos de las páginas (que corren antes que los del proveedor): así `refresh` ya ve el carrito.
+  useLayoutEffect(() => {
     itemsRef.current = items;
     lastRemovedRef.current = lastRemoved;
   });
@@ -191,22 +194,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
       .then((fresh) => {
         if (!fresh) return;
         const byId = new Map(fresh.map((product) => [product.id, product]));
-        setUnavailable(
-          new Set(
-            current
-              .filter((item) => byId.get(item.product.id)?.stock_status === "out_of_stock" || !byId.has(item.product.id))
-              .map((item) => item.product.id)
-          )
-        );
-        // Precio y datos actuales: lo que se ve es lo que se cobrará.
-        setItems((prev) =>
-          prev.map((item) => {
-            const product = byId.get(item.product.id);
-            return product && (product.sale_price !== item.product.sale_price || product.stock_status !== item.product.stock_status)
-              ? { ...item, product: { ...item.product, sale_price: Number(product.sale_price), stock_status: product.stock_status } }
-              : item;
-          })
-        );
+        const nextUnavailable = current
+          .filter((item) => byId.get(item.product.id)?.stock_status === "out_of_stock" || !byId.has(item.product.id))
+          .map((item) => item.product.id);
+        // Sin prisa y solo si algo cambió: así revisar el carrito no bloquea la página al abrirla.
+        startTransition(() => {
+          setUnavailable((prev) =>
+            prev.size === nextUnavailable.length && nextUnavailable.every((id) => prev.has(id)) ? prev : new Set(nextUnavailable)
+          );
+          // Precio y datos actuales: lo que se ve es lo que se cobrará.
+          setItems((prev) => {
+            let changed = false;
+            const next = prev.map((item) => {
+              const product = byId.get(item.product.id);
+              if (!product || (Number(product.sale_price) === item.product.sale_price && product.stock_status === item.product.stock_status)) {
+                return item;
+              }
+              changed = true;
+              return { ...item, product: { ...item.product, sale_price: Number(product.sale_price), stock_status: product.stock_status } };
+            });
+            return changed ? next : prev;
+          });
+        });
       })
       .catch(() => undefined);
   }, []);
