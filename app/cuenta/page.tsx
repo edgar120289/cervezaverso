@@ -9,6 +9,7 @@ import { ESTADO_BADGE, folio, formatFecha } from "@/lib/pedidos";
 import { eliminarDireccion, hacerPredeterminada } from "@/app/actions/cuenta";
 import ProductGrid from "@/components/ProductGrid";
 import SignOutButton from "@/components/SignOutButton";
+import LinkedOrdersNotice from "@/components/LinkedOrdersNotice";
 import LoyaltyProgress, { type Recompensa } from "@/components/LoyaltyProgress";
 import AvatarUpload from "@/components/AvatarUpload";
 import TribeSelector from "@/components/TribeSelector";
@@ -82,6 +83,8 @@ export default async function CuentaPage() {
         </div>
         <SignOutButton />
       </div>
+
+      <LinkedOrdersNotice />
 
       {loadError && (
         <p className="rounded-[20px] bg-red-50 px-5 py-4 text-sm text-danger">

@@ -114,6 +114,8 @@ export const promoCodeSchema = z
   .regex(/^[A-Z0-9_-]{3,30}$/, "El código debe tener de 3 a 30 letras, números o guiones.");
 
 export const MAX_NOTAS = 500;
+/** Máximo de piezas de una misma cerveza por pedido (carrito y servidor). */
+export const MAX_LINE_QUANTITY = 99;
 
 export const checkoutSchema = z
   .object({
@@ -131,7 +133,7 @@ export const checkoutSchema = z
       .array(
         z.object({
           product_id: z.uuid(),
-          cantidad: z.number().int().min(1).max(99),
+          cantidad: z.number().int().min(1).max(MAX_LINE_QUANTITY, `Máximo ${MAX_LINE_QUANTITY} piezas por cerveza.`),
         })
       )
       .min(1, "Tu carrito está vacío.")

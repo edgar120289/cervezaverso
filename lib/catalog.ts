@@ -193,6 +193,21 @@ export async function getProductSitemapEntries(): Promise<{ sku: string; updated
  * carrito. Primero las del mismo estilo que lo que hay en el carrito; si faltan, destacadas.
  * `excludeIds` debe venir validado como UUID (se interpola en el filtro `not.in`).
  */
+/**
+ * Estado actual de las cervezas de un carrito (precio y existencia) para mostrar lo mismo que se cobrará.
+ * Solo devuelve las activas: una que falte en el resultado ya no está a la venta.
+ */
+export async function getCartSnapshot(ids: string[]): Promise<Product[]> {
+  const supabase = getClient();
+  if (!supabase || ids.length === 0) return [];
+  const { data, error } = await supabase.from("products").select(PRODUCT_COLUMNS).eq("is_active", true).in("id", ids);
+  if (error) {
+    console.error("[catalog] Error al revisar el carrito:", error.message);
+    throw new Error("snapshot");
+  }
+  return (data ?? []).map(toProduct);
+}
+
 export async function getCompleteOrderSuggestions(styles: string[], excludeIds: string[], limit = 3): Promise<Product[]> {
   const supabase = getClient();
   if (!supabase) return [];

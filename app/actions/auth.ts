@@ -6,6 +6,7 @@ import { firstIssue, loginSchema, recoverSchema, signupSchema } from "@/lib/vali
 import { safeNextPath } from "@/lib/safe-next";
 import { SITE, SPAM_HINT } from "@/lib/site";
 import type { UserRole } from "@/lib/types";
+import { ligarPedidosInvitado } from "@/lib/pedidos-invitado";
 
 /**
  * Con "Captcha protection" activo en Supabase Auth (Authentication → Attack Protection), Supabase exige
@@ -48,6 +49,7 @@ export async function iniciarSesion(input: unknown): Promise<AuthResult<{ role: 
   }
 
   const { data: profile } = await supabase.from("users").select("role").eq("id", data.user.id).maybeSingle();
+  await ligarPedidosInvitado(data.user.id);
   return { ok: true, role: profile?.role === "admin" ? "admin" : "client" };
 }
 
@@ -74,6 +76,8 @@ export async function registrarCuenta(input: unknown): Promise<AuthResult<{ need
     console.error("[auth] Error al registrar:", error.code, error.message);
     return { ok: false, error: "No pudimos crear tu cuenta. Revisa tus datos o intenta más tarde." };
   }
+  // Sin confirmación por correo la sesión ya existe; si no, se liga al volver del enlace (/auth/callback).
+  if (data.session && data.user) await ligarPedidosInvitado(data.user.id);
   return { ok: true, needsConfirmation: !data.session };
 }
 

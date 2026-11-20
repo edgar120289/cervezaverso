@@ -82,7 +82,8 @@ function Banner({
         src={imageUrl}
         alt={imageAlt}
         fill
-        preload={priority}
+        // El primer banner se pide de inmediato y con prioridad alta (por defecto next/image carga en diferido).
+        loading={priority ? "eager" : undefined}
         fetchPriority={priority ? "high" : undefined}
         sizes={isSplit ? "(min-width: 1152px) 576px, (min-width: 768px) 50vw, 100vw" : "(min-width: 1152px) 1152px, 100vw"}
         className="object-cover object-center"
@@ -134,7 +135,7 @@ function Banner({
   );
 
   const card =
-    style.spotlight.enabled && product ? <ProductSpotlight product={product} badge={style.spotlight.badge} /> : null;
+    style.spotlight.enabled && product ? <ProductSpotlight product={product} badge={style.spotlight.badge} priority={priority} /> : null;
   const hasText = Boolean(heading || sub || ctas.length > 0);
 
   if (isSplit) {
@@ -183,7 +184,7 @@ function Banner({
         <div aria-hidden className="absolute inset-0 z-0" style={{ backgroundColor: `rgb(0 0 0 / ${style.overlay / 100})` }} />
       )}
       <div
-        className={`relative z-10 mx-auto grid w-full max-w-6xl gap-8 px-5 ${
+        className={`relative z-10 mx-auto grid w-full max-w-6xl grid-cols-[minmax(0,1fr)] gap-4 px-5 @min-[608px]:gap-8 ${
           card
             ? `h-full max-h-full py-6 @min-[992px]:grid-cols-2 @min-[992px]:grid-rows-1 @min-[992px]:items-center ${
                 hasText ? "grid-rows-[auto_minmax(0,1fr)]" : "grid-rows-[minmax(0,1fr)]"

@@ -8,7 +8,7 @@ const BUTTON_CLASS =
   "flex min-h-11 w-full items-center justify-center gap-3 rounded-full border border-black/15 bg-white px-5 py-3 font-semibold transition-colors hover:bg-canvas active:scale-[0.98] disabled:opacity-60";
 
 /** Inicio de sesión con Google (Supabase Auth); el retorno pasa por /auth/callback. */
-export default function SocialLoginButtons({ next }: { next: string }) {
+function useGoogleSignIn(next: string) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,6 +25,12 @@ export default function SocialLoginButtons({ next }: { next: string }) {
     }
   }
 
+  return { signIn, loading, error };
+}
+
+export default function SocialLoginButtons({ next }: { next: string }) {
+  const { signIn, loading, error } = useGoogleSignIn(next);
+
   return (
     <div className="mt-6 space-y-3">
       <button type="button" onClick={signIn} disabled={loading} className={BUTTON_CLASS}>
@@ -40,9 +46,32 @@ export default function SocialLoginButtons({ next }: { next: string }) {
   );
 }
 
-function GoogleIcon() {
+/** Versión compacta para el checkout (una sola fila). */
+export function GoogleSignInButton({ next, className = "" }: { next: string; className?: string }) {
+  const { signIn, loading, error } = useGoogleSignIn(next);
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+    <>
+      <button
+        type="button"
+        onClick={signIn}
+        disabled={loading}
+        className={`flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/15 bg-white px-3.5 text-sm font-semibold transition-colors hover:bg-canvas active:scale-[0.98] disabled:opacity-60 ${className}`}
+      >
+        <GoogleIcon size={18} />
+        {loading ? "Conectando…" : "Continuar con Google"}
+      </button>
+      {error && (
+        <p role="alert" className="w-full text-sm text-danger">
+          {error}
+        </p>
+      )}
+    </>
+  );
+}
+
+function GoogleIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
       <path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.45a5.52 5.52 0 0 1-2.39 3.62v3h3.87c2.26-2.09 3.57-5.16 3.57-8.81Z" />
       <path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.91l-3.87-3c-1.07.72-2.45 1.15-4.06 1.15-3.12 0-5.77-2.11-6.71-4.94H1.29v3.09A11.99 11.99 0 0 0 12 24Z" />
       <path fill="#FBBC05" d="M5.29 14.3a7.2 7.2 0 0 1 0-4.6V6.61H1.29a12 12 0 0 0 0 10.78l4-3.09Z" />
