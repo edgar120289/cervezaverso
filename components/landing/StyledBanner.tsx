@@ -82,7 +82,8 @@ function Banner({
         src={imageUrl}
         alt={imageAlt}
         fill
-        preload={priority}
+        // El primer banner se pide de inmediato y con prioridad alta (por defecto next/image carga en diferido).
+        loading={priority ? "eager" : undefined}
         fetchPriority={priority ? "high" : undefined}
         sizes={isSplit ? "(min-width: 1152px) 576px, (min-width: 768px) 50vw, 100vw" : "(min-width: 1152px) 1152px, 100vw"}
         className="object-cover object-center"
@@ -134,7 +135,7 @@ function Banner({
   );
 
   const card =
-    style.spotlight.enabled && product ? <ProductSpotlight product={product} badge={style.spotlight.badge} /> : null;
+    style.spotlight.enabled && product ? <ProductSpotlight product={product} badge={style.spotlight.badge} priority={priority} /> : null;
   const hasText = Boolean(heading || sub || ctas.length > 0);
 
   if (isSplit) {

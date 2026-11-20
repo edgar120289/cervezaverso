@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { HeroBanner } from "@/lib/hero";
@@ -30,18 +30,45 @@ export default function HeroCarousel({
   const [userPaused, setUserPaused] = useState(false);
   const [hovering, setHovering] = useState(false);
 
+  // Imágenes de los demás banners ya descargadas y decodificadas: solo se rota hacia una lista.
+  const readyRef = useRef(new Set<string>());
+
   const hasMany = banners.length > 1;
   const isRotating =
     hasMany && inView && !userPaused && !hovering && !reduceMotion;
 
+  // Tras cargar la página (sin competir con el primer banner) se descargan las demás imágenes.
+  useEffect(() => {
+    if (!hasMany) return;
+    const ready = readyRef.current;
+    const warm = () => {
+      for (const banner of banners.slice(1)) {
+        if (!banner.image_url || ready.has(banner.image_url)) continue;
+        const img = new window.Image();
+        img.src = banner.image_url;
+        img
+          .decode()
+          .then(() => ready.add(banner.image_url as string))
+          .catch(() => undefined);
+      }
+    };
+    if (document.readyState === "complete") warm();
+    else window.addEventListener("load", warm, { once: true });
+    return () => window.removeEventListener("load", warm);
+  }, [hasMany, banners]);
+
   useEffect(() => {
     if (!isRotating) return;
-    const timer = window.setInterval(
-      () => setIndex((current) => (current + 1) % banners.length),
-      intervalSeconds * 1000,
-    );
+    const timer = window.setInterval(() => {
+      setIndex((current) => {
+        const next = (current + 1) % banners.length;
+        const url = banners[next]?.image_url;
+        // Si la siguiente imagen aún no está lista, se queda la actual: nunca un banner en blanco.
+        return !url || readyRef.current.has(url) ? next : current;
+      });
+    }, intervalSeconds * 1000);
     return () => window.clearInterval(timer);
-  }, [isRotating, banners.length, intervalSeconds, index]);
+  }, [isRotating, banners, intervalSeconds, index]);
 
   const active = banners[index] ?? banners[0];
   const ref = spotlightRef(active.style);
@@ -66,14 +93,19 @@ export default function HeroCarousel({
       <div
         className={`relative w-full overflow-hidden rounded-[28px] md:aspect-[21/9] ${hasSpotlight ? "aspect-[3/5]" : "aspect-[4/5]"}`}
       >
-        {/* Un solo slide montado a la vez: el anterior sale antes de que entre el siguiente. */}
-        <AnimatePresence mode="wait" initial={false}>
+        {/* Fundido cruzado: el nuevo entra encima y el anterior se retira cuando ya lo cubre,
+            así nunca queda el área vacía entre banners. */}
+        <AnimatePresence initial={false}>
           <motion.div
             key={`${index}-${active.image_url}`}
-            // El primer slide llega ya visible desde el servidor: no depende de que el JS hidrate para verse.
-            initial={index === 0 ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            // `initial={false}` en AnimatePresence: el primero llega visible desde el servidor, sin animación de entrada.
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, zIndex: 1 }}
+            exit={{
+              opacity: 0,
+              zIndex: 0,
+              transition: { delay: reduceMotion ? 0 : 0.35, duration: 0 },
+            }}
             transition={{ duration: reduceMotion ? 0 : 0.35 }}
             className="absolute inset-0"
           >

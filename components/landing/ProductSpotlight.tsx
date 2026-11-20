@@ -6,7 +6,7 @@ import type { Product } from "@/lib/types";
 import { normalCase } from "@/lib/text-case";
 
 /** Tarjeta de "Cerveza destacada": foto, cervecería, nombre, precio, etiqueta editable y botón de compra. */
-export default function ProductSpotlight({ product, badge }: { product: Product; badge: string }) {
+export default function ProductSpotlight({ product, badge, priority = false }: { product: Product; badge: string; priority?: boolean }) {
   return (
     <article
       aria-label={`Cerveza destacada: ${product.name}`}
@@ -21,7 +21,7 @@ export default function ProductSpotlight({ product, badge }: { product: Product;
         href={`/cervezas/${product.sku}`}
         className="group relative block min-h-24 flex-1 overflow-hidden rounded-2xl bg-white"
       >
-        <ProductImage src={product.image_url} alt={normalCase(product.name)} sizes="(min-width: 1024px) 384px, 90vw" thumb />
+        <ProductImage src={product.image_url} alt={normalCase(product.name)} sizes="(min-width: 1024px) 384px, 90vw" thumb priority={priority} />
       </Link>
       <div className="shrink-0">
         <p className="truncate text-xs font-semibold uppercase tracking-wide text-muted">{product.brewery && normalCase(product.brewery)}</p>
